@@ -44,8 +44,8 @@ data VidaMinhoca
 data Minhoca = Minhoca
     -- | Uma posição no mapa. Opcional porque a minhoca pode ter saído do mapa.
     { posicaoMinhoca :: Maybe Posicao
-    -- | O estado de saúde da minhoca.
-    , vidaMinhoca :: VidaMinhoca
+
+    , vidaMinhoca :: VidaMinhoca -- | O estado de saúde da minhoca.
     -- | Munições de @Jetpack@.
     , jetpackMinhoca :: Int
     -- | Munições de @Escavadora@.

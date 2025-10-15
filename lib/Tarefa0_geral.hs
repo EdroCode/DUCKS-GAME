@@ -5,6 +5,8 @@ Description : Funções auxiliares gerais.
 Módulo que define funções genéricas sobre listas e matrizes.
 -}
 
+
+
 module Tarefa0_geral where
 
 -- * Tipos de dados
@@ -35,41 +37,73 @@ data Direcao = Norte | Nordeste | Este | Sudeste | Sul | Sudoeste | Oeste | Noro
 
 -- | Verifica se o indice pertence à lista.
 eIndiceListaValido :: Int -> [a] -> Bool
-eIndiceListaValido = undefined
+eIndiceListaValido x a = (x <= length(a)-1) && (x>(-1))
 
 -- | Calcula a dimensão de uma matriz.
 --
 -- __NB:__ Note que não existem matrizes de dimensão /m * 0/ ou /0 * n/, e que qualquer matriz vazia deve ter dimensão /0 * 0/.
 dimensaoMatriz :: Matriz a -> Dimensao
-dimensaoMatriz = undefined
+dimensaoMatriz a = (length a - 1, length(head a) - 1)
 
 -- | Verifica se a posição pertence à matriz.
 ePosicaoMatrizValida :: Posicao -> Matriz a -> Bool 
-ePosicaoMatrizValida = undefined
+ePosicaoMatrizValida (a,b) m = a <= length m - 1 && b <= length(head m) - 1 && a >= 0 && b >= 0
 
 -- | Move uma posição uma unidade no sentido de uma direção.
 movePosicao :: Direcao -> Posicao -> Posicao
-movePosicao = undefined
+movePosicao d (x,y) = case d of
+    Norte -> (x - 1, y) 
+    Sul -> (x + 1, y)
+    Este -> (x, y + 1)
+    Oeste -> (x, y - 1)
+    Nordeste -> (x - 1, y + 1)
+    Noroeste -> (x - 1, y - 1)
+    Sudoeste -> (x + 1, y + 1)
+    Sudeste -> (x + 1, y - 1)
+
+
 
 -- | Versão da função 'movePosicao' que garante que o movimento não se desloca para fora de uma janela.
 --
 -- __NB:__ Considere uma janela retangular com origem no canto superior esquerdo definida como uma matriz. A função recebe a dimensao da janela.
 movePosicaoJanela :: Dimensao -> Direcao -> Posicao -> Posicao
-movePosicaoJanela = undefined
+movePosicaoJanela (dy,dx) dir pos = 
+    if (yf < dy) && (xf < dx) && (yf >= 0) && (xf >= 0)
+        then (xf, yf)
+        else pos
+    where
+        (yf, xf) = movePosicao dir pos
+
+
 
 -- | Converte uma posição no referencial em que a origem é no canto superior esquerdo da janela numa posição em que a origem passa a estar no centro da janela.
 --
 -- __NB:__ Considere posições válidas. Efetue arredondamentos como achar necessário.
 origemAoCentro :: Dimensao -> Posicao -> Posicao
-origemAoCentro = undefined
+origemAoCentro (dy, dx) (y, x) = (y - div dy 2, x - div dx 2)
+
+
 
 -- | Roda um par (posição,direção) 45% para a direita.
 --
 -- __NB:__ Vendo um par (posição,direção) como um vector, cria um novo vetor do desto com a próxima direção da rosa dos ventos rodando para a direita.
 --
 -- <<https://haslab.github.io/Teaching/LI1/2526/img/rodaposicaodirecao.png>>
+
 rodaPosicaoDirecao :: (Posicao,Direcao) -> (Posicao,Direcao)
-rodaPosicaoDirecao = undefined
+rodaPosicaoDirecao (pos, d) = (p, novaDirecao) -- Retorna a tupla (Posicao, Direcao)
+    where 
+        novaDirecao = case d of
+            Norte    -> Nordeste
+            Sul      -> Sudoeste
+            Este     -> Sudeste
+            Oeste    -> Noroeste
+            Nordeste -> Este
+            Sudeste  -> Sul
+            Noroeste -> Norte
+            Sudoeste -> Oeste
+        
+        p = movePosicao novaDirecao pos
 
 -- * Funções recursivas.
 
@@ -77,19 +111,29 @@ rodaPosicaoDirecao = undefined
 --
 -- __NB:__ Retorna @Nothing@ se o índice não existir.
 encontraIndiceLista :: Int -> [a] -> Maybe a
-encontraIndiceLista = undefined
+encontraIndiceLista x [] = Nothing
+encontraIndiceLista x (h:t) = 
+    if x < 0 then Nothing else if x == 0 then Just h else encontraIndiceLista(x-1) t
+
 
 -- | Modifica um elemento num dado índice.
 --
 -- __NB:__ Devolve a própria lista se o elemento não existir.
 atualizaIndiceLista :: Int -> a -> [a] -> [a]
-atualizaIndiceLista = undefined
+atualizaIndiceLista i n [] = []
+atualizaIndiceLista 0 n (h:t) = n : t
+atualizaIndiceLista i n (h:t)= h : atualizaIndiceLista (i-1) n t
+
+
 
 -- | Devolve o elemento numa dada posição de uma matriz.
 --
 -- __NB:__ Retorna @Nothing@ se a posição não existir.
 encontraPosicaoMatriz :: Posicao -> Matriz a -> Maybe a
-encontraPosicaoMatriz = undefined
+encontraPosicaoMatriz pos [] = Nothing
+
+
+
 
 -- | Modifica um elemento numa dada posição de uma matriz.
 --
@@ -110,3 +154,4 @@ moveDirecaoPosicoes = undefined
 -- __NB:__ Todas as linhas devem ter o mesmo número de colunas. 
 eMatrizValida :: Matriz a -> Bool
 eMatrizValida = undefined
+
