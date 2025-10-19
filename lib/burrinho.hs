@@ -29,3 +29,5 @@ substituirMatriz :: Int -> (Int, Int) -> [[Int]] -> [[Int]] -- [[1,2,3], [4,5,6]
 substituirMatriz x pos [] = []
 substituirMatriz x (0, c) (h:t) = substituirLista c x h : t
 substituirMatriz x (l,c) (h:t) = h : substituirMatriz x (l - 1, c) t
+
+

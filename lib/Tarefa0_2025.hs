@@ -44,6 +44,11 @@ barrilTeste = Barril
   , explodeBarril = False
   }
 
+barrilTeste2 = Barril
+  { posicaoBarril = (2,2)
+  , explodeBarril = False
+  }
+
 disparo1 = Disparo
     { posicaoDisparo = (1,2)
     , direcaoDisparo = Norte
@@ -52,9 +57,11 @@ disparo1 = Disparo
     , donoDisparo = 0
 }
 
+objetosTeste = [barrilTeste, barrilTeste2, disparo1]
+
 estado1 = Estado
   { mapaEstado     = m
-  , objetosEstado  = [barrilTeste]
+  , objetosEstado  = [barrilTeste, barrilTeste2]
   , minhocasEstado = [minhoca1, minhoca2]
   }
 
@@ -92,7 +99,7 @@ eTerrenoOpaco :: Terreno -> Bool
 eTerrenoOpaco t = if t == Pedra || t == Terra then True else False
 
 -- | Verifica se uma posição do mapa está livre, i.e., pode ser ocupada por um objeto ou minhoca.
---
+--  
 -- __NB:__ Uma posição está livre se não contiver um terreno opaco.
 ePosicaoMapaLivre :: Posicao -> Mapa -> Bool
 ePosicaoMapaLivre (x,y) [] = False
@@ -104,7 +111,7 @@ encontraLinhaMapa :: Int -> [Terreno] -> Bool
 encontraLinhaMapa i [] = False
 encontraLinhaMapa 0 (h:t) = not (eTerrenoOpaco h)
 encontraLinhaMapa i (h:t) = encontraLinhaMapa (i-1) t 
--- *! SO esta livre se terreno opaco +e falso, revisar
+-- *! SO esta livre se terreno opaco +e falso,
     
 -- ---------------------
 

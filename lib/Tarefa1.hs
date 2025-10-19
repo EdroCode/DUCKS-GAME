@@ -58,15 +58,24 @@ terrenoValido ter = True -- *! Verificar com stor porque [[CImento]] -> erro e n
 -- * (mina sem tempo, ou um inteiro entre 0 e 2) (dinamite inteiro entre 0 e 4)
 -- * o dono do disparo tem de ser um indice valido
 
-eObjetoValido :: Objeto -> Bool
-eObjetoValido obj = ePosicaoMapaLivre posicaoObjeto
+eObjetosValido :: Estado -> [Objeto] -> Bool
+eObjetosValido e [] = True
+eObjetosValido e (h:t) = if (ePosicaoMapaLivre posicaoObjeto mapa && temBarril) then eObjetosValido e t else False
     where
-        posicaoObjeto = posicaoBarril obj
+        posicaoObjeto = case h of
+            Disparo { posicaoDisparo = p } -> p
+            Barril  { posicaoBarril  = p } -> p
+
+        mapa = mapaEstado e
+        minhocas = minhocasEstado e
+        temBarril = case h of
+            Disparo { tipoDisparo = Bazuca } -> True --*! Rever depois -- Testa se a bala for bazuca entao pode ter barril ou minhoca la que nao interfere
+            outro -> not (existeMinhoca posicaoObjeto minhocas) && not (existeObjeto posicaoObjeto (h:t))
 
 
-
-
-
+ehDisparo :: Objeto -> Bool
+ehDisparo Disparo{} = True
+ehDisparo _         = False
 
 
 
