@@ -4,6 +4,8 @@ import Labs2025
 import Tarefa1
 import Magic
 
+
+
 -- | Definir aqui os testes do grupo para a Tarefa 1
 testesTarefa1 :: [Estado]
 testesTarefa1 = []

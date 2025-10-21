@@ -138,20 +138,39 @@ encontraPosicaoMatriz pos [] = Nothing
 -- | Modifica um elemento numa dada posição de uma matriz.
 --
 -- __NB:__ Devolve a própria matriz se o elemento não existir.
+
 atualizaPosicaoMatriz :: Posicao -> a -> Matriz a -> Matriz a
-atualizaPosicaoMatriz = undefined
+atualizaPosicaoMatriz _ _ [] = []
+atualizaPosicaoMatriz (0,c) x (h:t) = substituirLista c x h : t
+atualizaPosicaoMatriz (l,c) x (h:t) = h : atualizaPosicaoMatriz (l - 1, c) x t
+
+substituirLista :: Int -> a -> [a] -> [a]
+substituirLista _ _ [] = []
+substituirLista 0 x (_:t) = x : t
+substituirLista i x (h:t) = h : substituirLista (i - 1) x t
+
+
+
+
+-- ** //////////////////////////////////////
 
 -- | Aplica uma sequência de movimentações a uma posição, pela ordem em que ocorrem na lista.
 moveDirecoesPosicao :: [Direcao] -> Posicao -> Posicao
-moveDirecoesPosicao = undefined
+moveDirecoesPosicao [] pos = pos
+moveDirecoesPosicao (h:t) pos = moveDirecoesPosicao t (movePosicao h pos)
+
 
 -- | Aplica a mesma movimentação a uma lista de posições.
 moveDirecaoPosicoes :: Direcao -> [Posicao] -> [Posicao]
-moveDirecaoPosicoes = undefined
+moveDirecaoPosicoes dir [] = []
+moveDirecaoPosicoes dir (h:t) = movePosicao dir h : moveDirecaoPosicoes dir t
 
 -- | Verifica se uma matriz é válida, no sentido em que modela um rectângulo.
 --
 -- __NB:__ Todas as linhas devem ter o mesmo número de colunas. 
 eMatrizValida :: Matriz a -> Bool
-eMatrizValida = undefined
+eMatrizValida [] = False
+eMatrizValida [h] = True
+eMatrizValida (h1:h2:t) = length h1 == length h2 && eMatrizValida (h2:t)
+
 

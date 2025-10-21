@@ -1,5 +1,5 @@
 
--- dedicada ao teste de funçcões para melhor entendimento da linguagem
+-- dedicada ao teste de funçcões para melhor entendimento da linguagem / armazenar estados teste
 type Posicao = (Int,Int)
 
 

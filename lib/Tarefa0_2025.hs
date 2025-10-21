@@ -11,7 +11,7 @@ module Tarefa0_2025 where
 import Labs2025
 
 minhoca1 = Minhoca{
-    posicaoMinhoca = Just(1,2),
+    posicaoMinhoca = Just(3,0),
     vidaMinhoca = Viva 13,
     jetpackMinhoca = 100,
     escavadoraMinhoca = 200,
@@ -20,7 +20,7 @@ minhoca1 = Minhoca{
     dinamiteMinhoca = 1
 }
 minhoca2 = Minhoca{
-    posicaoMinhoca = Just(1,2),
+    posicaoMinhoca = Just(3,1),
     vidaMinhoca = Viva 13,
     jetpackMinhoca = 100,
     escavadoraMinhoca = 200,
@@ -40,28 +40,29 @@ m = [[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
     ]
 
 barrilTeste = Barril
-  { posicaoBarril = (2,2)
+  { posicaoBarril = (3,2)
   , explodeBarril = False
   }
 
 barrilTeste2 = Barril
-  { posicaoBarril = (2,2)
+  { posicaoBarril = (3,3)
   , explodeBarril = False
   }
 
 disparo1 = Disparo
-    { posicaoDisparo = (1,2)
-    , direcaoDisparo = Norte
-    , tipoDisparo = Bazuca
-    , tempoDisparo = Just 15
-    , donoDisparo = 0
+  { posicaoDisparo = (0,4)
+  , direcaoDisparo = Norte
+  , tipoDisparo = Bazuca
+  , tempoDisparo = Just 15
+  , donoDisparo = 0
 }
 
-objetosTeste = [barrilTeste, barrilTeste2, disparo1]
+
+objetosTeste = [barrilTeste, barrilTeste2]
 
 estado1 = Estado
   { mapaEstado     = m
-  , objetosEstado  = [barrilTeste, barrilTeste2]
+  , objetosEstado  = objetosTeste
   , minhocasEstado = [minhoca1, minhoca2]
   }
 
@@ -159,19 +160,11 @@ minhocaTemDisparo tipo indiceMinhoca (h:ls) = if (i == indiceMinhoca && t == tip
 -- __NB__: Só terrenos @Terra@ pode ser destruídos.
 -- Assumo que seja destruir e substituir por Ar
 destroiPosicao :: Posicao -> Mapa -> Mapa
-destroiPosicao pos [] = []
-destroiPosicao (0,c) (h:t) = substituirBlocoMapa c h : t 
-destroiPosicao (l,c) (h:t) =  h : destroiPosicao (l-1, c) t
-
--- Auxiliar
-substituirBlocoMapa :: Int -> [Terreno] -> [Terreno]
-substituirBlocoMapa i [] = []
-substituirBlocoMapa 0 (h:t) = Ar : t
-substituirBlocoMapa i (h:t) = h : substituirBlocoMapa (i-1) t
--- --------
+destroiPosicao pos mapa = atualizaPosicaoMatriz pos Ar mapa
 
 -- Adiciona um novo objeto a um estado.
 --
 -- __NB__: A posição onde é inserido não é relevante.
 adicionaObjeto :: Objeto -> Estado -> Estado
 adicionaObjeto obj estado = estado {objetosEstado = obj : objetosEstado estado}
+
