@@ -6,7 +6,8 @@ import Magic
 
 -- * Comandos para testar (rodar na cmd - bash - na pasta do ficheiro)
 -- * cabal clean && rm -rf t1-feedback.tix
--- * cabal run --enable-coverage t1-feedback ./runhpc.sh t1-feedback
+-- * cabal run --enable-coverage t1-feedback 
+-- * ./runhpc.sh t1-feedback
 
 
 

@@ -1,0 +1,206 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style type="text/css">
+span.lineno { color: white; background: #aaaaaa; border-right: solid white 12px }
+span.nottickedoff { background: yellow}
+span.istickedoff { background: white }
+span.tickonlyfalse { margin: -1px; border: 1px solid #f20913; background: #f20913 }
+span.tickonlytrue  { margin: -1px; border: 1px solid #60de51; background: #60de51 }
+span.funcount { font-size: small; color: orange; z-index: 2; position: absolute; right: 20 }
+span.decl { font-weight: bold }
+span.spaces    { background: white }
+</style>
+</head>
+<body>
+<pre>
+<span class="decl"><span class="nottickedoff">never executed</span> <span class="tickonlytrue">always true</span> <span class="tickonlyfalse">always false</span></span>
+</pre>
+<pre>
+<span class="lineno">    1 </span>{-|
+<span class="lineno">    2 </span>Module      : Tarefa0_geral
+<span class="lineno">    3 </span>Description : Funções auxiliares gerais.
+<span class="lineno">    4 </span>
+<span class="lineno">    5 </span>Módulo que define funções genéricas sobre listas e matrizes.
+<span class="lineno">    6 </span>-}
+<span class="lineno">    7 </span>
+<span class="lineno">    8 </span>
+<span class="lineno">    9 </span>
+<span class="lineno">   10 </span>module Tarefa0_geral where
+<span class="lineno">   11 </span>
+<span class="lineno">   12 </span>-- * Tipos de dados
+<span class="lineno">   13 </span>
+<span class="lineno">   14 </span>-- | Uma matriz é um conjunto de elementos a duas dimensões.
+<span class="lineno">   15 </span>--
+<span class="lineno">   16 </span>-- Em notação matemática, é geralmente representada por:
+<span class="lineno">   17 </span>--
+<span class="lineno">   18 </span>-- &lt;&lt;https://haslab.github.io/Teaching/LI1/2526/img/matriz.png&gt;&gt;
+<span class="lineno">   19 </span>type Matriz a = [[a]]
+<span class="lineno">   20 </span>
+<span class="lineno">   21 </span>-- | Uma posição numa matriz é dada como um par (/linha/,/colunha/).
+<span class="lineno">   22 </span>-- As coordenadas são dois números naturais e começam com (0,0) no canto superior esquerdo, com as linhas incrementando para baixo e as colunas incrementando para a direita.
+<span class="lineno">   23 </span>--
+<span class="lineno">   24 </span>-- &lt;&lt;https://haslab.github.io/Teaching/LI1/2526/img/posicaomatriz.png&gt;&gt;
+<span class="lineno">   25 </span>type Posicao = (Int,Int)
+<span class="lineno">   26 </span>
+<span class="lineno">   27 </span>-- | A dimensão de uma matrix dada como um par (/número de linhas/,/número de colunhas/).
+<span class="lineno">   28 </span>type Dimensao = (Int,Int)
+<span class="lineno">   29 </span>
+<span class="lineno">   30 </span>-- | Uma direção é dada pela rosa dos ventos. Ou seja, os 4 pontos cardeais e os 4 pontos colaterais.
+<span class="lineno">   31 </span>--
+<span class="lineno">   32 </span>-- &lt;&lt;https://haslab.github.io/Teaching/LI1/2526/img/rosadosventos.jpg&gt;&gt;
+<span class="lineno">   33 </span>data Direcao = Norte | Nordeste | Este | Sudeste | Sul | Sudoeste | Oeste | Noroeste
+<span class="lineno">   34 </span>    deriving (<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Eq</span></span></span></span>,<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Ord</span></span></span></span></span></span></span></span></span></span></span></span></span></span>,<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Show</span></span></span></span></span></span>,<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Read</span></span></span></span></span></span></span></span>,<span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="istickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff"><span class="decl"><span class="nottickedoff">Enum</span></span></span></span></span></span></span></span></span></span></span></span></span></span></span></span>)
+<span class="lineno">   35 </span>
+<span class="lineno">   36 </span>-- * Funções não-recursivas.
+<span class="lineno">   37 </span>
+<span class="lineno">   38 </span>-- | Verifica se o indice pertence à lista.
+<span class="lineno">   39 </span>eIndiceListaValido :: Int -&gt; [a] -&gt; Bool
+<span class="lineno">   40 </span><span class="decl"><span class="nottickedoff">eIndiceListaValido x a = (x &lt;= length(a)-1) &amp;&amp; (x&gt;(-1))</span></span>
+<span class="lineno">   41 </span>
+<span class="lineno">   42 </span>-- | Calcula a dimensão de uma matriz.
+<span class="lineno">   43 </span>--
+<span class="lineno">   44 </span>-- __NB:__ Note que não existem matrizes de dimensão /m * 0/ ou /0 * n/, e que qualquer matriz vazia deve ter dimensão /0 * 0/.
+<span class="lineno">   45 </span>dimensaoMatriz :: Matriz a -&gt; Dimensao
+<span class="lineno">   46 </span><span class="decl"><span class="nottickedoff">dimensaoMatriz a = (length a - 1, length(head a) - 1)</span></span>
+<span class="lineno">   47 </span>
+<span class="lineno">   48 </span>-- | Verifica se a posição pertence à matriz.
+<span class="lineno">   49 </span>ePosicaoMatrizValida :: Posicao -&gt; Matriz a -&gt; Bool 
+<span class="lineno">   50 </span><span class="decl"><span class="nottickedoff">ePosicaoMatrizValida (a,b) m = a &lt;= length m - 1 &amp;&amp; b &lt;= length(head m) - 1 &amp;&amp; a &gt;= 0 &amp;&amp; b &gt;= 0</span></span>
+<span class="lineno">   51 </span>
+<span class="lineno">   52 </span>-- | Move uma posição uma unidade no sentido de uma direção.
+<span class="lineno">   53 </span>movePosicao :: Direcao -&gt; Posicao -&gt; Posicao
+<span class="lineno">   54 </span><span class="decl"><span class="nottickedoff">movePosicao d (x,y) = case d of</span>
+<span class="lineno">   55 </span><span class="spaces">    </span><span class="nottickedoff">Norte -&gt; (x - 1, y) </span>
+<span class="lineno">   56 </span><span class="spaces">    </span><span class="nottickedoff">Sul -&gt; (x + 1, y)</span>
+<span class="lineno">   57 </span><span class="spaces">    </span><span class="nottickedoff">Este -&gt; (x, y + 1)</span>
+<span class="lineno">   58 </span><span class="spaces">    </span><span class="nottickedoff">Oeste -&gt; (x, y - 1)</span>
+<span class="lineno">   59 </span><span class="spaces">    </span><span class="nottickedoff">Nordeste -&gt; (x - 1, y + 1)</span>
+<span class="lineno">   60 </span><span class="spaces">    </span><span class="nottickedoff">Noroeste -&gt; (x - 1, y - 1)</span>
+<span class="lineno">   61 </span><span class="spaces">    </span><span class="nottickedoff">Sudoeste -&gt; (x + 1, y + 1)</span>
+<span class="lineno">   62 </span><span class="spaces">    </span><span class="nottickedoff">Sudeste -&gt; (x + 1, y - 1)</span></span>
+<span class="lineno">   63 </span>
+<span class="lineno">   64 </span>
+<span class="lineno">   65 </span>
+<span class="lineno">   66 </span>-- | Versão da função 'movePosicao' que garante que o movimento não se desloca para fora de uma janela.
+<span class="lineno">   67 </span>--
+<span class="lineno">   68 </span>-- __NB:__ Considere uma janela retangular com origem no canto superior esquerdo definida como uma matriz. A função recebe a dimensao da janela.
+<span class="lineno">   69 </span>movePosicaoJanela :: Dimensao -&gt; Direcao -&gt; Posicao -&gt; Posicao
+<span class="lineno">   70 </span><span class="decl"><span class="nottickedoff">movePosicaoJanela (dy,dx) dir pos = </span>
+<span class="lineno">   71 </span><span class="spaces">    </span><span class="nottickedoff">if (yf &lt; dy) &amp;&amp; (xf &lt; dx) &amp;&amp; (yf &gt;= 0) &amp;&amp; (xf &gt;= 0)</span>
+<span class="lineno">   72 </span><span class="spaces">        </span><span class="nottickedoff">then (xf, yf)</span>
+<span class="lineno">   73 </span><span class="spaces">        </span><span class="nottickedoff">else pos</span>
+<span class="lineno">   74 </span><span class="spaces">    </span><span class="nottickedoff">where</span>
+<span class="lineno">   75 </span><span class="spaces">        </span><span class="nottickedoff">(yf, xf) = movePosicao dir pos</span></span>
+<span class="lineno">   76 </span>
+<span class="lineno">   77 </span>
+<span class="lineno">   78 </span>
+<span class="lineno">   79 </span>-- | Converte uma posição no referencial em que a origem é no canto superior esquerdo da janela numa posição em que a origem passa a estar no centro da janela.
+<span class="lineno">   80 </span>--
+<span class="lineno">   81 </span>-- __NB:__ Considere posições válidas. Efetue arredondamentos como achar necessário.
+<span class="lineno">   82 </span>origemAoCentro :: Dimensao -&gt; Posicao -&gt; Posicao
+<span class="lineno">   83 </span><span class="decl"><span class="nottickedoff">origemAoCentro (dy, dx) (y, x) = (y - div dy 2, x - div dx 2)</span></span>
+<span class="lineno">   84 </span>
+<span class="lineno">   85 </span>
+<span class="lineno">   86 </span>
+<span class="lineno">   87 </span>-- | Roda um par (posição,direção) 45% para a direita.
+<span class="lineno">   88 </span>--
+<span class="lineno">   89 </span>-- __NB:__ Vendo um par (posição,direção) como um vector, cria um novo vetor do desto com a próxima direção da rosa dos ventos rodando para a direita.
+<span class="lineno">   90 </span>--
+<span class="lineno">   91 </span>-- &lt;&lt;https://haslab.github.io/Teaching/LI1/2526/img/rodaposicaodirecao.png&gt;&gt;
+<span class="lineno">   92 </span>
+<span class="lineno">   93 </span>rodaPosicaoDirecao :: (Posicao,Direcao) -&gt; (Posicao,Direcao)
+<span class="lineno">   94 </span><span class="decl"><span class="nottickedoff">rodaPosicaoDirecao (pos, d) = (p, novaDirecao) -- Retorna a tupla (Posicao, Direcao)</span>
+<span class="lineno">   95 </span><span class="spaces">    </span><span class="nottickedoff">where </span>
+<span class="lineno">   96 </span><span class="spaces">        </span><span class="nottickedoff">novaDirecao = case d of</span>
+<span class="lineno">   97 </span><span class="spaces">            </span><span class="nottickedoff">Norte    -&gt; Nordeste</span>
+<span class="lineno">   98 </span><span class="spaces">            </span><span class="nottickedoff">Sul      -&gt; Sudoeste</span>
+<span class="lineno">   99 </span><span class="spaces">            </span><span class="nottickedoff">Este     -&gt; Sudeste</span>
+<span class="lineno">  100 </span><span class="spaces">            </span><span class="nottickedoff">Oeste    -&gt; Noroeste</span>
+<span class="lineno">  101 </span><span class="spaces">            </span><span class="nottickedoff">Nordeste -&gt; Este</span>
+<span class="lineno">  102 </span><span class="spaces">            </span><span class="nottickedoff">Sudeste  -&gt; Sul</span>
+<span class="lineno">  103 </span><span class="spaces">            </span><span class="nottickedoff">Noroeste -&gt; Norte</span>
+<span class="lineno">  104 </span><span class="spaces">            </span><span class="nottickedoff">Sudoeste -&gt; Oeste</span>
+<span class="lineno">  105 </span><span class="spaces">        </span><span class="nottickedoff"></span>
+<span class="lineno">  106 </span><span class="spaces">        </span><span class="nottickedoff">p = movePosicao novaDirecao pos</span></span>
+<span class="lineno">  107 </span>
+<span class="lineno">  108 </span>-- * Funções recursivas.
+<span class="lineno">  109 </span>
+<span class="lineno">  110 </span>-- | Devolve o elemento num dado índice de uma lista.
+<span class="lineno">  111 </span>--
+<span class="lineno">  112 </span>-- __NB:__ Retorna @Nothing@ se o índice não existir.
+<span class="lineno">  113 </span>encontraIndiceLista :: Int -&gt; [a] -&gt; Maybe a
+<span class="lineno">  114 </span><span class="decl"><span class="nottickedoff">encontraIndiceLista x [] = Nothing</span>
+<span class="lineno">  115 </span><span class="spaces"></span><span class="nottickedoff">encontraIndiceLista x (h:t) = </span>
+<span class="lineno">  116 </span><span class="spaces">    </span><span class="nottickedoff">if x &lt; 0 then Nothing else if x == 0 then Just h else encontraIndiceLista(x-1) t</span></span>
+<span class="lineno">  117 </span>
+<span class="lineno">  118 </span>
+<span class="lineno">  119 </span>-- | Modifica um elemento num dado índice.
+<span class="lineno">  120 </span>--
+<span class="lineno">  121 </span>-- __NB:__ Devolve a própria lista se o elemento não existir.
+<span class="lineno">  122 </span>atualizaIndiceLista :: Int -&gt; a -&gt; [a] -&gt; [a]
+<span class="lineno">  123 </span><span class="decl"><span class="nottickedoff">atualizaIndiceLista i n [] = []</span>
+<span class="lineno">  124 </span><span class="spaces"></span><span class="nottickedoff">atualizaIndiceLista 0 n (h:t) = n : t</span>
+<span class="lineno">  125 </span><span class="spaces"></span><span class="nottickedoff">atualizaIndiceLista i n (h:t)= h : atualizaIndiceLista (i-1) n t</span></span>
+<span class="lineno">  126 </span>
+<span class="lineno">  127 </span>
+<span class="lineno">  128 </span>
+<span class="lineno">  129 </span>-- | Devolve o elemento numa dada posição de uma matriz.
+<span class="lineno">  130 </span>--
+<span class="lineno">  131 </span>-- __NB:__ Retorna @Nothing@ se a posição não existir.
+<span class="lineno">  132 </span>encontraPosicaoMatriz :: Posicao -&gt; Matriz a -&gt; Maybe a
+<span class="lineno">  133 </span><span class="decl"><span class="istickedoff">encontraPosicaoMatriz pos [] = <span class="nottickedoff">Nothing</span></span>
+<span class="lineno">  134 </span><span class="spaces"></span><span class="istickedoff">encontraPosicaoMatriz (0,c) (h:t) = encontraLista c h</span>
+<span class="lineno">  135 </span><span class="spaces"></span><span class="istickedoff">encontraPosicaoMatriz (l,c) (h:t) = encontraPosicaoMatriz (l-1,c) t</span></span>
+<span class="lineno">  136 </span>
+<span class="lineno">  137 </span>
+<span class="lineno">  138 </span>encontraLista :: Int -&gt; [a] -&gt; Maybe a
+<span class="lineno">  139 </span><span class="decl"><span class="istickedoff">encontraLista i [] = <span class="nottickedoff">Nothing</span></span>
+<span class="lineno">  140 </span><span class="spaces"></span><span class="istickedoff">encontraLista i (h:t) |i == 0 = Just h </span>
+<span class="lineno">  141 </span><span class="spaces">                      </span><span class="istickedoff">|<span class="tickonlytrue">otherwise</span> = encontraLista (i-1) t</span></span>
+<span class="lineno">  142 </span>
+<span class="lineno">  143 </span>
+<span class="lineno">  144 </span>
+<span class="lineno">  145 </span>-- | Modifica um elemento numa dada posição de uma matriz.
+<span class="lineno">  146 </span>--
+<span class="lineno">  147 </span>-- __NB:__ Devolve a própria matriz se o elemento não existir.
+<span class="lineno">  148 </span>
+<span class="lineno">  149 </span>atualizaPosicaoMatriz :: Posicao -&gt; a -&gt; Matriz a -&gt; Matriz a
+<span class="lineno">  150 </span><span class="decl"><span class="nottickedoff">atualizaPosicaoMatriz _ _ [] = []</span>
+<span class="lineno">  151 </span><span class="spaces"></span><span class="nottickedoff">atualizaPosicaoMatriz (0,c) x (h:t) = substituirLista c x h : t</span>
+<span class="lineno">  152 </span><span class="spaces"></span><span class="nottickedoff">atualizaPosicaoMatriz (l,c) x (h:t) = h : atualizaPosicaoMatriz (l - 1, c) x t</span></span>
+<span class="lineno">  153 </span>
+<span class="lineno">  154 </span>substituirLista :: Int -&gt; a -&gt; [a] -&gt; [a]
+<span class="lineno">  155 </span><span class="decl"><span class="nottickedoff">substituirLista _ _ [] = []</span>
+<span class="lineno">  156 </span><span class="spaces"></span><span class="nottickedoff">substituirLista 0 x (_:t) = x : t</span>
+<span class="lineno">  157 </span><span class="spaces"></span><span class="nottickedoff">substituirLista i x (h:t) = h : substituirLista (i - 1) x t</span></span>
+<span class="lineno">  158 </span>
+<span class="lineno">  159 </span>
+<span class="lineno">  160 </span>
+<span class="lineno">  161 </span>
+<span class="lineno">  162 </span>-- ** //////////////////////////////////////
+<span class="lineno">  163 </span>
+<span class="lineno">  164 </span>-- | Aplica uma sequência de movimentações a uma posição, pela ordem em que ocorrem na lista.
+<span class="lineno">  165 </span>moveDirecoesPosicao :: [Direcao] -&gt; Posicao -&gt; Posicao
+<span class="lineno">  166 </span><span class="decl"><span class="nottickedoff">moveDirecoesPosicao [] pos = pos</span>
+<span class="lineno">  167 </span><span class="spaces"></span><span class="nottickedoff">moveDirecoesPosicao (h:t) pos = moveDirecoesPosicao t (movePosicao h pos)</span></span>
+<span class="lineno">  168 </span>
+<span class="lineno">  169 </span>
+<span class="lineno">  170 </span>-- | Aplica a mesma movimentação a uma lista de posições.
+<span class="lineno">  171 </span>moveDirecaoPosicoes :: Direcao -&gt; [Posicao] -&gt; [Posicao]
+<span class="lineno">  172 </span><span class="decl"><span class="nottickedoff">moveDirecaoPosicoes dir [] = []</span>
+<span class="lineno">  173 </span><span class="spaces"></span><span class="nottickedoff">moveDirecaoPosicoes dir (h:t) = movePosicao dir h : moveDirecaoPosicoes dir t</span></span>
+<span class="lineno">  174 </span>
+<span class="lineno">  175 </span>-- | Verifica se uma matriz é válida, no sentido em que modela um rectângulo.
+<span class="lineno">  176 </span>--
+<span class="lineno">  177 </span>-- __NB:__ Todas as linhas devem ter o mesmo número de colunas. 
+<span class="lineno">  178 </span>eMatrizValida :: Matriz a -&gt; Bool
+<span class="lineno">  179 </span><span class="decl"><span class="istickedoff">eMatrizValida [] = <span class="nottickedoff">False</span></span>
+<span class="lineno">  180 </span><span class="spaces"></span><span class="istickedoff">eMatrizValida [h] = True</span>
+<span class="lineno">  181 </span><span class="spaces"></span><span class="istickedoff">eMatrizValida (h1:h2:t) = length h1 == length h2 &amp;&amp; eMatrizValida (h2:t)</span></span>
+<span class="lineno">  182 </span>
+<span class="lineno">  183 </span>
+
+</pre>
+</body>
+</html>

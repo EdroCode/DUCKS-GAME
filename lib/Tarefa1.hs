@@ -13,11 +13,11 @@ import Tarefa0_2025
 
 -- * Aula
 
-getMunicoesMinhoca :: Minhoca -> Int
-getMunicoesMinhoca m = bazucaMinhoca m
+--getMunicoesMinhoca :: Minhoca -> Int
+--getMunicoesMinhoca m = bazucaMinhoca m
 
-incrementMunBazuca :: Minhoca -> Int -> Minhoca
-incrementMunBazuca m i = m {bazucaMinhoca = bazucaMinhoca m + i}
+--incrementMunBazuca :: Minhoca -> Int -> Minhoca
+--incrementMunBazuca m i = m {bazucaMinhoca = bazucaMinhoca m + i}
 -- -incrementMunBazuca m@Minhoca {bazucaMinhoca = bazucas} i - m {bazucaMinhoca = bazucas}
 
 -- * ------------------------------------------------------------
@@ -92,15 +92,12 @@ listaDonos (h:t) = if ehDisparo h
 
 -- * Verifica se existe donos repetidos
 
-verificarDonos :: [Int] -> Bool
+verificarDonos :: Eq a => [a] -> Bool
 verificarDonos [] = True
-verificarDonos (h:t) = if existe h t then False else verificarDonos t
-                      
-existe :: Eq a => a -> [a] -> Bool
-existe _ [] = False
-existe x (h:t)
-  | x == h    = True
-  | otherwise = existe x t
+verificarDonos (h:t) =
+  if elem h t then False
+  else verificarDonos t
+
 
 -- * -------------------------------------------
 

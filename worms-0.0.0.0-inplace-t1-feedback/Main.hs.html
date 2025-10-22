@@ -1,0 +1,112 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<style type="text/css">
+span.lineno { color: white; background: #aaaaaa; border-right: solid white 12px }
+span.nottickedoff { background: yellow}
+span.istickedoff { background: white }
+span.tickonlyfalse { margin: -1px; border: 1px solid #f20913; background: #f20913 }
+span.tickonlytrue  { margin: -1px; border: 1px solid #60de51; background: #60de51 }
+span.funcount { font-size: small; color: orange; z-index: 2; position: absolute; right: 20 }
+span.decl { font-weight: bold }
+span.spaces    { background: white }
+</style>
+</head>
+<body>
+<pre>
+<span class="decl"><span class="nottickedoff">never executed</span> <span class="tickonlytrue">always true</span> <span class="tickonlyfalse">always false</span></span>
+</pre>
+<pre>
+<span class="lineno">    1 </span>module Main where
+<span class="lineno">    2 </span>
+<span class="lineno">    3 </span>import Labs2025
+<span class="lineno">    4 </span>import Tarefa1
+<span class="lineno">    5 </span>import Magic
+<span class="lineno">    6 </span>
+<span class="lineno">    7 </span>-- * Comandos para testar (rodar na cmd - bash - na pasta do ficheiro)
+<span class="lineno">    8 </span>-- * cabal clean &amp;&amp; rm -rf t1-feedback.tix
+<span class="lineno">    9 </span>-- * cabal run --enable-coverage t1-feedback 
+<span class="lineno">   10 </span>-- * ./runhpc.sh t1-feedback
+<span class="lineno">   11 </span>
+<span class="lineno">   12 </span>
+<span class="lineno">   13 </span>
+<span class="lineno">   14 </span>
+<span class="lineno">   15 </span><span class="decl"><span class="istickedoff">m = [[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]</span>
+<span class="lineno">   16 </span><span class="spaces">    </span><span class="istickedoff">,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]</span>
+<span class="lineno">   17 </span><span class="spaces">    </span><span class="istickedoff">,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]</span>
+<span class="lineno">   18 </span><span class="spaces">    </span><span class="istickedoff">,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]</span>
+<span class="lineno">   19 </span><span class="spaces">    </span><span class="istickedoff">,[Terra,Terra,Terra,Terra,Terra,Ar,Ar,Ar,Ar,Ar]</span>
+<span class="lineno">   20 </span><span class="spaces">    </span><span class="istickedoff">,[Terra,Terra,Terra,Terra,Terra,Pedra,Pedra,Agua,Agua,Agua]</span>
+<span class="lineno">   21 </span><span class="spaces">    </span><span class="istickedoff">]</span></span>
+<span class="lineno">   22 </span>
+<span class="lineno">   23 </span><span class="decl"><span class="istickedoff">barrilTeste = Barril</span>
+<span class="lineno">   24 </span><span class="spaces">  </span><span class="istickedoff">{ posicaoBarril = (3,2)</span>
+<span class="lineno">   25 </span><span class="spaces">  </span><span class="istickedoff">, explodeBarril = False</span>
+<span class="lineno">   26 </span><span class="spaces">  </span><span class="istickedoff">}</span></span>
+<span class="lineno">   27 </span>
+<span class="lineno">   28 </span><span class="decl"><span class="istickedoff">disparo1 = Disparo</span>
+<span class="lineno">   29 </span><span class="spaces">  </span><span class="istickedoff">{ posicaoDisparo = (1,4)</span>
+<span class="lineno">   30 </span><span class="spaces">  </span><span class="istickedoff">, direcaoDisparo = Norte</span>
+<span class="lineno">   31 </span><span class="spaces">  </span><span class="istickedoff">, tipoDisparo = Mina</span>
+<span class="lineno">   32 </span><span class="spaces">  </span><span class="istickedoff">, tempoDisparo = Just 2</span>
+<span class="lineno">   33 </span><span class="spaces">  </span><span class="istickedoff">, donoDisparo = 0</span>
+<span class="lineno">   34 </span><span class="spaces"></span><span class="istickedoff">}</span></span>
+<span class="lineno">   35 </span>
+<span class="lineno">   36 </span><span class="decl"><span class="istickedoff">disparo2 = Disparo</span>
+<span class="lineno">   37 </span><span class="spaces">  </span><span class="istickedoff">{ posicaoDisparo = (2,4)</span>
+<span class="lineno">   38 </span><span class="spaces">  </span><span class="istickedoff">, direcaoDisparo = Norte</span>
+<span class="lineno">   39 </span><span class="spaces">  </span><span class="istickedoff">, tipoDisparo = Dinamite</span>
+<span class="lineno">   40 </span><span class="spaces">  </span><span class="istickedoff">, tempoDisparo = Just 2</span>
+<span class="lineno">   41 </span><span class="spaces">  </span><span class="istickedoff">, donoDisparo = 1</span>
+<span class="lineno">   42 </span><span class="spaces"></span><span class="istickedoff">}</span></span>
+<span class="lineno">   43 </span>
+<span class="lineno">   44 </span><span class="decl"><span class="istickedoff">minhoca1 = Minhoca{</span>
+<span class="lineno">   45 </span><span class="spaces">    </span><span class="istickedoff">posicaoMinhoca = Just(3,0),</span>
+<span class="lineno">   46 </span><span class="spaces">    </span><span class="istickedoff">vidaMinhoca = Morta,</span>
+<span class="lineno">   47 </span><span class="spaces">    </span><span class="istickedoff">jetpackMinhoca = 100,</span>
+<span class="lineno">   48 </span><span class="spaces">    </span><span class="istickedoff">escavadoraMinhoca = 200,</span>
+<span class="lineno">   49 </span><span class="spaces">    </span><span class="istickedoff">bazucaMinhoca = 150,</span>
+<span class="lineno">   50 </span><span class="spaces">    </span><span class="istickedoff">minaMinhoca = 3,</span>
+<span class="lineno">   51 </span><span class="spaces">    </span><span class="istickedoff">dinamiteMinhoca = 1</span>
+<span class="lineno">   52 </span><span class="spaces">    </span><span class="istickedoff">}</span></span>
+<span class="lineno">   53 </span>
+<span class="lineno">   54 </span><span class="decl"><span class="istickedoff">minhoca2 = Minhoca{</span>
+<span class="lineno">   55 </span><span class="spaces">    </span><span class="istickedoff">posicaoMinhoca = Just(3,1),</span>
+<span class="lineno">   56 </span><span class="spaces">    </span><span class="istickedoff">vidaMinhoca = Viva 0,</span>
+<span class="lineno">   57 </span><span class="spaces">    </span><span class="istickedoff">jetpackMinhoca = 100,</span>
+<span class="lineno">   58 </span><span class="spaces">    </span><span class="istickedoff">escavadoraMinhoca = 200,</span>
+<span class="lineno">   59 </span><span class="spaces">    </span><span class="istickedoff">bazucaMinhoca = 150,</span>
+<span class="lineno">   60 </span><span class="spaces">    </span><span class="istickedoff">minaMinhoca = 3,</span>
+<span class="lineno">   61 </span><span class="spaces">    </span><span class="istickedoff">dinamiteMinhoca = 1</span>
+<span class="lineno">   62 </span><span class="spaces">    </span><span class="istickedoff">}</span></span>
+<span class="lineno">   63 </span>
+<span class="lineno">   64 </span><span class="decl"><span class="istickedoff">minhocas = [minhoca1, minhoca2]</span></span>
+<span class="lineno">   65 </span><span class="decl"><span class="istickedoff">objetos = [disparo1, disparo2, barrilTeste]</span></span>
+<span class="lineno">   66 </span>
+<span class="lineno">   67 </span>
+<span class="lineno">   68 </span><span class="decl"><span class="istickedoff">estado1 = Estado</span>
+<span class="lineno">   69 </span><span class="spaces">  </span><span class="istickedoff">{ mapaEstado     = m</span>
+<span class="lineno">   70 </span><span class="spaces">  </span><span class="istickedoff">, objetosEstado  = objetos</span>
+<span class="lineno">   71 </span><span class="spaces">  </span><span class="istickedoff">, minhocasEstado = minhocas</span>
+<span class="lineno">   72 </span><span class="spaces">  </span><span class="istickedoff">}</span></span>
+<span class="lineno">   73 </span>
+<span class="lineno">   74 </span>
+<span class="lineno">   75 </span>
+<span class="lineno">   76 </span>
+<span class="lineno">   77 </span>
+<span class="lineno">   78 </span>-- | Definir aqui os testes do grupo para a Tarefa 1
+<span class="lineno">   79 </span>testesTarefa1 :: [Estado]
+<span class="lineno">   80 </span><span class="decl"><span class="istickedoff">testesTarefa1 = [estado1]</span></span>
+<span class="lineno">   81 </span>
+<span class="lineno">   82 </span>dataTarefa1 :: IO TaskData
+<span class="lineno">   83 </span><span class="decl"><span class="istickedoff">dataTarefa1 = do</span>
+<span class="lineno">   84 </span><span class="spaces">    </span><span class="istickedoff">let ins = testesTarefa1</span>
+<span class="lineno">   85 </span><span class="spaces">    </span><span class="istickedoff">outs &lt;- mapM (runTest . validaEstado) ins</span>
+<span class="lineno">   86 </span><span class="spaces">    </span><span class="istickedoff">return $ T1 ins outs</span></span>
+<span class="lineno">   87 </span>
+<span class="lineno">   88 </span>main :: IO ()
+<span class="lineno">   89 </span><span class="decl"><span class="istickedoff">main = runFeedback =&lt;&lt; dataTarefa1</span></span>
+
+</pre>
+</body>
+</html>
