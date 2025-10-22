@@ -131,7 +131,14 @@ atualizaIndiceLista i n (h:t)= h : atualizaIndiceLista (i-1) n t
 -- __NB:__ Retorna @Nothing@ se a posição não existir.
 encontraPosicaoMatriz :: Posicao -> Matriz a -> Maybe a
 encontraPosicaoMatriz pos [] = Nothing
+encontraPosicaoMatriz (0,c) (h:t) = encontraLista c h
+encontraPosicaoMatriz (l,c) (h:t) = encontraPosicaoMatriz (l-1,c) t
 
+
+encontraLista :: Int -> [a] -> Maybe a
+encontraLista i [] = Nothing
+encontraLista i (h:t) |i == 0 = Just h 
+                      |otherwise = encontraLista (i-1) t
 
 
 

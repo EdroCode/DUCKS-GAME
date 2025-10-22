@@ -10,6 +10,7 @@ import Labs2025
 import Tarefa0_2025
 
 
+
 -- * Aula
 
 getMunicoesMinhoca :: Minhoca -> Int
@@ -22,33 +23,24 @@ incrementMunBazuca m i = m {bazucaMinhoca = bazucaMinhoca m + i}
 -- * ------------------------------------------------------------
 
 
-
 -- | Função principa*! Excecao nl da Tarefa 1. Recebe um estado e retorna se este é válido ou não.
 validaEstado :: Estado -> Bool
-validaEstado e = eMapaValido mapa && eObjetosValido e objetos
+validaEstado e = eMapaValido mapa && eObjetosValido e objetos && eMinhocasValidas e minhocas
     where
         mapa = mapaEstado e
         objetos = objetosEstado e
+        minhocas = minhocasEstado e
 
-    
--- *todo   ValidacaoMapa
+-- * Valida se o mapa é valido
 
-eMapaValido :: Mapa -> Bool -- * Mapa é valido 
-eMapaValido [] = False      -- * a) Nao Vazio 
-eMapaValido m = (eMatrizValida m)  -- * b) é uma grelha (l = c)
-                            -- * c) contem terrenos validos
+eMapaValido :: Mapa -> Bool 
+eMapaValido [] = False    
+eMapaValido m = (eMatrizValida m)  
 
+-- * -------------------------------------------
 
--- *todo  ValidacaoObjeto
+-- * Valida se o objeto é valido
 
-
--- * Objeto é valido se (barril) -> posicao Valida e livre (menos disparos)
--- *                                posicao nao tem minhoca ou barril (sem ser o msm) (exceto bazuca)
--- ao feita - bazuca
--- * Se for um disparo -> Nao pode ser jetpack ou escavadora
--- * O tempo do disparo tem que ser coerente com o tipo de arma (bazuca = sem tempo) 
--- * (mina sem tempo, ou um inteiro entre 0 e 2) (dinamite inteiro entre 0 e 4)
--- * o dono do disparo tem de ser um indice valido
 eObjetosValido :: Estado -> [Objeto] -> Bool
 eObjetosValido _ [] = True
 eObjetosValido e (h:t) = if ePosicaoMapaLivre (posicaoObjeto h) mapa 
@@ -72,7 +64,8 @@ eObjetosValido e (h:t) = if ePosicaoMapaLivre (posicaoObjeto h) mapa
             _             -> True --todo caso exista novos casos adicionar
         
         
-        
+-- * ---------------- Auxiliares Objeto  ---------------------------
+
 -- * Verifica se o objeto fornecido é um disparo
 
 ehDisparo :: Objeto -> Bool
@@ -111,9 +104,58 @@ existe x (h:t)
 
 -- * -------------------------------------------
 
+-- * Valida se as minhocas são validas
+
+eMinhocasValidas :: Estado -> [Minhoca] -> Bool
+eMinhocasValidas e [] = True
+eMinhocasValidas e (h:t) = if ePosicaoEstadoLivre pos e{minhocasEstado = t} 
+                           && validaMorte h (mapaEstado e)
+                           && verificaVida h
+                           then eMinhocasValidas e t else False
+    where
+        pos = case posicaoMinhoca h of 
+            Just (y,x) -> (y,x) 
+            Nothing -> (-1,-1) -- !  perguntar ao stor
+        vida = case vidaMinhoca h of Viva a -> a
+        municoes = [jetpackMinhoca, escavadoraMinhoca, bazucaMinhoca, minaMinhoca, dinamiteMinhoca]
+        muniValidas :: [Int] -> Bool
+        muniValidas [] = True
+        muniValidas (h:t) = if (h >= 0) then muniValidas t else False
 
 
 
--- todo -- verificar a bala
+-- * ---------------- Auxiliares Minhoca  ---------------------------
 
-  
+
+-- * Verifica se a minhoca esta dentro de água, e caso esteja, verifica se a mesma esta morta
+-- * Retorna True se a minhoca estiver valida (pos valida e nao morta) e False caso esteja em agua e nao esteja morta
+validaMorte :: Minhoca -> Mapa -> Bool
+validaMorte minh [] = False
+validaMorte minh m = if pos == (-1, -1) || terrenoAtual == Agua -- ! mesma situacao
+                        then if minhocaViva then True else False
+                        else True                      
+  where
+    
+    vida = case vidaMinhoca minh of
+        Morta -> 0
+        Viva a -> a
+    
+    pos = case posicaoMinhoca minh of Just (y,x) -> (y,x)
+    terrenoAtual = case (encontraPosicaoMatriz pos m) of Just a -> a 
+                                                         Nothing -> Ar
+    
+    minhocaViva :: Bool
+    minhocaViva = if vida == 0 then False else True
+
+
+-- * Verifica se a vida da minhoca é valida
+
+verificaVida :: Minhoca -> Bool
+verificaVida m = case vida of
+                    Morta -> True
+                    Viva a -> if (a >= 0 && a <= 100) then True else False
+    where
+        vida = vidaMinhoca m
+
+
+-- todo -- Fazer com que caso a minhoca tenha vida 0 morra (pode vir a ser feito em tarefas futuras entao perguntar)

@@ -4,6 +4,13 @@ import Labs2025
 import Tarefa1
 import Magic
 
+-- * Comandos para testar (rodar na cmd - bash - na pasta do ficheiro)
+-- * cabal clean && rm -rf t1-feedback.tix
+-- * cabal run --enable-coverage t1-feedback ./runhpc.sh t1-feedback
+
+
+
+
 m = [[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
     ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
     ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
@@ -35,7 +42,7 @@ disparo2 = Disparo
 
 minhoca1 = Minhoca{
     posicaoMinhoca = Just(3,0),
-    vidaMinhoca = Viva 13,
+    vidaMinhoca = Morta,
     jetpackMinhoca = 100,
     escavadoraMinhoca = 200,
     bazucaMinhoca = 150,
@@ -45,7 +52,7 @@ minhoca1 = Minhoca{
 
 minhoca2 = Minhoca{
     posicaoMinhoca = Just(3,1),
-    vidaMinhoca = Viva 15,
+    vidaMinhoca = Viva 0,
     jetpackMinhoca = 100,
     escavadoraMinhoca = 200,
     bazucaMinhoca = 150,
