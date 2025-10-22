@@ -10,61 +10,6 @@ module Tarefa0_2025 where
     
 import Labs2025
 
-minhoca1 = Minhoca{
-    posicaoMinhoca = Just(3,0),
-    vidaMinhoca = Viva 13,
-    jetpackMinhoca = 100,
-    escavadoraMinhoca = 200,
-    bazucaMinhoca = 150,
-    minaMinhoca = 3,
-    dinamiteMinhoca = 1
-}
-minhoca2 = Minhoca{
-    posicaoMinhoca = Just(3,1),
-    vidaMinhoca = Viva 13,
-    jetpackMinhoca = 100,
-    escavadoraMinhoca = 200,
-    bazucaMinhoca = 150,
-    minaMinhoca = 3,
-    dinamiteMinhoca = 1
-}
-
-minhocas = [minhoca1, minhoca2]
-
-m = [[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
-    ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
-    ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
-    ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
-    ,[Terra,Terra,Terra,Terra,Terra,Ar,Ar,Ar,Ar,Ar]
-    ,[Terra,Terra,Terra,Terra,Terra,Pedra,Pedra,Agua,Agua,Agua]
-    ]
-
-barrilTeste = Barril
-  { posicaoBarril = (3,2)
-  , explodeBarril = False
-  }
-
-barrilTeste2 = Barril
-  { posicaoBarril = (3,3)
-  , explodeBarril = False
-  }
-
-disparo1 = Disparo
-  { posicaoDisparo = (0,4)
-  , direcaoDisparo = Norte
-  , tipoDisparo = Bazuca
-  , tempoDisparo = Just 15
-  , donoDisparo = 0
-}
-
-
-objetosTeste = [barrilTeste, barrilTeste2]
-
-estado1 = Estado
-  { mapaEstado     = m
-  , objetosEstado  = objetosTeste
-  , minhocasEstado = [minhoca1, minhoca2]
-  }
 
 
 -- | Retorna a quantidade de munições disponíveis de uma minhoca para uma dada arma.
@@ -138,8 +83,14 @@ existeMinhoca (x,y) (h:t) = let pos = posicaoMinhoca h
                        
 existeObjeto :: Posicao -> [Objeto] -> Bool
 existeObjeto pos [] = False
-existeObjeto pos (h:t) = let posicaoObjeto = posicaoBarril h
-                         in if posicaoObjeto == pos then True else existeObjeto pos t
+existeObjeto pos (h:t) = let p = posicaoObjeto h
+                         in if p == pos then True else existeObjeto pos t
+
+
+
+posicaoObjeto :: Objeto -> Posicao
+posicaoObjeto d@(Disparo {})  = posicaoDisparo d
+posicaoObjeto b@(Barril {}) = posicaoBarril b
 
 
 -- -----------------

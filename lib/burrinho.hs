@@ -1,3 +1,4 @@
+Modulo Burrinho where
 
 -- dedicada ao teste de funçcões para melhor entendimento da linguagem / armazenar estados teste
 type Posicao = (Int,Int)
@@ -5,7 +6,8 @@ type Posicao = (Int,Int)
 
 encontraLista :: Int -> [a] -> Bool
 encontraLista i [] = False
-encontraLista i (h:t) = if i == 0 then True else encontraLista (i-1) t
+encontraLista i (h:t) |i == 0 = True 
+                      |otherwise = encontraLista (i-1) t
 
 encontraMatriz :: Posicao -> [[a]] -> Bool
 encontraMatriz p [] = False
