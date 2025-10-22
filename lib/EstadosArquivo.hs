@@ -1,13 +1,46 @@
-module Main where
+module EstadosArquivo where
 
-import Labs2025
-import Tarefa1
-import Magic
 
--- * Comandos para testar (rodar na cmd - bash - na pasta do ficheiro)
--- * cabal clean && rm -rf t1-feedback.tix
--- * cabal run --enable-coverage t1-feedback 
--- * ./runhpc.sh t1-feedback
+-- dedicada ao teste de funçcões para melhor entendimento da linguagem / armazenar estados teste
+type Posicao = (Int,Int)
+
+
+encontraLista :: Int -> [a] -> Bool
+encontraLista i [] = False
+encontraLista i (h:t) |i == 0 = True 
+                      |otherwise = encontraLista (i-1) t
+
+encontraMatriz :: Posicao -> [[a]] -> Bool
+encontraMatriz p [] = False
+encontraMatriz (0,c) (h:t) = encontraLista c h
+encontraMatriz (l,c) (h:t) = encontraMatriz (l-1,c) t
+
+-- encontra (1,2) [(1,2),(1,2)]
+-- encontra (0,2) [(1,2)]
+-- encontraLista 2 [1,2]
+-- encontra lista 1 [2]
+-- encontra lista 0 [] -> False
+
+
+substituirLista :: Int -> Int -> [Int] -> [Int]
+substituirLista _ _ [] = []
+substituirLista 0 x (h:t) = x : t
+substituirLista i x (h:t) = h : substituirLista (i-1) x t
+
+
+substituirMatriz :: Int -> (Int, Int) -> [[Int]] -> [[Int]] -- [[1,2,3], [4,5,6]]
+substituirMatriz x pos [] = []
+substituirMatriz x (0, c) (h:t) = substituirLista c x h : t
+substituirMatriz x (l,c) (h:t) = h : substituirMatriz x (l - 1, c) t
+
+
+
+
+-- * -----------------------------------------
+-- * ESTADOS
+-- * -----------------------------------------
+
+
 
 
 
@@ -133,7 +166,7 @@ estadoInvalidoMinhocas = Estado
 -- * ESTADO INVALIDO (mapa vazio)
 
 
-minhoca7 = Minhoca{
+minhoca3 = Minhoca{
     posicaoMinhoca = Just(3,0),
     vidaMinhoca = Morta,
     jetpackMinhoca = 400,
@@ -147,13 +180,13 @@ minhoca7 = Minhoca{
 estadoInvalidoMapaVazio = Estado
   { mapaEstado     = []
   , objetosEstado  = objetos
-  , minhocasEstado = [minhoca7]
+  , minhocasEstado = [minhoca3]
   }
 
 -- * ESTADO VALIDO 2
 
 
-minhoca6 = Minhoca{
+minhoca3 = Minhoca{
     posicaoMinhoca = Just(3,0),
     vidaMinhoca = Morta,
     jetpackMinhoca = 400,
@@ -182,8 +215,8 @@ dina = Disparo
 
 estadoValido2 = Estado
   { mapaEstado     = m
-  , objetosEstado  = objetos ++ [mina, dina]
-  , minhocasEstado = [minhoca6]
+  , objetosEstado  = [objetos] ++ [mina, dina]
+  , minhocasEstado = [minhoca3]
   }
 
 
@@ -217,16 +250,3 @@ estadoInvalidoMinhocassss = Estado
   }
 
 estadosParaTestar = [estado1, estadoInvalidoMapa, estadoInvalidoMapaVazio, estadoInvalidoMinhocas, estadoInvalidoMinhocassss, estadoInvalidoObjetos, estadoValido2]
-
--- | Definir aqui os testes do grupo para a Tarefa 1
-testesTarefa1 :: [Estado]
-testesTarefa1 = estadosParaTestar
-
-dataTarefa1 :: IO TaskData
-dataTarefa1 = do
-    let ins = testesTarefa1
-    outs <- mapM (runTest . validaEstado) ins
-    return $ T1 ins outs
-
-main :: IO ()
-main = runFeedback =<< dataTarefa1

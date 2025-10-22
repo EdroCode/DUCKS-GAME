@@ -10,7 +10,6 @@ import Labs2025
 import Tarefa0_2025
 
 
-
 -- * Aula
 
 --getMunicoesMinhoca :: Minhoca -> Int
@@ -31,6 +30,9 @@ validaEstado e = eMapaValido mapa && eObjetosValido e objetos && eMinhocasValida
         objetos = objetosEstado e
         minhocas = minhocasEstado e
 
+
+
+
 -- * Valida se o mapa é valido
 
 eMapaValido :: Mapa -> Bool 
@@ -48,12 +50,14 @@ eObjetosValido e (h:t) = if ePosicaoMapaLivre (posicaoObjeto h) mapa
                         && objetoValido h
                         && disparoValido h
                         && verificarDonos donos
+                        && donosValido
                         then eObjetosValido e t else False
     where
         mapa = mapaEstado e
         minhocas = minhocasEstado e
         donos = listaDonos (h:t)
-     
+
+        donosValido = if length donos > length minhocas then False else True
 
         objetoValido obj = case obj of
             Disparo{tipoDisparo = Escavadora} -> False
@@ -94,9 +98,9 @@ listaDonos (h:t) = if ehDisparo h
 
 verificarDonos :: Eq a => [a] -> Bool
 verificarDonos [] = True
-verificarDonos (h:t) =
-  if elem h t then False
-  else verificarDonos t
+verificarDonos (h:t) = if elem h t then False else verificarDonos t
+
+
 
 
 -- * -------------------------------------------

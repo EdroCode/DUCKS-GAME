@@ -103,7 +103,7 @@ span.spaces    { background: white }
 <span class="lineno">   84 </span>existeObjeto :: Posicao -&gt; [Objeto] -&gt; Bool
 <span class="lineno">   85 </span><span class="decl"><span class="istickedoff">existeObjeto pos [] = False</span>
 <span class="lineno">   86 </span><span class="spaces"></span><span class="istickedoff">existeObjeto pos (h:t) = let p = posicaoObjeto h</span>
-<span class="lineno">   87 </span><span class="spaces">                         </span><span class="istickedoff">in if <span class="tickonlyfalse">p == pos</span> then <span class="nottickedoff">True</span> else existeObjeto pos t</span></span>
+<span class="lineno">   87 </span><span class="spaces">                         </span><span class="istickedoff">in if p == pos then True else existeObjeto pos t</span></span>
 <span class="lineno">   88 </span>
 <span class="lineno">   89 </span>
 <span class="lineno">   90 </span>
