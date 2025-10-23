@@ -61,7 +61,7 @@ span.spaces    { background: white }
 <span class="lineno">   42 </span>--
 <span class="lineno">   43 </span>-- __NB:__ Apenas @Terra@ ou @Pedra@ são opacos.
 <span class="lineno">   44 </span>eTerrenoOpaco :: Terreno -&gt; Bool
-<span class="lineno">   45 </span><span class="decl"><span class="istickedoff">eTerrenoOpaco t = if <span class="tickonlyfalse">t == Pedra || t == Terra</span> then <span class="nottickedoff">True</span> else False</span></span>
+<span class="lineno">   45 </span><span class="decl"><span class="istickedoff">eTerrenoOpaco t = if t == Pedra || t == Terra then True else False</span></span>
 <span class="lineno">   46 </span>
 <span class="lineno">   47 </span>-- | Verifica se uma posição do mapa está livre, i.e., pode ser ocupada por um objeto ou minhoca.
 <span class="lineno">   48 </span>--  
@@ -73,7 +73,7 @@ span.spaces    { background: white }
 <span class="lineno">   54 </span>
 <span class="lineno">   55 </span>-- Auxiliares 
 <span class="lineno">   56 </span>encontraLinhaMapa :: Int -&gt; [Terreno] -&gt; Bool
-<span class="lineno">   57 </span><span class="decl"><span class="istickedoff">encontraLinhaMapa i [] = <span class="nottickedoff">False</span></span>
+<span class="lineno">   57 </span><span class="decl"><span class="istickedoff">encontraLinhaMapa i [] = False</span>
 <span class="lineno">   58 </span><span class="spaces"></span><span class="istickedoff">encontraLinhaMapa 0 (h:t) = not (eTerrenoOpaco h)</span>
 <span class="lineno">   59 </span><span class="spaces"></span><span class="istickedoff">encontraLinhaMapa i (h:t) = encontraLinhaMapa (i-1) t</span></span> 
 <span class="lineno">   60 </span>-- *! SO esta livre se terreno opaco +e falso,
@@ -98,7 +98,7 @@ span.spaces    { background: white }
 <span class="lineno">   79 </span>existeMinhoca :: Posicao -&gt; [Minhoca] -&gt; Bool
 <span class="lineno">   80 </span><span class="decl"><span class="istickedoff">existeMinhoca pos [] = False</span>
 <span class="lineno">   81 </span><span class="spaces"></span><span class="istickedoff">existeMinhoca (x,y) (h:t) = let pos = posicaoMinhoca h</span>
-<span class="lineno">   82 </span><span class="spaces">                            </span><span class="istickedoff">in if <span class="tickonlyfalse">pos == Just (x,y)</span> then <span class="nottickedoff">True</span> else existeMinhoca (x,y) t</span></span>
+<span class="lineno">   82 </span><span class="spaces">                            </span><span class="istickedoff">in if pos == Just (x,y) then True else existeMinhoca (x,y) t</span></span>
 <span class="lineno">   83 </span>                       
 <span class="lineno">   84 </span>existeObjeto :: Posicao -&gt; [Objeto] -&gt; Bool
 <span class="lineno">   85 </span><span class="decl"><span class="istickedoff">existeObjeto pos [] = False</span>

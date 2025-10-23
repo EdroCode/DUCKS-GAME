@@ -99,7 +99,7 @@ span.spaces    { background: white }
 <span class="lineno">   80 </span>
 <span class="lineno">   81 </span>disparoValido :: Objeto -&gt; Bool
 <span class="lineno">   82 </span><span class="decl"><span class="istickedoff">disparoValido d@Disparo{tipoDisparo = Bazuca} = <span class="nottickedoff">if (tempoDisparo d == Nothing) then True else False</span></span>
-<span class="lineno">   83 </span><span class="spaces"></span><span class="istickedoff">disparoValido d@Disparo{tipoDisparo = Mina} = if (tempoDisparo d &lt;= Just 2 &amp;&amp; tempoDisparo d &gt;= Just 0) then True else False</span>
+<span class="lineno">   83 </span><span class="spaces"></span><span class="istickedoff">disparoValido d@Disparo{tipoDisparo = Mina} = if <span class="tickonlytrue">(tempoDisparo d &lt;= Just 2 &amp;&amp; tempoDisparo d &gt;= Just 0)</span> then True else <span class="nottickedoff">False</span></span>
 <span class="lineno">   84 </span><span class="spaces"></span><span class="istickedoff">disparoValido d@Disparo{tipoDisparo = Dinamite} = if <span class="tickonlytrue">(tempoDisparo d &lt;= Just 4 &amp;&amp; tempoDisparo d &gt;= Just 0)</span> then True else <span class="nottickedoff">False</span></span>
 <span class="lineno">   85 </span><span class="spaces"></span><span class="istickedoff">disparoValido _ = True</span></span>
 <span class="lineno">   86 </span>
@@ -115,70 +115,61 @@ span.spaces    { background: white }
 <span class="lineno">   96 </span>
 <span class="lineno">   97 </span>-- * Verifica se existe donos repetidos
 <span class="lineno">   98 </span>
-<span class="lineno">   99 </span>verificarDonos :: Eq a =&gt; [a] -&gt; Bool
+<span class="lineno">   99 </span>verificarDonos :: Eq Int =&gt; [Int] -&gt; Bool
 <span class="lineno">  100 </span><span class="decl"><span class="istickedoff">verificarDonos [] = True</span>
-<span class="lineno">  101 </span><span class="spaces"></span><span class="istickedoff">verificarDonos (h:t) = if <span class="tickonlyfalse">elem h t</span> then <span class="nottickedoff">False</span> else verificarDonos t</span></span>
+<span class="lineno">  101 </span><span class="spaces"></span><span class="istickedoff">verificarDonos (h:t) = if elem h t then False else verificarDonos t</span></span>
 <span class="lineno">  102 </span>
 <span class="lineno">  103 </span>
 <span class="lineno">  104 </span>
 <span class="lineno">  105 </span>
-<span class="lineno">  106 </span>-- * -------------------------------------------
-<span class="lineno">  107 </span>
-<span class="lineno">  108 </span>-- * Valida se as minhocas são validas
-<span class="lineno">  109 </span>
-<span class="lineno">  110 </span>eMinhocasValidas :: Estado -&gt; [Minhoca] -&gt; Bool
-<span class="lineno">  111 </span><span class="decl"><span class="istickedoff">eMinhocasValidas e [] = True</span>
-<span class="lineno">  112 </span><span class="spaces"></span><span class="istickedoff">eMinhocasValidas e (h:t) = if <span class="tickonlytrue">ePosicaoEstadoLivre pos e{minhocasEstado = t} </span></span>
-<span class="lineno">  113 </span><span class="spaces">                           </span><span class="istickedoff"><span class="tickonlytrue">&amp;&amp; validaMorte h (mapaEstado e)</span></span>
-<span class="lineno">  114 </span><span class="spaces">                           </span><span class="istickedoff"><span class="tickonlytrue">&amp;&amp; verificaVida h</span></span>
-<span class="lineno">  115 </span><span class="spaces">                           </span><span class="istickedoff">then eMinhocasValidas e t else <span class="nottickedoff">False</span></span>
-<span class="lineno">  116 </span><span class="spaces">    </span><span class="istickedoff">where</span>
-<span class="lineno">  117 </span><span class="spaces">        </span><span class="istickedoff">pos = case posicaoMinhoca h of </span>
-<span class="lineno">  118 </span><span class="spaces">            </span><span class="istickedoff">Just (y,x) -&gt; (y,x) </span>
-<span class="lineno">  119 </span><span class="spaces">            </span><span class="istickedoff">Nothing -&gt; <span class="nottickedoff">(-1,-1)</span> -- !  perguntar ao stor</span>
-<span class="lineno">  120 </span><span class="spaces">        </span><span class="istickedoff"><span class="nottickedoff">vida = case vidaMinhoca h of Viva a -&gt; a</span></span>
-<span class="lineno">  121 </span><span class="spaces">        </span><span class="istickedoff"><span class="nottickedoff">municoes = [jetpackMinhoca, escavadoraMinhoca, bazucaMinhoca, minaMinhoca, dinamiteMinhoca]</span></span>
-<span class="lineno">  122 </span><span class="spaces">        </span><span class="istickedoff">muniValidas :: [Int] -&gt; Bool</span>
-<span class="lineno">  123 </span><span class="spaces">        </span><span class="istickedoff"><span class="nottickedoff">muniValidas [] = True</span></span>
-<span class="lineno">  124 </span><span class="spaces">        </span><span class="istickedoff"><span class="nottickedoff">muniValidas (h:t) = if (h &gt;= 0) then muniValidas t else False</span></span></span>
+<span class="lineno">  106 </span>
+<span class="lineno">  107 </span>-- * -------------------------------------------
+<span class="lineno">  108 </span>
+<span class="lineno">  109 </span>-- * Valida se as minhocas são validas
+<span class="lineno">  110 </span>
+<span class="lineno">  111 </span>eMinhocasValidas :: Estado -&gt; [Minhoca] -&gt; Bool
+<span class="lineno">  112 </span><span class="decl"><span class="istickedoff">eMinhocasValidas _ [] = True</span>
+<span class="lineno">  113 </span><span class="spaces"></span><span class="istickedoff">eMinhocasValidas e (h:t) = posicaoValida &amp;&amp; morteOk &amp;&amp; vidaOk &amp;&amp; eMinhocasValidas e t</span>
+<span class="lineno">  114 </span><span class="spaces">  </span><span class="istickedoff">where</span>
+<span class="lineno">  115 </span><span class="spaces">    </span><span class="istickedoff">posicaoValida = case posicaoMinhoca h of</span>
+<span class="lineno">  116 </span><span class="spaces">        </span><span class="istickedoff">Nothing   -&gt; <span class="nottickedoff">True</span>  </span>
+<span class="lineno">  117 </span><span class="spaces">        </span><span class="istickedoff">Just p    -&gt; ePosicaoEstadoLivre p e{minhocasEstado = t}</span>
+<span class="lineno">  118 </span><span class="spaces"></span><span class="istickedoff"></span>
+<span class="lineno">  119 </span><span class="spaces">    </span><span class="istickedoff">morteOk = validaMorte h (mapaEstado e)</span>
+<span class="lineno">  120 </span><span class="spaces">    </span><span class="istickedoff">vidaOk  = verificaVida h</span></span>
+<span class="lineno">  121 </span>
+<span class="lineno">  122 </span>
+<span class="lineno">  123 </span>
+<span class="lineno">  124 </span>-- * ---------------- Auxiliares Minhoca  ---------------------------
 <span class="lineno">  125 </span>
 <span class="lineno">  126 </span>
-<span class="lineno">  127 </span>
-<span class="lineno">  128 </span>-- * ---------------- Auxiliares Minhoca  ---------------------------
+<span class="lineno">  127 </span>-- * Verifica se a minhoca esta dentro de água, e caso esteja, verifica se a mesma esta morta
+<span class="lineno">  128 </span>-- * Retorna True se a minhoca estiver valida (pos valida e nao morta) e False caso esteja em agua e nao esteja morta
 <span class="lineno">  129 </span>
-<span class="lineno">  130 </span>
-<span class="lineno">  131 </span>-- * Verifica se a minhoca esta dentro de água, e caso esteja, verifica se a mesma esta morta
-<span class="lineno">  132 </span>-- * Retorna True se a minhoca estiver valida (pos valida e nao morta) e False caso esteja em agua e nao esteja morta
-<span class="lineno">  133 </span>validaMorte :: Minhoca -&gt; Mapa -&gt; Bool
-<span class="lineno">  134 </span><span class="decl"><span class="istickedoff">validaMorte minh [] = <span class="nottickedoff">False</span></span>
-<span class="lineno">  135 </span><span class="spaces"></span><span class="istickedoff">validaMorte minh m = if <span class="tickonlyfalse">pos == (-1, <span class="nottickedoff">-1</span>) || terrenoAtual == Agua</span> -- ! mesma situacao</span>
-<span class="lineno">  136 </span><span class="spaces">                        </span><span class="istickedoff">then <span class="nottickedoff">if minhocaViva then True else False</span></span>
-<span class="lineno">  137 </span><span class="spaces">                        </span><span class="istickedoff">else True                      </span>
-<span class="lineno">  138 </span><span class="spaces">  </span><span class="istickedoff">where</span>
-<span class="lineno">  139 </span><span class="spaces">    </span><span class="istickedoff"></span>
-<span class="lineno">  140 </span><span class="spaces">    </span><span class="istickedoff"><span class="nottickedoff">vida = case vidaMinhoca minh of</span></span>
-<span class="lineno">  141 </span><span class="spaces">        </span><span class="istickedoff"><span class="nottickedoff">Morta -&gt; 0</span></span>
-<span class="lineno">  142 </span><span class="spaces">        </span><span class="istickedoff"><span class="nottickedoff">Viva a -&gt; a</span></span>
-<span class="lineno">  143 </span><span class="spaces">    </span><span class="istickedoff"></span>
-<span class="lineno">  144 </span><span class="spaces">    </span><span class="istickedoff">pos = case posicaoMinhoca minh of Just (y,x) -&gt; (y,x)</span>
-<span class="lineno">  145 </span><span class="spaces">    </span><span class="istickedoff">terrenoAtual = case (encontraPosicaoMatriz pos m) of Just a -&gt; a </span>
-<span class="lineno">  146 </span><span class="spaces">                                                         </span><span class="istickedoff">Nothing -&gt; <span class="nottickedoff">Ar</span></span>
-<span class="lineno">  147 </span><span class="spaces">    </span><span class="istickedoff"></span>
-<span class="lineno">  148 </span><span class="spaces">    </span><span class="istickedoff">minhocaViva :: Bool</span>
-<span class="lineno">  149 </span><span class="spaces">    </span><span class="istickedoff"><span class="nottickedoff">minhocaViva = if vida == 0 then False else True</span></span></span>
-<span class="lineno">  150 </span>
+<span class="lineno">  130 </span>validaMorte :: Minhoca -&gt; Mapa -&gt; Bool
+<span class="lineno">  131 </span><span class="decl"><span class="istickedoff">validaMorte minh [] = <span class="nottickedoff">False</span></span>
+<span class="lineno">  132 </span><span class="spaces"></span><span class="istickedoff">validaMorte minh m = case posicaoMinhoca minh of</span>
+<span class="lineno">  133 </span><span class="spaces">    </span><span class="istickedoff">Nothing -&gt;</span>
+<span class="lineno">  134 </span><span class="spaces">        </span><span class="istickedoff"><span class="nottickedoff">vidaMinhoca minh == Morta</span></span>
+<span class="lineno">  135 </span><span class="spaces"></span><span class="istickedoff"></span>
+<span class="lineno">  136 </span><span class="spaces">    </span><span class="istickedoff">Just pos -&gt; case terrenoAtual of</span>
+<span class="lineno">  137 </span><span class="spaces">                                    </span><span class="istickedoff">Agua -&gt; vidaMinhoca minh == Morta</span>
+<span class="lineno">  138 </span><span class="spaces">                                    </span><span class="istickedoff">outro    -&gt; True</span>
+<span class="lineno">  139 </span><span class="spaces">                </span><span class="istickedoff">where</span>
+<span class="lineno">  140 </span><span class="spaces">                    </span><span class="istickedoff">terrenoAtual = case (encontraPosicaoMatriz pos m) of</span>
+<span class="lineno">  141 </span><span class="spaces">                                        </span><span class="istickedoff">Just a -&gt; a </span>
+<span class="lineno">  142 </span><span class="spaces">                                        </span><span class="istickedoff">Nothing -&gt; <span class="nottickedoff">Ar</span></span></span> -- ! atencao
+<span class="lineno">  143 </span>-- * Verifica se a vida da minhoca é valida
+<span class="lineno">  144 </span>
+<span class="lineno">  145 </span>verificaVida :: Minhoca -&gt; Bool
+<span class="lineno">  146 </span><span class="decl"><span class="istickedoff">verificaVida m = case vida of</span>
+<span class="lineno">  147 </span><span class="spaces">                    </span><span class="istickedoff">Morta -&gt; True</span>
+<span class="lineno">  148 </span><span class="spaces">                    </span><span class="istickedoff">Viva a -&gt; if <span class="tickonlytrue">(a &gt;= 0 &amp;&amp; a &lt;= 100)</span> then True else <span class="nottickedoff">False</span></span>
+<span class="lineno">  149 </span><span class="spaces">    </span><span class="istickedoff">where</span>
+<span class="lineno">  150 </span><span class="spaces">        </span><span class="istickedoff">vida = vidaMinhoca m</span></span>
 <span class="lineno">  151 </span>
-<span class="lineno">  152 </span>-- * Verifica se a vida da minhoca é valida
-<span class="lineno">  153 </span>
-<span class="lineno">  154 </span>verificaVida :: Minhoca -&gt; Bool
-<span class="lineno">  155 </span><span class="decl"><span class="istickedoff">verificaVida m = case vida of</span>
-<span class="lineno">  156 </span><span class="spaces">                    </span><span class="istickedoff">Morta -&gt; True</span>
-<span class="lineno">  157 </span><span class="spaces">                    </span><span class="istickedoff">Viva a -&gt; if <span class="tickonlytrue">(a &gt;= 0 &amp;&amp; a &lt;= 100)</span> then True else <span class="nottickedoff">False</span></span>
-<span class="lineno">  158 </span><span class="spaces">    </span><span class="istickedoff">where</span>
-<span class="lineno">  159 </span><span class="spaces">        </span><span class="istickedoff">vida = vidaMinhoca m</span></span>
-<span class="lineno">  160 </span>
-<span class="lineno">  161 </span>
-<span class="lineno">  162 </span>-- todo -- Fazer com que caso a minhoca tenha vida 0 morra (pode vir a ser feito em tarefas futuras entao perguntar)
+<span class="lineno">  152 </span>
+<span class="lineno">  153 </span>-- todo -- Fazer com que caso a minhoca tenha vida 0 morra (pode vir a ser feito em tarefas futuras entao perguntar)
 
 </pre>
 </body>

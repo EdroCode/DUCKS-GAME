@@ -159,7 +159,7 @@ span.spaces    { background: white }
 <span class="lineno">  140 </span><span class="spaces">        </span><span class="nottickedoff">True -&gt; liftM Right decode</span></span>
 <span class="lineno">  141 </span>
 <span class="lineno">  142 </span>instance <span class="decl"><span class="nottickedoff">Coded a =&gt; Coded (Maybe a)</span></span> where
-<span class="lineno">  143 </span>    <span class="decl"><span class="istickedoff">encode Nothing = <span class="nottickedoff">encode False</span></span>
+<span class="lineno">  143 </span>    <span class="decl"><span class="istickedoff">encode Nothing = encode False</span>
 <span class="lineno">  144 </span><span class="spaces">    </span><span class="istickedoff">encode (Just a) = encode True &lt;&gt; encode a</span></span>
 <span class="lineno">  145 </span>    <span class="decl"><span class="nottickedoff">decode = decode &gt;&gt;= \b -&gt; case b of</span>
 <span class="lineno">  146 </span><span class="spaces">        </span><span class="nottickedoff">False -&gt; return Nothing</span>

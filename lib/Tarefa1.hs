@@ -96,9 +96,10 @@ listaDonos (h:t) = if ehDisparo h
 
 -- * Verifica se existe donos repetidos
 
-verificarDonos :: Eq a => [a] -> Bool
+verificarDonos :: Eq Int => [Int] -> Bool
 verificarDonos [] = True
 verificarDonos (h:t) = if elem h t then False else verificarDonos t
+
 
 
 
@@ -108,20 +109,15 @@ verificarDonos (h:t) = if elem h t then False else verificarDonos t
 -- * Valida se as minhocas são validas
 
 eMinhocasValidas :: Estado -> [Minhoca] -> Bool
-eMinhocasValidas e [] = True
-eMinhocasValidas e (h:t) = if ePosicaoEstadoLivre pos e{minhocasEstado = t} 
-                           && validaMorte h (mapaEstado e)
-                           && verificaVida h
-                           then eMinhocasValidas e t else False
-    where
-        pos = case posicaoMinhoca h of 
-            Just (y,x) -> (y,x) 
-            Nothing -> (-1,-1) -- !  perguntar ao stor
-        vida = case vidaMinhoca h of Viva a -> a
-        municoes = [jetpackMinhoca, escavadoraMinhoca, bazucaMinhoca, minaMinhoca, dinamiteMinhoca]
-        muniValidas :: [Int] -> Bool
-        muniValidas [] = True
-        muniValidas (h:t) = if (h >= 0) then muniValidas t else False
+eMinhocasValidas _ [] = True
+eMinhocasValidas e (h:t) = posicaoValida && morteOk && vidaOk && eMinhocasValidas e t
+  where
+    posicaoValida = case posicaoMinhoca h of
+        Nothing   -> True  
+        Just p    -> ePosicaoEstadoLivre p e{minhocasEstado = t}
+
+    morteOk = validaMorte h (mapaEstado e)
+    vidaOk  = verificaVida h
 
 
 
@@ -130,25 +126,20 @@ eMinhocasValidas e (h:t) = if ePosicaoEstadoLivre pos e{minhocasEstado = t}
 
 -- * Verifica se a minhoca esta dentro de água, e caso esteja, verifica se a mesma esta morta
 -- * Retorna True se a minhoca estiver valida (pos valida e nao morta) e False caso esteja em agua e nao esteja morta
+
 validaMorte :: Minhoca -> Mapa -> Bool
 validaMorte minh [] = False
-validaMorte minh m = if pos == (-1, -1) || terrenoAtual == Agua -- ! mesma situacao
-                        then if minhocaViva then True else False
-                        else True                      
-  where
-    
-    vida = case vidaMinhoca minh of
-        Morta -> 0
-        Viva a -> a
-    
-    pos = case posicaoMinhoca minh of Just (y,x) -> (y,x)
-    terrenoAtual = case (encontraPosicaoMatriz pos m) of Just a -> a 
-                                                         Nothing -> Ar
-    
-    minhocaViva :: Bool
-    minhocaViva = if vida == 0 then False else True
+validaMorte minh m = case posicaoMinhoca minh of
+    Nothing ->
+        vidaMinhoca minh == Morta
 
-
+    Just pos -> case terrenoAtual of
+                                    Agua -> vidaMinhoca minh == Morta
+                                    outro    -> True
+                where
+                    terrenoAtual = case (encontraPosicaoMatriz pos m) of
+                                        Just a -> a 
+                                        Nothing -> Ar -- ! atencao
 -- * Verifica se a vida da minhoca é valida
 
 verificaVida :: Minhoca -> Bool

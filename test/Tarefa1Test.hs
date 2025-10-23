@@ -41,7 +41,7 @@ disparo2 = Disparo
 }
 
 minhoca1 = Minhoca{
-    posicaoMinhoca = Just(3,0),
+    posicaoMinhoca = Just(5,7),
     vidaMinhoca = Morta,
     jetpackMinhoca = 100,
     escavadoraMinhoca = 200,
@@ -94,10 +94,10 @@ estadoInvalidoMapa = Estado
 
 
 disparo3 = Disparo
-  { posicaoDisparo = (1,4)
+  { posicaoDisparo = (3,0)
   , direcaoDisparo = Norte
-  , tipoDisparo = Mina
-  , tempoDisparo = Just 24
+  , tipoDisparo = Dinamite
+  , tempoDisparo = Just 2
   , donoDisparo = 0
 }
 
@@ -149,6 +149,32 @@ estadoInvalidoMapaVazio = Estado
   , objetosEstado  = objetos
   , minhocasEstado = [minhoca7]
   }
+
+-- * ESTADO INVALIDO (donos repetidos)
+
+
+
+estadoInvalidoDonosIguais = Estado
+    { mapaEstado =
+        [[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Terra,Terra,Terra,Terra,Terra,Ar,Ar,Ar,Ar,Ar]
+        ,[Terra,Terra,Terra,Terra,Terra,Pedra,Pedra,Agua,Agua,Agua]
+        ]
+    , objetosEstado =
+        [Disparo {posicaoDisparo = (1,4), direcaoDisparo = Norte, tipoDisparo = Mina, tempoDisparo = Just 2, donoDisparo = 0}
+        ,Disparo {posicaoDisparo = (2,4), direcaoDisparo = Norte, tipoDisparo = Dinamite, tempoDisparo = Just 2, donoDisparo = 1}
+        ,Barril {posicaoBarril = (3,2), explodeBarril = False}
+        ,Disparo {posicaoDisparo = (0,0), direcaoDisparo = Norte, tipoDisparo = Bazuca, tempoDisparo = Nothing, donoDisparo = 0}
+        ,Disparo {posicaoDisparo = (1,1), direcaoDisparo = Este, tipoDisparo = Bazuca, tempoDisparo = Nothing, donoDisparo = 0}
+        ]
+    , minhocasEstado =
+        [Minhoca {posicaoMinhoca = Just (5,7), vidaMinhoca = Morta, jetpackMinhoca = 100, escavadoraMinhoca = 200, bazucaMinhoca = 150, minaMinhoca = 3, dinamiteMinhoca = 1}
+        ,Minhoca {posicaoMinhoca = Just (3,1), vidaMinhoca = Viva 0, jetpackMinhoca = 100, escavadoraMinhoca = 200, bazucaMinhoca = 150, minaMinhoca = 3, dinamiteMinhoca = 1}
+        ]
+    }
 
 -- * ESTADO VALIDO 2
 
@@ -216,7 +242,152 @@ estadoInvalidoMinhocassss = Estado
   , minhocasEstado = [minhoca5, minhoca4]
   }
 
-estadosParaTestar = [estado1, estadoInvalidoMapa, estadoInvalidoMapaVazio, estadoInvalidoMinhocas, estadoInvalidoMinhocassss, estadoInvalidoObjetos, estadoValido2]
+
+-- * ESTADO VALIDO 3
+
+estadoValido3 = Estado
+    { mapaEstado =
+        [[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Terra,Terra,Terra,Terra,Terra,Ar,Ar,Ar,Ar,Ar]
+        ,[Terra,Terra,Terra,Terra,Terra,Pedra,Pedra,Agua,Agua,Agua]
+        ]
+    , objetosEstado =
+        [Disparo {posicaoDisparo = (3,1), direcaoDisparo = Norte, tipoDisparo = Mina, tempoDisparo = Just 2, donoDisparo = 0}
+        ,Disparo {posicaoDisparo = (2,4), direcaoDisparo = Norte, tipoDisparo = Dinamite, tempoDisparo = Just 2, donoDisparo = 1}
+        ,Barril {posicaoBarril = (3,2), explodeBarril = False}
+        ]
+    , minhocasEstado =
+        [Minhoca {posicaoMinhoca = Just (3,0), vidaMinhoca = Morta, jetpackMinhoca = 100, escavadoraMinhoca = 200, bazucaMinhoca = 150, minaMinhoca = 3, dinamiteMinhoca = 1}
+        ,Minhoca {posicaoMinhoca = Just (3,1), vidaMinhoca = Viva 0, jetpackMinhoca = 100, escavadoraMinhoca = 200, bazucaMinhoca = 150, minaMinhoca = 3, dinamiteMinhoca = 1}
+        ]
+    }
+
+-- * ESTADO INVALIDO (minhoca overlap mapa)
+
+estadoInvalido3 = Estado
+    { mapaEstado =
+        [[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Terra,Terra,Terra,Terra,Terra,Ar,Ar,Ar,Ar,Ar]
+        ,[Terra,Terra,Terra,Terra,Terra,Pedra,Pedra,Agua,Agua,Agua]
+        ]
+    , objetosEstado =
+        [Disparo {posicaoDisparo = (3,3), direcaoDisparo = Norte, tipoDisparo = Mina, tempoDisparo = Just 2, donoDisparo = 0}
+        ,Disparo {posicaoDisparo = (2,4), direcaoDisparo = Norte, tipoDisparo = Dinamite, tempoDisparo = Just 2, donoDisparo = 1}
+        ,Barril {posicaoBarril = (3,2), explodeBarril = False}
+        ]
+    , minhocasEstado =
+        [Minhoca {posicaoMinhoca = Just (3,0), vidaMinhoca = Morta, jetpackMinhoca = 100, escavadoraMinhoca = 200, bazucaMinhoca = 150, minaMinhoca = 3, dinamiteMinhoca = 1}
+        ,Minhoca {posicaoMinhoca = Just (4,2), vidaMinhoca = Viva 0, jetpackMinhoca = 100, escavadoraMinhoca = 200, bazucaMinhoca = 150, minaMinhoca = 3, dinamiteMinhoca = 1}
+        ]
+    }
+
+-- * ESTADO INVALIDO (BARRIL OVERLAP MAPA)
+
+estadoInvalido4 = Estado
+    { mapaEstado =
+        [[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Terra,Terra,Terra,Terra,Terra,Ar,Ar,Ar,Ar,Ar]
+        ,[Terra,Terra,Terra,Terra,Terra,Pedra,Pedra,Agua,Agua,Agua]
+        ]
+    , objetosEstado =
+        [Disparo {posicaoDisparo = (3,3), direcaoDisparo = Norte, tipoDisparo = Mina, tempoDisparo = Just 2, donoDisparo = 0}
+        ,Disparo {posicaoDisparo = (2,4), direcaoDisparo = Norte, tipoDisparo = Dinamite, tempoDisparo = Just 2, donoDisparo = 1}
+        ,Barril {posicaoBarril = (4,3), explodeBarril = False}
+        ]
+    , minhocasEstado =
+        [Minhoca {posicaoMinhoca = Just (3,0), vidaMinhoca = Morta, jetpackMinhoca = 100, escavadoraMinhoca = 200, bazucaMinhoca = 150, minaMinhoca = 3, dinamiteMinhoca = 1}
+        ,Minhoca {posicaoMinhoca = Just (3,2), vidaMinhoca = Viva 0, jetpackMinhoca = 100, escavadoraMinhoca = 200, bazucaMinhoca = 150, minaMinhoca = 3, dinamiteMinhoca = 1}
+        ]
+    }
+
+-- * ESTADO INVALIDO MINHOCA VIVA EM AGUA
+
+estadoInvalido5 = Estado
+    { mapaEstado =
+        [[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Terra,Terra,Terra,Terra,Terra,Ar,Ar,Ar,Ar,Ar]
+        ,[Terra,Terra,Terra,Terra,Terra,Pedra,Pedra,Agua,Agua,Agua]
+        ]
+    , objetosEstado =
+        [Disparo {posicaoDisparo = (3,3), direcaoDisparo = Norte, tipoDisparo = Mina, tempoDisparo = Just 2, donoDisparo = 0}
+        ,Disparo {posicaoDisparo = (2,4), direcaoDisparo = Norte, tipoDisparo = Dinamite, tempoDisparo = Just 2, donoDisparo = 1}
+        ,Barril {posicaoBarril = (3,5), explodeBarril = False}
+        ]
+    , minhocasEstado =
+        [Minhoca {posicaoMinhoca = Just (3,0), vidaMinhoca = Morta, jetpackMinhoca = 100, escavadoraMinhoca = 200, bazucaMinhoca = 150, minaMinhoca = 3, dinamiteMinhoca = 1}
+        ,Minhoca {posicaoMinhoca = Just (5,7), vidaMinhoca = Viva 0, jetpackMinhoca = 100, escavadoraMinhoca = 200, bazucaMinhoca = 150, minaMinhoca = 3, dinamiteMinhoca = 1}
+        ]
+    }
+
+
+-- * ESTADO INVALIDO (TEMPO E POSICAO)
+
+estadoInvalido6 = Estado
+    { mapaEstado =
+        [[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Terra,Terra,Terra,Terra,Terra,Ar,Ar,Ar,Ar,Ar]
+        ,[Terra,Terra,Terra,Terra,Terra,Pedra,Pedra,Agua,Agua,Agua]
+        ]
+    , objetosEstado =
+        [Disparo {posicaoDisparo = (3,24), direcaoDisparo = Norte, tipoDisparo = Mina, tempoDisparo = Just 2, donoDisparo = 0}
+        ,Disparo {posicaoDisparo = (2,4), direcaoDisparo = Norte, tipoDisparo = Dinamite, tempoDisparo = Just 23, donoDisparo = 1}
+        ,Barril {posicaoBarril = (3,5), explodeBarril = False}
+        ]
+    , minhocasEstado =
+        [Minhoca {posicaoMinhoca = Just (3,0), vidaMinhoca = Morta, jetpackMinhoca = 100, escavadoraMinhoca = 200, bazucaMinhoca = 150, minaMinhoca = 3, dinamiteMinhoca = 1}
+        ,Minhoca {posicaoMinhoca = Just (5,7), vidaMinhoca = Viva 0, jetpackMinhoca = 100, escavadoraMinhoca = 200, bazucaMinhoca = 150, minaMinhoca = 3, dinamiteMinhoca = 1}
+        ]
+    }
+
+
+-- * ESTADO INVALIDO BALAS TEMPO NULO
+
+estadoBalaNulo = Estado
+    { mapaEstado =
+        [[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Terra,Terra,Terra,Terra,Terra,Ar,Ar,Ar,Ar,Ar]
+        ,[Terra,Terra,Terra,Terra,Terra,Pedra,Pedra,Agua,Agua,Agua]
+        ]
+    , objetosEstado =
+        [Disparo {posicaoDisparo = (3,2), direcaoDisparo = Norte, tipoDisparo = Bazuca, tempoDisparo = Nothing, donoDisparo = 0},Disparo {posicaoDisparo = (3,2), direcaoDisparo = Norte, tipoDisparo = Mina, tempoDisparo = Nothing, donoDisparo = 0},Disparo {posicaoDisparo = (3,2), direcaoDisparo = Norte, tipoDisparo = Dinamite, tempoDisparo = Nothing, donoDisparo = 0}
+        , Disparo {posicaoDisparo = (3,2), direcaoDisparo = Norte, tipoDisparo = Escavadora, tempoDisparo = Nothing, donoDisparo = 0}, Disparo {posicaoDisparo = (3,2), direcaoDisparo = Norte, tipoDisparo = Jetpack, tempoDisparo = Nothing, donoDisparo = 0}, Disparo {posicaoDisparo = (3,2), direcaoDisparo = Norte, tipoDisparo = Bazuca, tempoDisparo = Just 0, donoDisparo = 0}]
+    , minhocasEstado =
+        [Minhoca {posicaoMinhoca = Just (15,7), vidaMinhoca = Morta, jetpackMinhoca = 100, escavadoraMinhoca = 200, bazucaMinhoca = 150, minaMinhoca = 3, dinamiteMinhoca = 1}
+        ,Minhoca {posicaoMinhoca = Nothing, vidaMinhoca = Morta, jetpackMinhoca = 100, escavadoraMinhoca = 200, bazucaMinhoca = 150, minaMinhoca = 3, dinamiteMinhoca = 1}
+        
+        ]
+    }
+
+-- * MINHOCAS E VAZIAS
+
+estadoVazio = Estado
+    { mapaEstado =
+        []
+    , objetosEstado =[]
+    , minhocasEstado = []
+    }
+
+
+
+estadosParaTestar = [estado1, estadoInvalidoMapa,estadoInvalidoDonosIguais, estadoInvalidoMapaVazio, estadoInvalidoMinhocas, estadoInvalidoMinhocassss, estadoInvalidoObjetos, estadoValido2, estadoInvalido3, estadoInvalido4, estadoInvalido5, estadoInvalido6,estadoValido3, estadoBalaNulo,estadoVazio]
 
 -- | Definir aqui os testes do grupo para a Tarefa 1
 testesTarefa1 :: [Estado]
