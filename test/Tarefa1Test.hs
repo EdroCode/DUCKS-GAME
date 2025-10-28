@@ -3,8 +3,7 @@ module Main where
 import Labs2025
 import Tarefa1
 import Magic
-
-
+import EstadosArquivo
 
 -- * Comandos para testar (rodar na cmd - bash - na pasta do ficheiro)
 -- * cabal clean && rm -rf t1-feedback.tix

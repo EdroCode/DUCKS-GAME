@@ -134,7 +134,7 @@ donoValido e obj = if indiceValido && verificaLista (listaDonos listaDisparos) t
 
 eMinhocasValidas :: Estado -> [Minhoca] -> Bool
 eMinhocasValidas _ [] = True
-eMinhocasValidas e (h:t) = posicaoValida && morteOk && vidaOk && eMinhocasValidas e t
+eMinhocasValidas e (h:t) = posicaoValida && morteOk && vidaOk && eMinhocasValidas e t && armasValidas
   where
     posicaoValida = case posicaoMinhoca h of
         Nothing   -> True  
@@ -143,6 +143,8 @@ eMinhocasValidas e (h:t) = posicaoValida && morteOk && vidaOk && eMinhocasValida
     morteOk = validaMorte h (mapaEstado e)
     vidaOk  = verificaVida h
 
+    armasValidas = if jetpackMinhoca h >= 0 && escavadoraMinhoca >= 0 && bazucaMinhoca >= 0 && minaMinhoca >= 0 && dinamiteMinhoca >= 0 then True else False
+
 
 
 -- * ---------------- Auxiliares Minhoca  ---------------------------
@@ -150,6 +152,7 @@ eMinhocasValidas e (h:t) = posicaoValida && morteOk && vidaOk && eMinhocasValida
 
 -- * Verifica se a minhoca esta dentro de água, e caso esteja, verifica se a mesma esta morta
 -- * Retorna True se a minhoca estiver valida (pos valida e nao morta) e False caso esteja em agua e nao esteja morta
+
 
 validaMorte :: Minhoca -> Mapa -> Bool
 validaMorte minh [] = False
@@ -174,6 +177,10 @@ verificaVida m = case vida of
         vida = vidaMinhoca m
 
 
--- todo -> Disparos podem ser repetidos caso nao sejam do mesmo dono 
+
+-- todo -> Disparos podem ser repetidos caso nao sejam do mesmo dono ( FEITO )
 -- todo bloco anterior ao disparo da bazuca ( FEITO )
 -- todo UMA MINA E UMA DINAMITE PODEM ESTAR NA POSICAO DA MINHOCA OU OUTRO OBJETO ( FEITO )
+
+
+

@@ -50,6 +50,7 @@ executable t1-feedback
     import:           warnings
     other-modules:
         Magic
+        EstadosArquivo
     other-extensions:
     main-is: Tarefa1Test.hs
     build-depends:
@@ -61,6 +62,7 @@ executable t2-feedback
     import:           warnings
     other-modules:
         Magic
+        EstadosArquivo
     other-extensions:
     main-is: Tarefa2Test.hs
     build-depends:
@@ -72,6 +74,7 @@ executable t3-feedback
     import:           warnings
     other-modules:
         Magic
+        EstadosArquivo
     other-extensions:
     main-is: Tarefa3Test.hs
     build-depends:
