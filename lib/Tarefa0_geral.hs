@@ -9,6 +9,8 @@ Módulo que define funções genéricas sobre listas e matrizes.
 
 module Tarefa0_geral where
 
+
+
 -- * Tipos de dados
 
 -- | Uma matriz é um conjunto de elementos a duas dimensões.
@@ -61,6 +63,19 @@ movePosicao d (x,y) = case d of
     Sudoeste -> (x + 1, y + 1)
     Sudeste -> (x + 1, y - 1)
 
+-- * Auxiliar 
+
+direcaoOposta :: Direcao -> Direcao
+direcaoOposta Norte    = Sul
+direcaoOposta Sul      = Norte
+direcaoOposta Este     = Oeste
+direcaoOposta Oeste    = Este
+direcaoOposta Nordeste = Sudoeste
+direcaoOposta Sudoeste = Nordeste
+direcaoOposta Noroeste = Sudeste
+direcaoOposta Sudeste  = Noroeste
+
+-- * ----------------------------
 
 
 -- | Versão da função 'movePosicao' que garante que o movimento não se desloca para fora de uma janela.

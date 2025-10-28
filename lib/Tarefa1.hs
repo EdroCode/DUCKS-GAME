@@ -32,73 +32,101 @@ eMapaValido m = (eMatrizValida m)
 
 -- * Valida se o objeto é valido
 
+
+
 eObjetosValido :: Estado -> [Objeto] -> Bool
 eObjetosValido _ [] = True
 eObjetosValido e (h:t) =
     if ehDisparo h == True
-    then
-        if ePosicaoMapaLivre (posicaoObjeto h) mapa
-            && not (existeBarril (posicaoObjeto h) t)
-            && objetoValido h
-            && disparoValido h
-            && verificarDonos donos
-            && donosValido
-        then eObjetosValido e t
-        else False
-    else
-        if ePosicaoMapaLivre (posicaoObjeto h) mapa
-            && ePosicaoEstadoLivre (posicaoObjeto h) e{objetosEstado = t}
-            && objetoValido h
-            && disparoValido h
-            && verificarDonos donos
-            && donosValido
-        then eObjetosValido e t
-        else False
-
+        then
+            if not (existeBarril (posicaoObjeto h) t)
+                && objetoValido h
+                && disparoValido mapa h
+                && donoValido e h
+            then eObjetosValido e t
+            else False
+        else
+            if ePosicaoMapaLivre (posicaoObjeto h) mapa
+                && ePosicaoEstadoLivre (posicaoObjeto h) e{objetosEstado = t}
+            then eObjetosValido e t
+            else False
                         
     where
         mapa = mapaEstado e
         minhocas = minhocasEstado e -- * MINHOCAS
-        donos = listaDonos (h:t)
-
-        donosValido = if length donos > length minhocas then False else True
+        
+        
 
         objetoValido obj = case obj of
             Disparo{tipoDisparo = Escavadora} -> False
             Disparo{tipoDisparo = Jetpack}  -> False
-            Disparo{tipoDisparo = Bazuca} -> disparoValido obj
-            Disparo{tipoDisparo = Mina} -> disparoValido obj
-            Disparo{tipoDisparo = Dinamite} -> disparoValido obj
-            _             -> True --todo caso exista novos casos adicionar
+            Disparo{tipoDisparo = Bazuca} -> disparoValido mapa obj
+            Disparo{tipoDisparo = Mina} -> disparoValido mapa obj
+            Disparo{tipoDisparo = Dinamite} -> disparoValido mapa obj
+            _ -> True --todo caso exista novos casos adicionar
         
-        
+
 -- * ---------------- Auxiliares Objeto  ---------------------------
-
-
 
 -- * Verifica se o disparo é valido
 
-disparoValido :: Objeto -> Bool
-disparoValido d@Disparo{tipoDisparo = Bazuca} = if (tempoDisparo d == Nothing) then True else False
-disparoValido d@Disparo{tipoDisparo = Mina} = if (tempoDisparo d <= Just 2 && tempoDisparo d >= Just 0) || (tempoDisparo d == Nothing) then True else False
-disparoValido d@Disparo{tipoDisparo = Dinamite} = if (tempoDisparo d <= Just 4 && tempoDisparo d >= Just 0) then True else False
-disparoValido _ = True
+disparoValido :: Mapa -> Objeto -> Bool
+disparoValido m d@Disparo{tipoDisparo = Bazuca} = if (tempoDisparo d == Nothing && disparoBazucaValido d m) then True else False
+disparoValido m d@Disparo{tipoDisparo = Mina} = if (tempoDisparo d <= Just 2 && tempoDisparo d >= Just 0 && ePosicaoMapaLivre (posicaoObjeto d) m) || (tempoDisparo d == Nothing && ePosicaoMapaLivre (posicaoObjeto d) m) then True else False
+disparoValido m d@Disparo{tipoDisparo = Dinamite} = if (tempoDisparo d <= Just 4 && tempoDisparo d >= Just 0 && ePosicaoMapaLivre (posicaoObjeto d) m) then True else False
+disparoValido m _ = True
 
--- * Retorna uma lista de todos os donos dos disparos no estado
+-- * Auxiliar que verifica caso o disparo de Bazuca veio de uma posicao valida (a excecao)
 
-listaDonos :: [Objeto] -> [Int]
-listaDonos [] = []
-listaDonos (h:t) = if ehDisparo h
-                        then [x] ++ listaDonos t 
-                        else listaDonos t
+disparoBazucaValido :: Objeto -> Mapa -> Bool -- * e livre se n tiver opaco
+disparoBazucaValido obj mapa = if not (ePosicaoMapaLivre prevPos mapa) then False else True
                     where
-                        x = donoDisparo h
+                        pos = posicaoObjeto obj
+                        dir = direcaoDisparo obj
+                        prevPos = movePosicao (direcaoOposta dir) pos
 
--- * Verifica se existe donos repetidos
+-- * ------------------------------------------
+-- * Verificação dos Donos
 
-verificarDonos :: Eq Int => [Int] -> Bool
-verificarDonos [] = True
-verificarDonos (h:t) = if elem h t then False else verificarDonos t
+-- tem de ser um indice valido na lista das minhocas (ex 3 minhocas indices [0,1,2], logo i tem de estar no intervcalo 0 2)
+-- O mesmo dono não pode ter simultaneamente mais do que um disparo de cada tipo.
+-- Logo
+
+
+donoValido :: Estado -> Objeto -> Bool
+donoValido e obj = if indiceValido && verificaLista (listaDonos listaDisparos) then True else False
+            where
+                indiceDono = donoDisparo obj
+                minhocas = minhocasEstado e
+                objetos = objetosEstado e
+                listaDisparos = disparosEstado objetos
+                -- Primeira verificação (é um indice valido na lista de minhocas)
+                indiceValido = if indiceDono <= (length minhocas - 1) && indiceDono >= 0 then True else False
+
+
+                listaDonos :: [Objeto] -> [(TipoArma, Int)]
+                listaDonos [] = []
+                listaDonos (h:t) = (tipo,indice) : listaDonos t
+                                    where
+                                        indice = donoDisparo h
+                                        tipo = tipoDisparo h
+               
+                -- * Recebe os objetos do estado e devolve uma lista com (tipo de arma, dono)
+                -- Exemplo [(Dinamite, 0,(Mina,0)] -> Valida
+                -- Exemplo [(Dinamite, 0),(Dinamite,0)] -> Invalido
+
+                
+                verificaLista :: [(TipoArma, Int)] -> Bool
+                verificaLista [] = True
+                verificaLista (h:t) = if elem h t then False else True
+
+
+                -- * Devolve os objetos disparos
+                disparosEstado :: [Objeto] -> [Objeto]
+                disparosEstado [] = []
+                disparosEstado (h:t) = if ehDisparo h then h : disparosEstado t else disparosEstado t
+
+
 
 -- * -------------------------------------------
 
@@ -146,6 +174,6 @@ verificaVida m = case vida of
         vida = vidaMinhoca m
 
 
--- todo -> Disparos podem ser repetidos caso nao sejam do mesmo dono
--- todo bloco anterior ao disparo da bazuca
+-- todo -> Disparos podem ser repetidos caso nao sejam do mesmo dono 
+-- todo bloco anterior ao disparo da bazuca ( FEITO )
 -- todo UMA MINA E UMA DINAMITE PODEM ESTAR NA POSICAO DA MINHOCA OU OUTRO OBJETO ( FEITO )
