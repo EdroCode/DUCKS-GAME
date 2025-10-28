@@ -10,16 +10,8 @@ import Labs2025
 import Tarefa0_2025
 
 
--- * Aula
 
---getMunicoesMinhoca :: Minhoca -> Int
---getMunicoesMinhoca m = bazucaMinhoca m
 
---incrementMunBazuca :: Minhoca -> Int -> Minhoca
---incrementMunBazuca m i = m {bazucaMinhoca = bazucaMinhoca m + i}
--- -incrementMunBazuca m@Minhoca {bazucaMinhoca = bazucas} i - m {bazucaMinhoca = bazucas}
-
--- * ------------------------------------------------------------
 
 
 -- | Função principa*! Excecao nl da Tarefa 1. Recebe um estado e retorna se este é válido ou não.
@@ -29,9 +21,6 @@ validaEstado e = eMapaValido mapa && eObjetosValido e objetos && eMinhocasValida
         mapa = mapaEstado e
         objetos = objetosEstado e
         minhocas = minhocasEstado e
-
-
-
 
 -- * Valida se o mapa é valido
 
@@ -45,16 +34,31 @@ eMapaValido m = (eMatrizValida m)
 
 eObjetosValido :: Estado -> [Objeto] -> Bool
 eObjetosValido _ [] = True
-eObjetosValido e (h:t) = if ePosicaoMapaLivre (posicaoObjeto h) mapa 
-                        && ePosicaoEstadoLivre (posicaoObjeto h) e{objetosEstado = t} 
-                        && objetoValido h
-                        && disparoValido h
-                        && verificarDonos donos
-                        && donosValido
-                        then eObjetosValido e t else False
+eObjetosValido e (h:t) =
+    if ehDisparo h == True
+    then
+        if ePosicaoMapaLivre (posicaoObjeto h) mapa
+            && not (existeBarril (posicaoObjeto h) t)
+            && objetoValido h
+            && disparoValido h
+            && verificarDonos donos
+            && donosValido
+        then eObjetosValido e t
+        else False
+    else
+        if ePosicaoMapaLivre (posicaoObjeto h) mapa
+            && ePosicaoEstadoLivre (posicaoObjeto h) e{objetosEstado = t}
+            && objetoValido h
+            && disparoValido h
+            && verificarDonos donos
+            && donosValido
+        then eObjetosValido e t
+        else False
+
+                        
     where
         mapa = mapaEstado e
-        minhocas = minhocasEstado e
+        minhocas = minhocasEstado e -- * MINHOCAS
         donos = listaDonos (h:t)
 
         donosValido = if length donos > length minhocas then False else True
@@ -70,17 +74,13 @@ eObjetosValido e (h:t) = if ePosicaoMapaLivre (posicaoObjeto h) mapa
         
 -- * ---------------- Auxiliares Objeto  ---------------------------
 
--- * Verifica se o objeto fornecido é um disparo
 
-ehDisparo :: Objeto -> Bool
-ehDisparo d@Disparo{} = True
-ehDisparo _ = False
 
 -- * Verifica se o disparo é valido
 
 disparoValido :: Objeto -> Bool
 disparoValido d@Disparo{tipoDisparo = Bazuca} = if (tempoDisparo d == Nothing) then True else False
-disparoValido d@Disparo{tipoDisparo = Mina} = if (tempoDisparo d <= Just 2 && tempoDisparo d >= Just 0) then True else False
+disparoValido d@Disparo{tipoDisparo = Mina} = if (tempoDisparo d <= Just 2 && tempoDisparo d >= Just 0) || (tempoDisparo d == Nothing) then True else False
 disparoValido d@Disparo{tipoDisparo = Dinamite} = if (tempoDisparo d <= Just 4 && tempoDisparo d >= Just 0) then True else False
 disparoValido _ = True
 
@@ -99,10 +99,6 @@ listaDonos (h:t) = if ehDisparo h
 verificarDonos :: Eq Int => [Int] -> Bool
 verificarDonos [] = True
 verificarDonos (h:t) = if elem h t then False else verificarDonos t
-
-
-
-
 
 -- * -------------------------------------------
 
@@ -150,4 +146,6 @@ verificaVida m = case vida of
         vida = vidaMinhoca m
 
 
--- todo -- Fazer com que caso a minhoca tenha vida 0 morra (pode vir a ser feito em tarefas futuras entao perguntar)
+-- todo -> Disparos podem ser repetidos caso nao sejam do mesmo dono
+-- todo bloco anterior ao disparo da bazuca
+-- todo UMA MINA E UMA DINAMITE PODEM ESTAR NA POSICAO DA MINHOCA OU OUTRO OBJETO ( FEITO )

@@ -11,7 +11,6 @@ module Tarefa0_2025 where
 import Labs2025
 
 
-
 -- | Retorna a quantidade de munições disponíveis de uma minhoca para uma dada arma.
 encontraQuantidadeArmaMinhoca :: TipoArma -> Minhoca -> Int
 encontraQuantidadeArmaMinhoca tipo m = case tipo of
@@ -66,7 +65,7 @@ encontraLinhaMapa i (h:t) = encontraLinhaMapa (i-1) t
 -- __NB:__ Uma posição está livre se o mapa estiver livre e se não estiver já uma minhoca ou um barril nessa posição.
 ePosicaoEstadoLivre :: Posicao -> Estado -> Bool
 ePosicaoEstadoLivre pos estado =
-    ePosicaoMapaLivre pos mapa && not (existeMinhoca pos minhocas) && not (existeObjeto pos objetos)
+    ePosicaoMapaLivre pos mapa && not (existeMinhoca pos minhocas) && not (existeBarril pos objetos)
   where
     mapa = mapaEstado estado
     objetos = objetosEstado estado
@@ -81,12 +80,21 @@ existeMinhoca pos [] = False
 existeMinhoca (x,y) (h:t) = let pos = posicaoMinhoca h
                             in if pos == Just (x,y) then True else existeMinhoca (x,y) t
                        
-existeObjeto :: Posicao -> [Objeto] -> Bool
-existeObjeto pos [] = False
-existeObjeto pos (h:t) = let p = posicaoObjeto h
-                         in if p == pos then True else existeObjeto pos t
+existeBarril :: Posicao -> [Objeto] -> Bool
+existeBarril pos [] = False
+existeBarril pos (h:t) =
+  let p = posicaoObjeto h
+  in if (ehDisparo h == False)
+       then if p == pos
+              then True
+              else existeBarril pos t
+        else existeBarril pos t
 
+-- * Verifica se o objeto fornecido é um disparo se não, é Barril
 
+ehDisparo :: Objeto -> Bool
+ehDisparo d@Disparo{} = True
+ehDisparo _ = False
 
 posicaoObjeto :: Objeto -> Posicao
 posicaoObjeto d@(Disparo {})  = posicaoDisparo d
