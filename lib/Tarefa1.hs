@@ -143,7 +143,7 @@ eMinhocasValidas e (h:t) = posicaoValida && morteOk && vidaOk && eMinhocasValida
     morteOk = validaMorte h (mapaEstado e)
     vidaOk  = verificaVida h
 
-    armasValidas = if jetpackMinhoca h >= 0 && escavadoraMinhoca >= 0 && bazucaMinhoca >= 0 && minaMinhoca >= 0 && dinamiteMinhoca >= 0 then True else False
+    armasValidas = if jetpackMinhoca h >= 0 && escavadoraMinhoca h >= 0 && bazucaMinhoca h >= 0 && minaMinhoca h >= 0 && dinamiteMinhoca h >= 0 then True else False
 
 
 
