@@ -79,7 +79,7 @@ disparoValido m _ = True
 -- * Auxiliar que verifica caso o disparo de Bazuca veio de uma posicao valida (a excecao)
 
 disparoBazucaValido :: Objeto -> Mapa -> Bool -- * e livre se n tiver opaco
-disparoBazucaValido obj mapa = if not (ePosicaoMapaLivre prevPos mapa) then False else True
+disparoBazucaValido obj mapa = if (ePosicaoMapaLivre prevPos mapa) then True else False
                     where
                         pos = posicaoObjeto obj
                         dir = direcaoDisparo obj
