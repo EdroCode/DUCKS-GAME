@@ -18,12 +18,23 @@ estadoTeste = Estado
     , objetosEstado =
         []
     , minhocasEstado =
-        [Minhoca {posicaoMinhoca = Just (2,0), vidaMinhoca = Viva 100, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 1}
-        ]
+        [Minhoca {posicaoMinhoca = Just (3,1), vidaMinhoca = Viva 100, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 1}]
     }
 
 jogadaTeste = Move Norte
 
+                            
+-- * --------------------------------------
+-- * MOVIMENTO
+-- * --------------------------------------
+
+mapaOk = [[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+    ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+    ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+    ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+    ,[Terra,Terra,Terra,Terra,Terra,Ar,Ar,Ar,Ar,Ar]
+    ,[Terra,Terra,Terra,Terra,Terra,Pedra,Pedra,Agua,Agua,Agua]
+    ]
 
 
 
@@ -33,9 +44,8 @@ efetuaJogada n (Dispara arma direcao) e = undefined
 efetuaJogada n (Move direcao) e = if not (vidaMinhoca minhoca == Morta)  -- * Se a posicao nao for nula (para so aceitar posicoes validas nas funcoes seguintes)
                                     then if not (posicaoMinhoca minhoca == Nothing)
                                                 then if estaNoSolo pos mapa  -- * esta no solo (nao esta no ar)
-                                                        then case direcao of-- * Ela move se
-                                                            _ -> estadoFinal -- * Move se
-                                                    else e 
+                                                        then estadoFinal -- * Move se
+                                                        else e{minhocasEstado = []}
                                                 else e -- * esta no Ar
                                     else e
                                 
@@ -58,12 +68,12 @@ efetuaJogada n (Move direcao) e = if not (vidaMinhoca minhoca == Morta)  -- * Se
 
                             minhocaFinal = -- * NOva pos n é opaca
                                 if ePosicaoMatrizValida pos mapa
-                                    then if eNovaPosLivre pos e
-                                        then minhoca { posicaoMinhoca = Just novaPos } 
+                                    then if eNovaPosLivre novaPos e
+                                        then if not ((encontraPosicaoMatriz novaPos mapa) == Just Agua) 
+                                            then minhoca { posicaoMinhoca = Just novaPos } 
+                                            else minhoca { posicaoMinhoca = Just novaPos,  vidaMinhoca = Morta } 
                                         else minhoca
                                 else minhoca { posicaoMinhoca = Nothing, vidaMinhoca = Morta }
-                            
-                            
                             
                             
                             
@@ -73,34 +83,20 @@ efetuaJogada n (Move direcao) e = if not (vidaMinhoca minhoca == Morta)  -- * Se
                                 mapaEstado = mapa,
                                 objetosEstado = objetos,
                                 minhocasEstado = minhocasFinais
-                            } -- todo por definir
+                            } 
 
-                            -- * Auxiliares
-
-                            
+                             
 
 
                
-                            
--- * --------------------------------------
--- * MOVIMENTO
--- * --------------------------------------
 
-mapaOk = [[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
-    ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
-    ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
-    ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
-    ,[Terra,Terra,Terra,Terra,Terra,Ar,Ar,Ar,Ar,Ar]
-    ,[Terra,Terra,Terra,Terra,Terra,Pedra,Pedra,Agua,Agua,Agua]
-    ]
 
 
 -- Verifica se a posicao que a minhoca ira é nao opaca
 eNovaPosLivre :: Posicao -> Estado -> Bool
-eNovaPosLivre posNova est = if ePosicaoEstadoLivre posNova est == False then False else True
+eNovaPosLivre posNova est = if ePosicaoEstadoLivre posNova est == True then True else False
 
  
--- ! not exhaustive ERROR
 estaNoSolo :: Posicao -> Mapa -> Bool
 estaNoSolo p [] = False
 estaNoSolo pos mapa = if eTerrenoOpaco blocoInferior && not (eTerrenoOpaco blocoAtual) then True else False
