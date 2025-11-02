@@ -9,6 +9,7 @@ module Tarefa2 where
 import Labs2025
 import Tarefa0_geral
 import Tarefa0_2025
+import Tarefa1
 import Foreign (moveArray)
 
 -- * Assume se que todos os estados recebidos serao validos
@@ -18,10 +19,14 @@ estadoTeste = Estado
     , objetosEstado =
         []
     , minhocasEstado =
-        [Minhoca {posicaoMinhoca = Just (3,1), vidaMinhoca = Viva 100, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 1}]
+        [Minhoca {posicaoMinhoca = Just (4,6), vidaMinhoca = Viva 100, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 1}]
     }
 
 jogadaTeste = Move Norte
+jogadaTeste2 = (0,Dispara Escavadora Sul,estadoTeste)
+jogadaTeste6 = Dispara Escavadora Sul
+
+
 
                             
 -- * --------------------------------------
@@ -31,7 +36,7 @@ jogadaTeste = Move Norte
 mapaOk = [[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
     ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
     ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
-    ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+    ,[Ar,Ar,Pedra,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
     ,[Terra,Terra,Terra,Terra,Terra,Ar,Ar,Ar,Ar,Ar]
     ,[Terra,Terra,Terra,Terra,Terra,Pedra,Pedra,Agua,Agua,Agua]
     ]
@@ -40,7 +45,69 @@ mapaOk = [[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
 
 -- | Função principal da Tarefa 2. Recebe o índice de uma minhoca na lista de minhocas, uma jogada, um estado e retorna um novo estado em que essa minhoca efetuou essa jogada.
 efetuaJogada :: NumMinhoca -> Jogada -> Estado -> Estado
-efetuaJogada n (Dispara arma direcao) e = undefined
+
+-- * DISPARO - Dispara TIpo Direcao
+efetuaJogada n (Dispara arma direcao) e = if not (vidaMinhoca minhoca == Morta) -- não esta morta
+                                            then if not (elem (arma,n) (listaDonos objetos)) -- Verifica se existe um disparo da mesma arma da mesma minhoca no estado atual
+                                                then case arma of
+
+                                                    Jetpack -> if ePosicaoMatrizValida novaPos mapa && ePosicaoEstadoLivre novaPos e
+                                                            then Estado {mapaEstado = mapa,objetosEstado = objetos,minhocasEstado = minhocasFinais}
+                                                            else e
+                                                    
+                                                    Escavadora -> if ePosicaoMatrizValida novaPos mapa
+
+                                                            then if not (blocoTargeted == Pedra)
+                                                                then if eTerrenoDestrutivel(blocoTargeted)
+                                                                    then Estado {mapaEstado = atualizaPosicaoMatriz novaPos Ar mapa ,objetosEstado = objetos,minhocasEstado = minhocasFinais}
+                                                                    else Estado {mapaEstado = mapa ,objetosEstado = objetos,minhocasEstado = minhocasFinais}
+                                                                
+                                                                else Estado{mapaEstado=mapaOk,objetosEstado=objetos,minhocasEstado=atualizaIndiceLista n (minhoca{escavadoraMinhoca = escavadoraMinhoca minhoca-1}) minhocas}                                                
+                                                            else e
+
+
+                                                else e
+                                            else e
+                                        
+                                        
+                                        
+                                        where    
+                                            
+                                            -- * minhoca estudada
+                                            minhoca = case encontraIndiceLista n minhocas of Just m -> m -- ! atencao
+                                            pos = case posicaoMinhoca minhoca of Just a -> a
+                                            
+                                            -- -------------
+                                            
+                                            minhocas = minhocasEstado e
+                                            mapa = mapaEstado e
+                                            objetos = objetosEstado e
+
+                                            novaPos = movePosicao direcao pos
+
+                                            
+
+                                            minhocaFinal = -- * NOva pos n é opaca
+                                            
+                                                if ePosicaoMatrizValida novaPos mapa
+                                                    then if not ((encontraPosicaoMatriz novaPos mapa) == Just Agua) 
+                                                        then case arma of 
+                                                                Jetpack -> minhoca { posicaoMinhoca = Just novaPos, jetpackMinhoca = jetpackMinhoca minhoca - 1} 
+                                                                Escavadora -> minhoca { posicaoMinhoca = Just novaPos, escavadoraMinhoca = escavadoraMinhoca minhoca - 1} 
+
+                                                        else minhoca { posicaoMinhoca = Just novaPos,  vidaMinhoca = Morta } 
+                                                    
+                                                else minhoca { posicaoMinhoca = Nothing, vidaMinhoca = Morta }
+                                            
+
+                                            blocoTargeted = case encontraPosicaoMatriz novaPos mapa of Just a -> a
+                                        
+                                            minhocasFinais = atualizaIndiceLista n minhocaFinal minhocas
+
+                       
+
+
+-- * MOVIMENTO
 efetuaJogada n (Move direcao) e = if not (vidaMinhoca minhoca == Morta)  -- * Se a posicao nao for nula (para so aceitar posicoes validas nas funcoes seguintes)
                                     then if not (posicaoMinhoca minhoca == Nothing)
                                                 then if estaNoSolo pos mapa  -- * esta no solo (nao esta no ar)
@@ -67,7 +134,7 @@ efetuaJogada n (Move direcao) e = if not (vidaMinhoca minhoca == Morta)  -- * Se
                             -- * Estado final
 
                             minhocaFinal = -- * NOva pos n é opaca
-                                if ePosicaoMatrizValida pos mapa
+                                if ePosicaoMatrizValida novaPos mapa
                                     then if eNovaPosLivre novaPos e
                                         then if not ((encontraPosicaoMatriz novaPos mapa) == Just Agua) 
                                             then minhoca { posicaoMinhoca = Just novaPos } 

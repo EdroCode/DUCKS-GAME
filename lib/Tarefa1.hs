@@ -104,13 +104,6 @@ donoValido e obj = if indiceValido && verificaLista (listaDonos listaDisparos) t
                 indiceValido = if indiceDono <= (length minhocas - 1) && indiceDono >= 0 then True else False
 
 
-                listaDonos :: [Objeto] -> [(TipoArma, Int)]
-                listaDonos [] = []
-                listaDonos (h:t) = (tipo,indice) : listaDonos t
-                                    where
-                                        indice = donoDisparo h
-                                        tipo = tipoDisparo h
-               
                 -- * Recebe os objetos do estado e devolve uma lista com (tipo de arma, dono)
                 -- Exemplo [(Dinamite, 0,(Mina,0)] -> Valida
                 -- Exemplo [(Dinamite, 0),(Dinamite,0)] -> Invalido
@@ -127,6 +120,13 @@ donoValido e obj = if indiceValido && verificaLista (listaDonos listaDisparos) t
                 disparosEstado (h:t) = if ehDisparo h then h : disparosEstado t else disparosEstado t
 
 
+listaDonos :: [Objeto] -> [(TipoArma, Int)]
+listaDonos [] = []
+listaDonos (h:t) = (tipo,indice) : listaDonos t
+                where
+                    indice = donoDisparo h
+                    tipo = tipoDisparo h
+               
 
 -- * -------------------------------------------
 

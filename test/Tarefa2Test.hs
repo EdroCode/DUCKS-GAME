@@ -5,14 +5,14 @@ import Tarefa2
 import Magic
 
 
-jogadaTeste2 = (0,Move Oeste,estadoTeste)
+jogadaTeste22 = (0,Dispara Escavadora Sudeste,estadoTeste)
 jogadaTeste3 = (0,Move Sul,estadoTeste)
 jogadaTeste4 = (0,Move Sudoeste,estadoTeste)
 
 
 -- | Definir aqui os testes do grupo para a Tarefa 2
 testesTarefa2 :: [(NumMinhoca,Jogada,Estado)]
-testesTarefa2 = [jogadaTeste2,jogadaTeste3,jogadaTeste4]
+testesTarefa2 = [jogadaTeste22,jogadaTeste3,jogadaTeste4]
 
 dataTarefa2 :: IO TaskData
 dataTarefa2 = do
