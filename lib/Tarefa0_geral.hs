@@ -53,15 +53,16 @@ ePosicaoMatrizValida (a,b) m = a <= length m - 1 && b <= length(head m) - 1 && a
 
 -- | Move uma posição uma unidade no sentido de uma direção.
 movePosicao :: Direcao -> Posicao -> Posicao
-movePosicao d (x,y) = case d of
-    Norte -> (x - 1, y) 
-    Sul -> (x + 1, y)
-    Este -> (x, y + 1)
-    Oeste -> (x, y - 1)
-    Nordeste -> (x - 1, y + 1)
-    Noroeste -> (x - 1, y - 1)
-    Sudoeste -> (x + 1, y + 1)
-    Sudeste -> (x + 1, y - 1)
+movePosicao d (x, y) = case d of
+    Norte     -> (x - 1, y)
+    Sul       -> (x + 1, y)
+    Este      -> (x, y + 1)
+    Oeste     -> (x, y - 1)
+    Nordeste  -> (x - 1, y + 1)
+    Noroeste  -> (x - 1, y - 1)
+    Sudeste   -> (x + 1, y + 1)
+    Sudoeste  -> (x + 1, y - 1)
+
 
 -- * Auxiliar 
 
