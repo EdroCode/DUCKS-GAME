@@ -51,6 +51,7 @@ executable t1-feedback
     other-modules:
         Magic
         EstadosArquivo
+        JogadasArquivo
     other-extensions:
     main-is: Tarefa1Test.hs
     build-depends:
@@ -63,6 +64,7 @@ executable t2-feedback
     other-modules:
         Magic
         EstadosArquivo
+        JogadasArquivo
     other-extensions:
     main-is: Tarefa2Test.hs
     build-depends:
@@ -75,6 +77,7 @@ executable t3-feedback
     other-modules:
         Magic
         EstadosArquivo
+        JogadasArquivo
     other-extensions:
     main-is: Tarefa3Test.hs
     build-depends:

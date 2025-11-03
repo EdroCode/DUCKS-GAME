@@ -12,35 +12,6 @@ import Tarefa0_2025
 import Tarefa1
 import Foreign (moveArray)
 
--- * Assume se que todos os estados recebidos serao validos
-
-estadoTeste = Estado
-    { mapaEstado = mapaOk
-    , objetosEstado =
-        []
-    , minhocasEstado =
-        [Minhoca {posicaoMinhoca = Just (4,6), vidaMinhoca = Viva 100, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 1}]
-    }
-
-jogadaTeste = Move Norte
-jogadaTeste2 = (0,Dispara Escavadora Sul,estadoTeste)
-jogadaTeste6 = Dispara Escavadora Sul
-
-
-
-                            
--- * --------------------------------------
--- * MOVIMENTO
--- * --------------------------------------
-
-mapaOk = [[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
-    ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
-    ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
-    ,[Ar,Ar,Pedra,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
-    ,[Terra,Terra,Terra,Terra,Terra,Ar,Ar,Ar,Ar,Ar]
-    ,[Terra,Terra,Terra,Terra,Terra,Pedra,Pedra,Agua,Agua,Agua]
-    ]
-
 
 
 -- | Função principal da Tarefa 2. Recebe o índice de uma minhoca na lista de minhocas, uma jogada, um estado e retorna um novo estado em que essa minhoca efetuou essa jogada.
@@ -54,7 +25,7 @@ efetuaJogada n (Dispara arma direcao) e = if not (vidaMinhoca minhoca == Morta) 
 
                                                         Jetpack -> if ePosicaoMatrizValida novaPos mapa && ePosicaoEstadoLivre novaPos e
                                                                 then Estado {mapaEstado = mapa,objetosEstado = objetos,minhocasEstado = minhocasFinais}
-                                                                else e
+                                                                else e{minhocasEstado = minhocasFinais}
                                                         
                                                         Escavadora -> if ePosicaoMatrizValida novaPos mapa
 
@@ -63,8 +34,8 @@ efetuaJogada n (Dispara arma direcao) e = if not (vidaMinhoca minhoca == Morta) 
                                                                         then Estado {mapaEstado = atualizaPosicaoMatriz novaPos Ar mapa ,objetosEstado = objetos,minhocasEstado = minhocasFinais}
                                                                         else Estado {mapaEstado = mapa ,objetosEstado = objetos,minhocasEstado = minhocasFinais}
                                                                     
-                                                                    else Estado{mapaEstado=mapaOk,objetosEstado=objetos,minhocasEstado=atualizaIndiceLista n (minhoca{escavadoraMinhoca = escavadoraMinhoca minhoca-1}) minhocas}                                                
-                                                                else e
+                                                                    else Estado{mapaEstado=mapa,objetosEstado=objetos,minhocasEstado=atualizaIndiceLista n (minhoca{escavadoraMinhoca = escavadoraMinhoca minhoca-1}) minhocas}                                                
+                                                                else e{minhocasEstado = minhocasFinais}
 
                                                         Bazuca -> if ePosicaoMatrizValida novaPos mapa
 
@@ -107,12 +78,11 @@ efetuaJogada n (Dispara arma direcao) e = if not (vidaMinhoca minhoca == Morta) 
 
                                             minhocaFinal =
                                                 let
-                                                    
-                                                    bloco = if ePosicaoMatrizValida novaPos mapa
-                                                                then encontraPosicaoMatriz novaPos mapa
-                                                                else Nothing
+                                                    bloco =
+                                                        if ePosicaoMatrizValida novaPos mapa
+                                                            then encontraPosicaoMatriz novaPos mapa
+                                                            else Nothing
 
-                                                    -- Atualiza a munição da minhoca
                                                     atualizaMunicao m = case arma of
                                                         Jetpack    -> m { jetpackMinhoca    = jetpackMinhoca m - 1 }
                                                         Escavadora -> m { escavadoraMinhoca = escavadoraMinhoca m - 1 }
@@ -120,22 +90,18 @@ efetuaJogada n (Dispara arma direcao) e = if not (vidaMinhoca minhoca == Morta) 
                                                         Mina       -> m { minaMinhoca       = minaMinhoca m - 1 }
                                                         Dinamite   -> m { dinamiteMinhoca   = dinamiteMinhoca m - 1 }
 
-                                                    
                                                     (novaPosicao, novaVida) =
                                                         if not (ePosicaoMatrizValida novaPos mapa) then
-                                                            
                                                             case arma of
-                                                                Jetpack    -> (Nothing, Morta)
-                                                                Escavadora -> (Nothing, Morta)
-                                                                _          -> (posicaoMinhoca minhoca, vidaMinhoca minhoca)
-
+                                                                Jetpack    -> (Nothing, Morta)  -- jetpack fora do mapa -> morre
+                                                                Escavadora -> (posicaoMinhoca minhoca, vidaMinhoca minhoca)  -- escavadora n mexe
+                                                                _          -> (posicaoMinhoca minhoca, vidaMinhoca minhoca)  -- outras arma fica parada
                                                         else case bloco of
                                                             Just Agua ->
                                                                 case arma of
                                                                     Jetpack    -> (Just novaPos, Morta)
                                                                     Escavadora -> (Just novaPos, Morta)
                                                                     _          -> (posicaoMinhoca minhoca, vidaMinhoca minhoca)
-
                                                             _ ->
                                                                 case arma of
                                                                     Jetpack    -> (Just novaPos, vidaMinhoca minhoca)
