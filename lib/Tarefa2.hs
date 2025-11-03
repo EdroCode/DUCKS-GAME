@@ -149,6 +149,8 @@ efetuaJogada n (Move direcao) e = if not (vidaMinhoca minhoca == Morta)  -- * Se
                              
                             -- -------------
                             
+                            
+
                             minhocas = minhocasEstado e
                             mapa = mapaEstado e
                             objetos = objetosEstado e

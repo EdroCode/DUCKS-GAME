@@ -79,12 +79,12 @@ disparoInvalido8 = Disparo{posicaoDisparo=(2,4), direcaoDisparo=Oeste, tipoDispa
 disparoInvalido9 = Disparo{posicaoDisparo=(3,5), direcaoDisparo=Sul, tipoDisparo=Mina, tempoDisparo=Just 1, donoDisparo=0} -- mina sobre barril
 
 -- BARRIS VÁLIDOS
-barrilValido1 = Barril{posicaoBarril=(6,6),explodeBarril = False }
+barrilValido1 = Barril{posicaoBarril=(4,6),explodeBarril = False }
 barrilValido2 = Barril{posicaoBarril=(0,5),explodeBarril = False }
 barrilValido3 = Barril{posicaoBarril=(2,0),explodeBarril = False }
 
 -- BARRIS INVÁLIDOS
-barrilInvalido1 = Barril{posicaoBarril=(6,6),explodeBarril = False } -- mesma posição que outro barril
+barrilInvalido1 = Barril{posicaoBarril=(4,5),explodeBarril = False } -- mesma posição que outro barril
 barrilInvalido2 = Barril{posicaoBarril=(3,2),explodeBarril = False } -- posição ocupada por minhoca
 barrilInvalido3 = Barril{posicaoBarril=(2,2),explodeBarril = False } -- posição em terreno opaco (opcional para teste)
 

@@ -97,7 +97,7 @@ span.spaces    { background: white }
 <span class="lineno">   78 </span>existeMinhoca :: Posicao -&gt; [Minhoca] -&gt; Bool
 <span class="lineno">   79 </span><span class="decl"><span class="istickedoff">existeMinhoca pos [] = False</span>
 <span class="lineno">   80 </span><span class="spaces"></span><span class="istickedoff">existeMinhoca (x,y) (h:t) = let pos = posicaoMinhoca h</span>
-<span class="lineno">   81 </span><span class="spaces">                            </span><span class="istickedoff">in if <span class="tickonlyfalse">pos == Just (x,<span class="nottickedoff">y</span>)</span> then <span class="nottickedoff">True</span> else existeMinhoca <span class="nottickedoff">(x,y)</span> t</span></span>
+<span class="lineno">   81 </span><span class="spaces">                            </span><span class="istickedoff">in if <span class="tickonlyfalse">pos == Just (x,y)</span> then <span class="nottickedoff">True</span> else existeMinhoca (x,y) t</span></span>
 <span class="lineno">   82 </span>                       
 <span class="lineno">   83 </span>existeBarril :: Posicao -&gt; [Objeto] -&gt; Bool
 <span class="lineno">   84 </span><span class="decl"><span class="istickedoff">existeBarril pos [] = False</span>

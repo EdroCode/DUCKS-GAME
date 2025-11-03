@@ -75,8 +75,8 @@ span.spaces    { background: white }
 <span class="lineno">   56 </span><span class="decl"><span class="istickedoff">movePosicao d (x, y) = case d of</span>
 <span class="lineno">   57 </span><span class="spaces">    </span><span class="istickedoff">Norte     -&gt; (x - 1, y)</span>
 <span class="lineno">   58 </span><span class="spaces">    </span><span class="istickedoff">Sul       -&gt; (x + 1, y)</span>
-<span class="lineno">   59 </span><span class="spaces">    </span><span class="istickedoff">Este      -&gt; <span class="nottickedoff">(x, y + 1)</span></span>
-<span class="lineno">   60 </span><span class="spaces">    </span><span class="istickedoff">Oeste     -&gt; <span class="nottickedoff">(x, y - 1)</span></span>
+<span class="lineno">   59 </span><span class="spaces">    </span><span class="istickedoff">Este      -&gt; (x, y + 1)</span>
+<span class="lineno">   60 </span><span class="spaces">    </span><span class="istickedoff">Oeste     -&gt; (x, y - 1)</span>
 <span class="lineno">   61 </span><span class="spaces">    </span><span class="istickedoff">Nordeste  -&gt; (x - 1, y + 1)</span>
 <span class="lineno">   62 </span><span class="spaces">    </span><span class="istickedoff">Noroeste  -&gt; (x - 1, y - 1)</span>
 <span class="lineno">   63 </span><span class="spaces">    </span><span class="istickedoff">Sudeste   -&gt; <span class="nottickedoff">(x + 1, y + 1)</span></span>
@@ -157,7 +157,7 @@ span.spaces    { background: white }
 <span class="lineno">  138 </span>atualizaIndiceLista :: Int -&gt; a -&gt; [a] -&gt; [a]
 <span class="lineno">  139 </span><span class="decl"><span class="istickedoff">atualizaIndiceLista i n [] = <span class="nottickedoff">[]</span></span>
 <span class="lineno">  140 </span><span class="spaces"></span><span class="istickedoff">atualizaIndiceLista 0 n (h:t) = n : t</span>
-<span class="lineno">  141 </span><span class="spaces"></span><span class="istickedoff">atualizaIndiceLista i n (h:t)= <span class="nottickedoff">h : atualizaIndiceLista (i-1) n t</span></span></span>
+<span class="lineno">  141 </span><span class="spaces"></span><span class="istickedoff">atualizaIndiceLista i n (h:t)= h : atualizaIndiceLista (i-1) n t</span></span>
 <span class="lineno">  142 </span>
 <span class="lineno">  143 </span>
 <span class="lineno">  144 </span>

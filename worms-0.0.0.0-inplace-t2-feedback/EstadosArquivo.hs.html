@@ -98,12 +98,12 @@ span.spaces    { background: white }
 <span class="lineno">   79 </span><span class="decl"><span class="nottickedoff">disparoInvalido9 = Disparo{posicaoDisparo=(3,5), direcaoDisparo=Sul, tipoDisparo=Mina, tempoDisparo=Just 1, donoDisparo=0}</span></span> -- mina sobre barril
 <span class="lineno">   80 </span>
 <span class="lineno">   81 </span>-- BARRIS VÁLIDOS
-<span class="lineno">   82 </span><span class="decl"><span class="istickedoff">barrilValido1 = Barril{posicaoBarril=(6,6),explodeBarril = False }</span></span>
+<span class="lineno">   82 </span><span class="decl"><span class="istickedoff">barrilValido1 = Barril{posicaoBarril=(4,6),explodeBarril = False }</span></span>
 <span class="lineno">   83 </span><span class="decl"><span class="nottickedoff">barrilValido2 = Barril{posicaoBarril=(0,5),explodeBarril = False }</span></span>
 <span class="lineno">   84 </span><span class="decl"><span class="nottickedoff">barrilValido3 = Barril{posicaoBarril=(2,0),explodeBarril = False }</span></span>
 <span class="lineno">   85 </span>
 <span class="lineno">   86 </span>-- BARRIS INVÁLIDOS
-<span class="lineno">   87 </span><span class="decl"><span class="nottickedoff">barrilInvalido1 = Barril{posicaoBarril=(6,6),explodeBarril = False }</span></span> -- mesma posição que outro barril
+<span class="lineno">   87 </span><span class="decl"><span class="nottickedoff">barrilInvalido1 = Barril{posicaoBarril=(4,5),explodeBarril = False }</span></span> -- mesma posição que outro barril
 <span class="lineno">   88 </span><span class="decl"><span class="nottickedoff">barrilInvalido2 = Barril{posicaoBarril=(3,2),explodeBarril = False }</span></span> -- posição ocupada por minhoca
 <span class="lineno">   89 </span><span class="decl"><span class="nottickedoff">barrilInvalido3 = Barril{posicaoBarril=(2,2),explodeBarril = False }</span></span> -- posição em terreno opaco (opcional para teste)
 <span class="lineno">   90 </span>
@@ -120,7 +120,7 @@ span.spaces    { background: white }
 <span class="lineno">  101 </span><span class="decl"><span class="istickedoff">minhocaValida1 = Minhoca{posicaoMinhoca=Just (3,0), vidaMinhoca=Morta, jetpackMinhoca=100, escavadoraMinhoca=200, bazucaMinhoca=150, minaMinhoca=3, dinamiteMinhoca=1}</span></span> -- posição válida, morta, munições &gt;= 0
 <span class="lineno">  102 </span><span class="decl"><span class="istickedoff">minhocaValida2 = Minhoca{posicaoMinhoca=Just (1,1), vidaMinhoca=Viva 50, jetpackMinhoca=0, escavadoraMinhoca=0, bazucaMinhoca=0, minaMinhoca=0, dinamiteMinhoca=0}</span></span> -- viva, vida entre 0-100, posição livre
 <span class="lineno">  103 </span><span class="decl"><span class="nottickedoff">minhocaValida3 = Minhoca{posicaoMinhoca=Nothing, vidaMinhoca=Morta, jetpackMinhoca=10, escavadoraMinhoca=5, bazucaMinhoca=2, minaMinhoca=0, dinamiteMinhoca=0}</span></span> -- sem posição, obrigatoriamente morta
-<span class="lineno">  104 </span><span class="decl"><span class="nottickedoff">minhocaValida4 = Minhoca{posicaoMinhoca=Just (2,2), vidaMinhoca=Viva 0, jetpackMinhoca=0, escavadoraMinhoca=0, bazucaMinhoca=0, minaMinhoca=0, dinamiteMinhoca=0}</span></span> -- viva com vida 0 (permitido), posição válida
+<span class="lineno">  104 </span><span class="decl"><span class="istickedoff">minhocaValida4 = Minhoca{posicaoMinhoca=Just (2,2), vidaMinhoca=Viva 0, jetpackMinhoca=0, escavadoraMinhoca=0, bazucaMinhoca=0, minaMinhoca=0, dinamiteMinhoca=0}</span></span> -- viva com vida 0 (permitido), posição válida
 <span class="lineno">  105 </span><span class="decl"><span class="nottickedoff">minhocaValida5 = Minhoca{posicaoMinhoca=Just (0,0), vidaMinhoca=Viva 100, jetpackMinhoca=50, escavadoraMinhoca=50, bazucaMinhoca=50, minaMinhoca=5, dinamiteMinhoca=2}</span></span> -- posição válida, vida máxima
 <span class="lineno">  106 </span>
 <span class="lineno">  107 </span>-- MINHOCAS INVÁLIDAS
