@@ -8,7 +8,7 @@ Módulo para a realização da Tarefa 3 de LI1\/LP1 em 2025\/26.
 module Tarefa3 where
 
 import Data.Either
-
+import Tarefa2
 import Labs2025
 
 type Dano = Int
@@ -22,9 +22,41 @@ avancaEstado e@(Estado mapa objetos minhocas) = foldr aplicaDanos e' danoss
     (objetos',danoss) = partitionEithers $ map (uncurry $ avancaObjeto $ e { minhocasEstado = minhocas' }) (zip [0..] objetos)
     e' = Estado mapa objetos' minhocas'
 
+
+
+
 -- | Para um dado estado, dado o índice de uma minhoca na lista de minhocas e o estado dessa minhoca, retorna o novo estado da minhoca no próximo tick.
 avancaMinhoca :: Estado -> NumMinhoca -> Minhoca -> Minhoca
-avancaMinhoca e i m = undefined
+avancaMinhoca e i minhoca = case encontraPosicaoMatriz posicaoFinal mapa of
+                                Nothing ->  minhoca{posicaoMinhoca = Nothing, vidaMinhoca = Morta}
+                                Just Agua -> minhoca{posicaoMinhoca = Just posicaoFinal, vidaMinhoca = Morta}
+                                Just Ar -> minhoca{posicaoMinhoca = Just posicaoFinal}
+                                _ -> minhoca{posicaoMinhoca = Just posicaoFinal}
+                               
+                    where
+
+                        -- Desdobrar minhoca
+                        pos = case posicaoMinhoca minhoca of Just a -> a
+                        posicaoFinal = if estaNoSolo pos mapa 
+                            then pos
+                            else movePosicao Sul pos
+                        
+
+                        -- Desdobrar estado
+                        mapa = mapaEstado e
+                        objetos = objetosEstado e
+                        minhocas = minhocasEstado e
+
+
+
+
+
+
+
+
+
+
+
 
 -- | Para um dado estado, dado o índice de um objeto na lista de objetos e o estado desse objeto, retorna o novo estado do objeto no próximo tick ou, caso o objeto expluda, uma lista de posições afetadas com o dano associado.
 avancaObjeto :: Estado -> NumObjeto -> Objeto -> Either Objeto Danos

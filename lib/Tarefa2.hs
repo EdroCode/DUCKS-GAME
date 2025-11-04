@@ -28,7 +28,6 @@ efetuaJogada n (Dispara arma direcao) e = if not (vidaMinhoca minhoca == Morta) 
                                                                 else e{minhocasEstado = minhocasFinais}
                                                         
                                                         Escavadora -> if ePosicaoMatrizValida novaPos mapa
-
                                                                 then if not (blocoTargeted == Pedra)
                                                                     then if eTerrenoDestrutivel(blocoTargeted)
                                                                         then Estado {mapaEstado = atualizaPosicaoMatriz novaPos Ar mapa ,objetosEstado = objetos,minhocasEstado = minhocasFinais}
@@ -188,15 +187,15 @@ efetuaJogada n (Move direcao) e = if not (vidaMinhoca minhoca == Morta)  -- * Se
 
 -- Verifica se a posicao que a minhoca ira é nao opaca
 eNovaPosLivre :: Posicao -> Estado -> Bool
-eNovaPosLivre posNova est = if ePosicaoEstadoLivre posNova est == True then True else False
+eNovaPosLivre posNova est = ePosicaoEstadoLivre posNova est
 
  
 estaNoSolo :: Posicao -> Mapa -> Bool
 estaNoSolo p [] = False
-estaNoSolo pos mapa = if eTerrenoOpaco blocoInferior && not (eTerrenoOpaco blocoAtual) then True else False
-            where
-                blocoInferior = case encontraPosicaoMatriz (movePosicao Sul pos) mapa of Just a -> a
-                blocoAtual =  case encontraPosicaoMatriz pos mapa of Just a -> a
-
+estaNoSolo pos mapa = case encontraPosicaoMatriz (movePosicao Sul pos) mapa of
+    Nothing -> False
+    Just blocoInferior -> case encontraPosicaoMatriz pos mapa of
+        Nothing -> False
+        Just blocoAtual -> eTerrenoOpaco blocoInferior && not (eTerrenoOpaco blocoAtual)
 
  
