@@ -61,46 +61,43 @@ avancaMinhoca e i minhoca = case encontraPosicaoMatriz posicaoFinal mapa of
 -- | Para um dado estado, dado o índice de um objeto na lista de objetos e o estado desse objeto, retorna o novo estado do objeto no próximo tick ou, caso o objeto expluda, uma lista de posições afetadas com o dano associado.
 avancaObjeto :: Estado -> NumObjeto -> Objeto -> Either Objeto Danos
 avancaObjeto e i o = case o of
-    Barril pos explode
-        | explode -> Right [(pos, 50)] -- Barril explode
-        | if (estaNoSolo pos mapa) then Left o -- Barril ta no chao  
-                else
-            let newPos = movePosicao Sul pos
-            in case encontraPosicaoMatriz newPos mapa of
-                Just Agua -> Right [(newPos, 0)] -- Barril some na agua
-                Nothing -> Right [(pos, 0)] -- Barril caiu do mapa
-                otherwise -> Left (Barril newPos False) -- Barril ta no ar e cai
     
-    Disparo pos dir tempo dono -> case tipoDisparo of
-        Jetpack -> Right [(pos, 0)] -- Some jetpack e usa ele
+    Barril pos explode ->
+        if explode 
+            then Right [(pos, 50)]
+            else if estaNoSolo pos mapa 
+                then Left o
+                else case encontraPosicaoMatriz newPos mapa of
+                    Just Agua -> Right [(newPos, 0)]
+                    Nothing -> Right [(pos, 0)]
+                    _ -> Left (Barril newPos False)
+        where newPos = movePosicao Sul pos
 
-        Escavadora
-            Just Terra -> Right [(pos, 25)] -- Destroi terra
-            _ -> Right [(pos, 0)] -- em qlqr outro terreno some
+    Disparo pos dir tipo tempo dono -> case tipo of
+        Jetpack -> Right [(pos, 0)]
+        Escavadora -> case encontraPosicaoMatriz pos mapa of
+            Just Terra -> Right [(pos, 25)]
+            _ -> Right [(pos, 0)]
         Bazuca -> case tempo of
-            Just t | t <= 0 -> Right [(pos, 75)]  -- Bazuca explode com tempo 0
-            Just t -> Left (Disparo pos dir tipo (Just (t-1)) dono)  -- cronometro
+            Just t | t <= 0 -> Right [(pos, 75)]
+            Just t -> Left (Disparo pos dir tipo (Just (t-1)) dono)
             Nothing -> 
                 let newPos = movePosicao dir pos
                 in case encontraPosicaoMatriz newPos mapa of
-                    Just Pedra -> Right [(pos, 75)]  -- Explode na pedra
-                    Just Terra -> Right [(pos, 75)]  -- Explode na terra
-                    Just Ar -> Left (Disparo newPos dir tipo Nothing dono)  -- Continua movimento
-                    _ -> Right [(pos, 75)]  -- Explode em outros casos
-        
+                    Just Pedra -> Right [(pos, 75)]
+                    Just Terra -> Right [(pos, 75)]
+                    Just Ar -> Left (Disparo newPos dir tipo Nothing dono)
+                    _ -> Right [(pos, 75)]
         Mina -> case encontraPosicaoMatriz pos mapa of
-            Just Terra -> Right [(pos, 40)]  -- Mina explode na terra
-            Just Ar | estaNoSolo pos mapa -> Left o  -- Mina fica no chão
-            Just Ar -> Left (Disparo (movePosicao Sul pos) dir tipo tempo dono)  -- Mina cai
-            _ -> Right [(pos, 40)]  -- Mina explode em outros casos
-        
+            Just Terra -> Right [(pos, 40)]
+            Just Ar | estaNoSolo pos mapa -> Left o
+            Just Ar -> Left (Disparo (movePosicao Sul pos) dir tipo tempo dono)
+            _ -> Right [(pos, 40)]
         Dinamite -> case tempo of
-            Just t | t <= 0 -> Right [(pos, 100)]  -- Dinamite explode com tempo 0
-            Just t -> Left (Disparo pos dir tipo (Just (t-1)) dono)  -- cronometro
-            Nothing -> Right [(pos, 100)] 
-    where
-        mapa = mapaEstado e
-
+            Just t | t <= 0 -> Right [(pos, 100)]
+            Just t -> Left (Disparo pos dir tipo (Just (t-1)) dono)
+            Nothing -> Right [(pos, 100)]
+    where mapa = mapaEstado e
 
         
 
