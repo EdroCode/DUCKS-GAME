@@ -8,6 +8,8 @@ Módulo para a realização da Tarefa 3 de LI1\/LP1 em 2025\/26.
 module Tarefa3 where
 
 import Data.Either
+import Tarefa0_geral
+import Tarefa0_2025
 import Tarefa2
 import Labs2025
 
@@ -22,6 +24,29 @@ avancaEstado e@(Estado mapa objetos minhocas) = foldr aplicaDanos e' danoss
     (objetos',danoss) = partitionEithers $ map (uncurry $ avancaObjeto $ e { minhocasEstado = minhocas' }) (zip [0..] objetos)
     e' = Estado mapa objetos' minhocas'
 
+
+
+
+
+
+
+barrilTestador = Barril{posicaoBarril = (2,1), explodeBarril = False}
+disparoTestador = Disparo{posicaoDisparo = (2,0), direcaoDisparo = Oeste, tipoDisparo = Bazuca, tempoDisparo = Nothing, donoDisparo = 0}
+minhocaValida1 = Minhoca{posicaoMinhoca=Just (2,0), vidaMinhoca=Morta, jetpackMinhoca=100, escavadoraMinhoca=200, bazucaMinhoca=150, minaMinhoca=3, dinamiteMinhoca=1} -- posição válida, morta, munições >= 0
+
+
+teste = Estado
+    { mapaEstado =
+        [[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Agua,Agua]
+        ,[Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Agua,Agua]
+        ]
+    , objetosEstado = [barrilTestador, disparoTestador]
+    , minhocasEstado = [minhocaValida1]
+        
+    } 
 
 
 
@@ -54,52 +79,68 @@ avancaMinhoca e i minhoca = case encontraPosicaoMatriz posicaoFinal mapa of
 
 
 
-
-
-
-
 -- | Para um dado estado, dado o índice de um objeto na lista de objetos e o estado desse objeto, retorna o novo estado do objeto no próximo tick ou, caso o objeto expluda, uma lista de posições afetadas com o dano associado.
 avancaObjeto :: Estado -> NumObjeto -> Objeto -> Either Objeto Danos
 avancaObjeto e i o = case o of
-    
-    Barril pos explode ->
-        if explode 
-            then Right [(pos, 50)]
-            else if estaNoSolo pos mapa 
-                then Left o
-                else case encontraPosicaoMatriz newPos mapa of
-                    Just Agua -> Right [(newPos, 0)]
-                    Nothing -> Right [(pos, 0)]
-                    _ -> Left (Barril newPos False)
-        where newPos = movePosicao Sul pos
+  Barril posBarril explode ->
+    if not explode
+      then
+        if not (estaNoSolo posBarril mapa) || estaEmAgua posBarril mapa -- esta no ar ou em agua
+          then Left (Barril { posicaoBarril = posBarril, explodeBarril = True })
+          else Left o -- todo
+      else Left o --todo n é o
 
-    Disparo pos dir tipo tempo dono -> case tipo of
-        Jetpack -> Right [(pos, 0)]
-        Escavadora -> case encontraPosicaoMatriz pos mapa of
-            Just Terra -> Right [(pos, 25)]
-            _ -> Right [(pos, 0)]
-        Bazuca -> case tempo of
-            Just t | t <= 0 -> Right [(pos, 75)]
-            Just t -> Left (Disparo pos dir tipo (Just (t-1)) dono)
-            Nothing -> 
-                let newPos = movePosicao dir pos
-                in case encontraPosicaoMatriz newPos mapa of
-                    Just Pedra -> Right [(pos, 75)]
-                    Just Terra -> Right [(pos, 75)]
-                    Just Ar -> Left (Disparo newPos dir tipo Nothing dono)
-                    _ -> Right [(pos, 75)]
-        Mina -> case encontraPosicaoMatriz pos mapa of
-            Just Terra -> Right [(pos, 40)]
-            Just Ar | estaNoSolo pos mapa -> Left o
-            Just Ar -> Left (Disparo (movePosicao Sul pos) dir tipo tempo dono)
-            _ -> Right [(pos, 40)]
-        Dinamite -> case tempo of
-            Just t | t <= 0 -> Right [(pos, 100)]
-            Just t -> Left (Disparo pos dir tipo (Just (t-1)) dono)
-            Nothing -> Right [(pos, 100)]
-    where mapa = mapaEstado e
-
+  Disparo pos dir tipo tempo dono -> case tipo of
+      Bazuca ->
+        let posNova = movePosicao dir pos
+            tempoNovo = case tempo of
+              Just t  -> Just (t - 1)
+              Nothing -> Nothing
+        in if ePosicaoMatrizValida posNova mapa
+          then if ePosicaoMapaLivre pos mapa
+            then Left (Disparo{posicaoDisparo = posNova, direcaoDisparo = dir, tipoDisparo = tipo, tempoDisparo = tempoNovo, donoDisparo = dono})
+            else Right []         
+          else Right []
         
+      Mina ->
+        case tempo of
+          Just 0 -> Right []
+          Just _ ->
+            if not (estaNoSolo pos mapa) || estaEmAgua pos mapa
+              then
+                if dir == Sul
+                  then Left (Disparo { posicaoDisparo = movePosicao dir pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = tempo, donoDisparo = dono })
+                  else Left o
+              else Left (Disparo { posicaoDisparo = movePosicao dir pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = tempo, donoDisparo = dono })
+          Nothing -> if not (existeDonoMinhoca pos dono minhocas) -- * Da true se nao existe nenhnuma minhoca alem do dono na posicao
+                      then Left o
+                      else Left (Disparo { posicaoDisparo = movePosicao dir pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = 2, donoDisparo = dono })
+      
+      Dinamite ->
+        case tempo of -- dinamite nao tem tempo nulo
+          Just 0 -> Right []  
+          Just _ -> 
+            if not(estaNoSolo pos mapa) 
+          
+
+
+  -- todos os right precisam ser completos, falta definir a funcao que calcule a area das explosoes e a lista de danos para conseguir usar isso como output
+
+
+  where
+    mapa = mapaEstado e
+    minhocas = minhocasEstado e
+
+
+
+      -- todo podera ser otimizado com a funcao auxiliar da tarefa0
+      -- ! rever talvez
+existeDonoMinhoca :: Posicao -> Int -> [Minhoca] -> Bool
+existeDonoMinhoca pos n [] = False
+existeDonoMinhoca (x,y) n (h:t) = let pos = posicaoMinhoca h
+                                in if pos == Just (x,y) && n /= 0 then True else existeMinhoca (x,y) t
+                  
+              
 
 -- | Para uma lista de posições afetadas por uma explosão, recebe um estado e calcula o novo estado em que esses danos são aplicados.
 aplicaDanos :: Danos -> Estado -> Estado

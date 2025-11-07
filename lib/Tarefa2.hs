@@ -161,7 +161,7 @@ efetuaJogada n (Move direcao) e = if not (vidaMinhoca minhoca == Morta)  -- * Se
 
                             minhocaFinal = -- * NOva pos n é opaca
                                 if ePosicaoMatrizValida novaPos mapa
-                                    then if eNovaPosLivre novaPos e
+                                    then if ePosicaoEstadoLivre novaPos e
                                         then if not ((encontraPosicaoMatriz novaPos mapa) == Just Agua) 
                                             then minhoca { posicaoMinhoca = Just novaPos } 
                                             else minhoca { posicaoMinhoca = Just novaPos,  vidaMinhoca = Morta } 
@@ -178,18 +178,12 @@ efetuaJogada n (Move direcao) e = if not (vidaMinhoca minhoca == Morta)  -- * Se
                                 minhocasEstado = minhocasFinais
                             } 
 
-                             
 
-
-               
-
-
-
--- Verifica se a posicao que a minhoca ira é nao opaca
-eNovaPosLivre :: Posicao -> Estado -> Bool
-eNovaPosLivre posNova est = ePosicaoEstadoLivre posNova est
-
+-- ! removi a função (e novaposlivre) porque era estupida e eu deveria tar maluco se fui eu q escrevi aquilo      
  
+
+
+ -- todo mudar para estaNoAr e a logica da mesma para melhor readability?
 estaNoSolo :: Posicao -> Mapa -> Bool
 estaNoSolo p [] = False
 estaNoSolo pos mapa = case encontraPosicaoMatriz (movePosicao Sul pos) mapa of
@@ -199,3 +193,9 @@ estaNoSolo pos mapa = case encontraPosicaoMatriz (movePosicao Sul pos) mapa of
         Just blocoAtual -> eTerrenoOpaco blocoInferior && not (eTerrenoOpaco blocoAtual)
 
  
+estaEmAgua :: Posicao -> Mapa -> Bool
+estaEmAgua p [] = False
+estaEmAgua pos mapa = case encontraPosicaoMatriz (movePosicao Sul pos) mapa of
+    Nothing -> False
+    Just Agua -> True
+    Just _ -> False

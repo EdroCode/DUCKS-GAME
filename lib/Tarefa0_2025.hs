@@ -80,6 +80,7 @@ existeMinhoca pos [] = False
 existeMinhoca (x,y) (h:t) = let pos = posicaoMinhoca h
                             in if pos == Just (x,y) then True else existeMinhoca (x,y) t
                        
+                       
 existeBarril :: Posicao -> [Objeto] -> Bool
 existeBarril pos [] = False
 existeBarril pos (h:t) =

@@ -4,6 +4,10 @@ import Labs2025
 import Tarefa3
 import Magic
 
+barrilTestador = Barril{posicaoBarril = (2,1), explodeBarril = False}
+disparoTestador = Disparo{posicaoDisparo = (2,0), direcaoDisparo = Oeste, tipoDisparo = Bazuca, tempoDisparo = Nothing, donoDisparo = 0}
+minhocaValida1 = Minhoca{posicaoMinhoca=Just (2,0), vidaMinhoca=Morta, jetpackMinhoca=100, escavadoraMinhoca=200, bazucaMinhoca=150, minaMinhoca=3, dinamiteMinhoca=1} -- posição válida, morta, munições >= 0
+
 
 teste = Estado
     { mapaEstado =
@@ -13,11 +17,9 @@ teste = Estado
         ,[Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Agua,Agua]
         ,[Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Agua,Agua]
         ]
-    , objetosEstado =
-        []
-    , minhocasEstado =
-        [Minhoca {posicaoMinhoca = Just (4,8), vidaMinhoca = Viva 100, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 1}
-        ]
+    , objetosEstado = [barrilTestador, disparoTestador]
+    , minhocasEstado = [minhocaValida1]
+        
     }
 
 
