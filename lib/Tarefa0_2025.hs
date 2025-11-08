@@ -72,7 +72,6 @@ ePosicaoEstadoLivre pos estado =
     minhocas = minhocasEstado estado
 
 
-
 --Auxiliares -----------------
 
 existeMinhoca :: Posicao -> [Minhoca] -> Bool

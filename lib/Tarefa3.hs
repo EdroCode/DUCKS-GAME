@@ -30,24 +30,6 @@ avancaEstado e@(Estado mapa objetos minhocas) = foldr aplicaDanos e' danoss
 
 
 
-barrilTestador = Barril{posicaoBarril = (2,1), explodeBarril = False}
-disparoTestador = Disparo{posicaoDisparo = (2,0), direcaoDisparo = Sudeste, tipoDisparo = Dinamite, tempoDisparo = Just 2, donoDisparo = 0}
-minhocaValida1 = Minhoca{posicaoMinhoca=Just (2,0), vidaMinhoca=Morta, jetpackMinhoca=100, escavadoraMinhoca=200, bazucaMinhoca=150, minaMinhoca=3, dinamiteMinhoca=1} -- posição válida, morta, munições >= 0
-
-
-teste = Estado
-    { mapaEstado =
-        [[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
-        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
-        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
-        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
-        ,[Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Agua,Agua]
-        ,[Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Agua,Agua]
-        ]
-    , objetosEstado = [barrilTestador, disparoTestador]
-    , minhocasEstado = [minhocaValida1]
-        
-    } 
 
 
 
@@ -78,8 +60,6 @@ avancaMinhoca e i minhoca = case encontraPosicaoMatriz posicaoFinal mapa of
 
 
 
-
-
 -- | Para um dado estado, dado o índice de um objeto na lista de objetos e o estado desse objeto, retorna o novo estado do objeto no próximo tick ou, caso o objeto expluda, uma lista de posições afetadas com o dano associado.
 avancaObjeto :: Estado -> NumObjeto -> Objeto -> Either Objeto Danos
 avancaObjeto e i o = case o of
@@ -89,7 +69,7 @@ avancaObjeto e i o = case o of
         if not (estaNoSolo posBarril mapa) || estaEmAgua posBarril mapa -- esta no ar ou em agua
           then Left (Barril { posicaoBarril = posBarril, explodeBarril = True })
           else Left o
-      else Right (calculaExplosao pos 5)
+      else Right (calculaExplosao posBarril 5)
 
   Disparo pos dir tipo tempo dono -> case tipo of
       Bazuca ->
@@ -97,8 +77,8 @@ avancaObjeto e i o = case o of
             tempoNovo = case tempo of
               Just t  -> Just (t - 1)
               Nothing -> Nothing
-        in if ePosicaoMatrizValida posNova mapa
-          then if ePosicaoMapaLivre pos mapa
+        in if ePosicaoEstadoLivre pos e
+          then if ePosicaoMatrizValida posNova mapa
             then Left (Disparo{posicaoDisparo = posNova, direcaoDisparo = dir, tipoDisparo = tipo, tempoDisparo = tempoNovo, donoDisparo = dono})
             else Right (calculaExplosao pos 5)     
           else Right (calculaExplosao pos 5)
@@ -183,4 +163,78 @@ avancaObjeto e i o = case o of
 
 -- | Para uma lista de posições afetadas por uma explosão, recebe um estado e calcula o novo estado em que esses danos são aplicados.
 aplicaDanos :: Danos -> Estado -> Estado
-aplicaDanos ds e = undefined
+aplicaDanos danos estado = estado {
+    minhocasEstado = atualizaMinhocas (minhocasEstado estado),
+    mapaEstado = atualizaMapa (mapaEstado estado) danos
+  }
+  where
+
+
+    -- * Terrenos
+
+    atualizaMapa :: Mapa -> Danos -> Mapa
+    atualizaMapa mapa [] = mapa
+    atualizaMapa mapa ((pos, _):ds) =
+      let 
+        terrenoAtual = case encontraPosicaoMatriz pos mapa of Just a -> a
+        mapa' = if eTerrenoDestrutivel (terrenoAtual)
+                    then destroiPosicao pos mapa
+                    else mapa
+      in atualizaMapa mapa' ds
+    
+    -- * Minhocas
+    
+    atualizaMinhocas :: [Minhoca] -> [Minhoca]
+    atualizaMinhocas [] = []
+    atualizaMinhocas (h:t) = atualizaMinhoca h : atualizaMinhocas t
+
+    
+    atualizaMinhoca :: Minhoca -> Minhoca
+    atualizaMinhoca minhoca =
+      case posicaoMinhoca minhoca of
+        Nothing -> minhoca
+        Just pos ->
+          case vidaMinhoca minhoca of
+            Morta -> minhoca
+            Viva v ->
+              let dano = somaDanos pos danos
+                  novaVida = v - dano
+              in if novaVida <= 0
+                 then minhoca { vidaMinhoca = Morta }
+                 else minhoca { vidaMinhoca = Viva novaVida }
+
+    somaDanos :: Posicao -> Danos -> Int
+    somaDanos _ [] = 0
+    somaDanos pos ((p, d):ds) =
+      if pos == p
+        then d + somaDanos pos ds
+        else somaDanos pos ds
+
+-- * Objetos
+    
+    atualizaObjetos :: Danos -> [Objeto] -> [Objeto]
+    atualizaObjetos _ [] = []
+    atualizaObjetos danos (obj:resto) =
+      let pos = posicaoObjeto obj
+          objAtualizado = case obj of
+            Barril _ False ->
+              if posAfetado pos danos
+                then Barril pos True
+                else obj
+            _ -> obj
+      in objAtualizado : atualizaObjetos danos resto
+      where
+
+        posAfetado :: Posicao -> Danos -> Bool
+        posAfetado _ [] = False
+        posAfetado p ((posDano, _):t) =
+          if p == posDano then True else posAfetado p t
+
+    
+
+
+
+
+
+
+

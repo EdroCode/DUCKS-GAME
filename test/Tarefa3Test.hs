@@ -5,8 +5,8 @@ import Tarefa3
 import Magic
 
 barrilTestador = Barril{posicaoBarril = (2,1), explodeBarril = False}
-disparoTestador = Disparo{posicaoDisparo = (2,0), direcaoDisparo = Oeste, tipoDisparo = Bazuca, tempoDisparo = Nothing, donoDisparo = 0}
-minhocaValida1 = Minhoca{posicaoMinhoca=Just (2,0), vidaMinhoca=Morta, jetpackMinhoca=100, escavadoraMinhoca=200, bazucaMinhoca=150, minaMinhoca=3, dinamiteMinhoca=1} -- posição válida, morta, munições >= 0
+disparoTestador = Disparo{posicaoDisparo = (2,1), direcaoDisparo = Oeste, tipoDisparo = Bazuca, tempoDisparo = Nothing, donoDisparo = 0}
+minhocaValida1 = Minhoca{posicaoMinhoca=Just (2,6), vidaMinhoca=Morta, jetpackMinhoca=100, escavadoraMinhoca=200, bazucaMinhoca=150, minaMinhoca=3, dinamiteMinhoca=1} -- posição válida, morta, munições >= 0
 
 
 teste = Estado
