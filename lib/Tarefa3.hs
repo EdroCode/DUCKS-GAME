@@ -31,13 +31,14 @@ avancaEstado e@(Estado mapa objetos minhocas) = foldr aplicaDanos e' danoss
 
 
 barrilTestador = Barril{posicaoBarril = (2,1), explodeBarril = False}
-disparoTestador = Disparo{posicaoDisparo = (2,0), direcaoDisparo = Oeste, tipoDisparo = Bazuca, tempoDisparo = Nothing, donoDisparo = 0}
+disparoTestador = Disparo{posicaoDisparo = (2,0), direcaoDisparo = Sudeste, tipoDisparo = Dinamite, tempoDisparo = Just 2, donoDisparo = 0}
 minhocaValida1 = Minhoca{posicaoMinhoca=Just (2,0), vidaMinhoca=Morta, jetpackMinhoca=100, escavadoraMinhoca=200, bazucaMinhoca=150, minaMinhoca=3, dinamiteMinhoca=1} -- posição válida, morta, munições >= 0
 
 
 teste = Estado
     { mapaEstado =
         [[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
         ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
         ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
         ,[Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Agua,Agua]
@@ -114,15 +115,28 @@ avancaObjeto e i o = case o of
               else Left (Disparo { posicaoDisparo = movePosicao dir pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = tempo, donoDisparo = dono })
           Nothing -> if not (existeDonoMinhoca pos dono minhocas) -- * Da true se nao existe nenhnuma minhoca alem do dono na posicao
                       then Left o
-                      else Left (Disparo { posicaoDisparo = movePosicao dir pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = 2, donoDisparo = dono })
+                      else Left (Disparo { posicaoDisparo = movePosicao dir pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = Just 2, donoDisparo = dono })
+      
       
       Dinamite ->
-        case tempo of -- dinamite nao tem tempo nulo
-          Just 0 -> Right []  
-          Just _ -> 
-            if not(estaNoSolo pos mapa) 
-          
-
+        case tempo of -- dinamite não tem tempo nulo
+          Just 0 -> Right []
+          Just _ ->
+            
+            if not (estaNoSolo pos mapa) -- esta no ar
+              then
+                let
+                  
+                  (x,y) = pos
+                    
+                  (novaPos, novaDir) = case dir of
+                        Norte -> ((x, y - 1), Norte)      -- cai vertical, aponta para Norte
+                        Sul   -> ((x, y - 1), Norte)    
+                        _     -> rodaPosicaoDirecao (pos, dir) -- move e roda 45° para a direita
+                  
+                in Left (Disparo { posicaoDisparo = novaPos, direcaoDisparo = novaDir, tipoDisparo = tipo, tempoDisparo = tempoNovo, donoDisparo = dono })
+              else Left (Disparo { posicaoDisparo = pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = tempoNovo, donoDisparo = dono })
+            where tempoNovo = case tempo of Just t  -> Just (t - 1)
 
   -- todos os right precisam ser completos, falta definir a funcao que calcule a area das explosoes e a lista de danos para conseguir usar isso como output
 
@@ -135,11 +149,11 @@ avancaObjeto e i o = case o of
 
       -- todo podera ser otimizado com a funcao auxiliar da tarefa0
       -- ! rever talvez
-existeDonoMinhoca :: Posicao -> Int -> [Minhoca] -> Bool
-existeDonoMinhoca pos n [] = False
-existeDonoMinhoca (x,y) n (h:t) = let pos = posicaoMinhoca h
-                                in if pos == Just (x,y) && n /= 0 then True else existeMinhoca (x,y) t
-                  
+    existeDonoMinhoca :: Posicao -> Int -> [Minhoca] -> Bool
+    existeDonoMinhoca pos n [] = False
+    existeDonoMinhoca (x,y) n (h:t) = let pos = posicaoMinhoca h
+                                    in if pos == Just (x,y) && n /= 0 then True else existeMinhoca (x,y) t
+    
               
 
 -- | Para uma lista de posições afetadas por uma explosão, recebe um estado e calcula o novo estado em que esses danos são aplicados.
