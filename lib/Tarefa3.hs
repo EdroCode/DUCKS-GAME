@@ -88,8 +88,8 @@ avancaObjeto e i o = case o of
       then
         if not (estaNoSolo posBarril mapa) || estaEmAgua posBarril mapa -- esta no ar ou em agua
           then Left (Barril { posicaoBarril = posBarril, explodeBarril = True })
-          else Left o -- todo
-      else Left o --todo n é o
+          else Left o
+      else Right (calculaExplosao pos 5)
 
   Disparo pos dir tipo tempo dono -> case tipo of
       Bazuca ->
@@ -100,12 +100,12 @@ avancaObjeto e i o = case o of
         in if ePosicaoMatrizValida posNova mapa
           then if ePosicaoMapaLivre pos mapa
             then Left (Disparo{posicaoDisparo = posNova, direcaoDisparo = dir, tipoDisparo = tipo, tempoDisparo = tempoNovo, donoDisparo = dono})
-            else Right []         
-          else Right []
+            else Right (calculaExplosao pos 5)     
+          else Right (calculaExplosao pos 5)
         
       Mina ->
         case tempo of
-          Just 0 -> Right []
+          Just 0 -> Right (calculaExplosao pos 3)
           Just _ ->
             if not (estaNoSolo pos mapa) || estaEmAgua pos mapa
               then
@@ -120,7 +120,7 @@ avancaObjeto e i o = case o of
       
       Dinamite ->
         case tempo of -- dinamite não tem tempo nulo
-          Just 0 -> Right []
+          Just 0 -> Right (calculaExplosao pos 7)
           Just _ ->
             
             if not (estaNoSolo pos mapa) -- esta no ar
@@ -154,7 +154,32 @@ avancaObjeto e i o = case o of
     existeDonoMinhoca (x,y) n (h:t) = let pos = posicaoMinhoca h
                                     in if pos == Just (x,y) && n /= 0 then True else existeMinhoca (x,y) t
     
-              
+
+    -- todo -> Isto definitivamente não é a forma mais otimizada de fazer isto, mas devido ao tempo é melhor usar assim por enquanto
+    -- todo -> Atualmente so se usa explosoes 3,5 e 7 logo isto serve, mas no futuro é importante transformar numa função generalizada
+    calculaExplosao :: Posicao -> Int -> Danos 
+    calculaExplosao pos d = case d of
+      3 -> [
+              (pos, d*10),
+              (movePosicao Norte pos, (d-2)*10),(movePosicao Sul pos, (d-2)*10),(movePosicao Oeste pos, (d-2)*10),(movePosicao Este pos, (d-2)*10)
+          ]
+
+      5 -> [
+              (pos, d*10),
+              (movePosicao Norte pos, (d-2)*10),(movePosicao Sul pos, (d-2)*10),(movePosicao Oeste pos, (d-2)*10),(movePosicao Este pos, (d-2)*10),
+              (movePosicao Sudeste pos, (d-3)*10),(movePosicao Sudoeste pos, (d-3)*10),(movePosicao Nordeste pos, (d-3)*10),(movePosicao Noroeste pos, (d-3)*10),
+              (movePosicao Norte (movePosicao Norte pos), (d-4)*10),(movePosicao Sul (movePosicao Sul pos), (d-4)*10),(movePosicao Este (movePosicao Este pos), (d-4)*10),(movePosicao Oeste (movePosicao Oeste pos), (d-4)*10)
+          ]
+        
+      7 -> [
+            (pos, 7*10),
+            (movePosicao Norte pos, 50),(movePosicao Sul pos, 50),(movePosicao Oeste pos, 50),(movePosicao Este pos, 50),
+            (movePosicao Noroeste pos, 40),(movePosicao Nordeste pos, 40),(movePosicao Sudeste pos, 40),(movePosicao Sudoeste pos, 40),
+            (movePosicao Norte (movePosicao Norte pos), 30),(movePosicao Sul (movePosicao Sul pos), 30),(movePosicao Este (movePosicao Este pos), 30),(movePosicao Oeste (movePosicao Oeste pos), 30),
+            (movePosicao Noroeste (movePosicao Noroeste pos), 20),(movePosicao Nordeste (movePosicao Nordeste pos), 20),(movePosicao Sudeste (movePosicao Sudeste pos), 20),(movePosicao Sudoeste (movePosicao Sudoeste pos), 20),
+            (movePosicao Norte (movePosicao Norte (movePosicao Norte pos)), 10),(movePosicao Sul (movePosicao Sul (movePosicao Sul pos)), 10),(movePosicao Este (movePosicao Este (movePosicao Este pos)), 10),(movePosicao Oeste (movePosicao Oeste (movePosicao Oeste pos)), 10)
+        ]
+       
 
 -- | Para uma lista de posições afetadas por uma explosão, recebe um estado e calcula o novo estado em que esses danos são aplicados.
 aplicaDanos :: Danos -> Estado -> Estado
