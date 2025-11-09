@@ -50,7 +50,6 @@ executable t1-feedback
     import:           warnings
     other-modules:
         Magic
-        EstadosArquivo
         JogadasArquivo
     other-extensions:
     main-is: Tarefa1Test.hs
@@ -63,7 +62,6 @@ executable t2-feedback
     import:           warnings
     other-modules:
         Magic
-        EstadosArquivo
         JogadasArquivo
     other-extensions:
     main-is: Tarefa2Test.hs

@@ -111,9 +111,6 @@ eObjetosValido e (h:t) =
                         
     where
         mapa = mapaEstado e
-        minhocas = minhocasEstado e -- * MINHOCAS
-        
-        
 
         objetoValido obj = case obj of
             Disparo{tipoDisparo = Escavadora} -> False
@@ -121,10 +118,7 @@ eObjetosValido e (h:t) =
             Disparo{tipoDisparo = Bazuca} -> disparoValido mapa obj
             Disparo{tipoDisparo = Mina} -> disparoValido mapa obj
             Disparo{tipoDisparo = Dinamite} -> disparoValido mapa obj
-            _ -> True --todo caso exista novos casos adicionar
-        
-
--- *Auxiliares Objeto  
+            
 
 {-| Verifica se o 'Disparo' é valido
 
@@ -143,7 +137,6 @@ disparoValido :: Mapa -> Objeto -> Bool
 disparoValido m d@Disparo{tipoDisparo = Bazuca} = if (tempoDisparo d == Nothing && disparoBazucaValido d m) then True else False
 disparoValido m d@Disparo{tipoDisparo = Mina} = if (tempoDisparo d <= Just 2 && tempoDisparo d >= Just 0 && ePosicaoMapaLivre (posicaoObjeto d) m) || (tempoDisparo d == Nothing && ePosicaoMapaLivre (posicaoObjeto d) m) then True else False
 disparoValido m d@Disparo{tipoDisparo = Dinamite} = if (tempoDisparo d <= Just 4 && tempoDisparo d >= Just 0 && ePosicaoMapaLivre (posicaoObjeto d) m) then True else False
-disparoValido m _ = True
 
 {-| Verifica se o disparo de bazuca é valido
 
@@ -306,7 +299,7 @@ validaMorte minh m = case posicaoMinhoca minh of
                 where
                     terrenoAtual = case (encontraPosicaoMatriz pos m) of
                                         Just a -> a 
-                                        Nothing -> Ar -- ! atencao
+                                        Nothing -> Ar 
 -- Verifica se a vida da minhoca é valida
 {-| Verifica se a vida da minhoca é valida
 
@@ -321,7 +314,7 @@ False
 verificaVida :: Minhoca -> Bool
 verificaVida m = case vida of
                     Morta -> True
-                    Viva a -> if (a >= 0 && a <= 100) then True else False
+                    Viva a -> (a >= 0 && a <= 100)
     where
         vida = vidaMinhoca m
 

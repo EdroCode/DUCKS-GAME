@@ -572,6 +572,7 @@ estado37 = Estado
         ]
     }
 
+
 -- | Definir aqui os testes do grupo para a Tarefa 3
 testesTarefa3 :: [Estado]
 testesTarefa3 = [estado1,estado2,estado3,estado4,estado5,estado6,estado7,estado8, estado10, 
