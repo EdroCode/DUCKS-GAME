@@ -23,10 +23,9 @@ type Danos = [(Posicao,Dano)]
 
 Funcionamento:
 
-* Atualiza o 'Estado' de cada 'Minhoca'
-* Atualiza o 'Estado' de cada 'Objeto'
-* Cria o novo 'Estado' de ambos
-* Aplica o 'Dano' para cada novo 'Estado'
+* Atualiza os componentes de cada 'Minhoca'
+* Atualiza os componentes de cada 'Objeto'
+* Cria um novo 'Estado' contendo as minhocas e os objetos atualizados de acordo com o dano recebido
 
 
 
@@ -105,8 +104,61 @@ avancaMinhoca e i minhoca =
          && getMinhocaViva posAbaixo minhocas
 
 
+{- | Para um dado 'Estado', dado o índice('NumObjeto') de um 'Objeto' na lista de objetos e o estado desse objeto, retorna o novo estado do objeto no próximo tick ou, caso o objeto exploda, uma lista de posições afetadas com o dano associado. Cada 'Objeto' possui um comportamento diferente
 
--- | Para um dado estado, dado o índice de um objeto na lista de objetos e o estado desse objeto, retorna o novo estado do objeto no próximo tick ou, caso o objeto expluda, uma lista de posições afetadas com o dano associado.
+Funcinamento Geral:
+
+* Recebe o 'Estado', o índice do 'Objeto' e o 'Objeto' atual
+
+* Para cada tipo de 'Objeto', aplica a lógica específica:
+
+==__'Barril':__
+
+* Se o 'Barril' não está a explodir:
+  * Verifica se está no solo ou em água
+    * Se não estiver, marca o 'Barril' para explodir
+    * Caso contrário, mantém o 'Barril' inalterado
+
+==__'Bazuca':__
+* Move o 'Disparo' na direção especificada
+* Verifica se a nova posição é válida e livre
+  * Se for, atualiza a posição do 'Disparo'
+  * Caso contrário, calcula a explosão na posição atual
+
+==__'Mina':__
+* Verifica o tempo restante da 'Mina'
+  * Se acabar o tempo, calcula a explosão na posição atual
+  * Se o tempo for maior que 0:
+
+  @
+  -Verifica se está no solo ou em água
+    -Se não estiver, move a mina para baixo e ajusta a direção
+    -Caso contrário, mantém a mina na posição atual
+  @
+
+  * Se o tempo for 'Nothing':
+
+  @
+  -Verifica se há outras minhocas no raio de explosão (exceto o dono)
+    -Se não houver, mantém a mina inalterada
+    -Caso contrário, inicia o temporizador da mina
+  @
+
+==__'Dinamite':__
+* Verifica o tempo restante da 'Dinamite'
+  * Se acabar o tempo, calcula a explosão na posição atual
+  * Se o tempo for maior que 0:
+
+  @
+  -Verifica se está no solo
+    -Se não estiver, move a dinamite para baixo ou roda a posição dependendo da direção
+    -Caso contrário, mantém a dinamite na posição atual
+  @
+
+
+
+-}
+
 avancaObjeto :: Estado -> NumObjeto -> Objeto -> Either Objeto Danos
 avancaObjeto e i o = case o of
   Barril posBarril explode ->
@@ -246,21 +298,21 @@ Funcionamento Geral:
 * Cria um novo 'Estado' contendo as minhocas e os objetos atualizados de acordo com o dano recebido.
 
 
-==__Terrenos:__
+==__'Terreno':__
 * Atualiza o 'Mapa' do 'Estado', destruindo os terrenos destrutíveis nas posições afetadas
 
 * Se o terreno na posição afetada for destrutível, destrói-o (substitui por 'Ar')
 * Caso contrário, mantém o terreno como está
 
 
-==__Minhocas:__
+==__'Minhoca':__
 
 * Atualiza cada 'Minhoca' na lista de 'Minhocas' do 'Estado', aplicando o dano correspondente se a 'Minhoca' estiver na posição afetada
 * Se a 'Minhoca' estiver na posição afetada, reduz a sua 'Vida' pelo valor do dano
 * Se a 'Vida' da 'Minhoca' for menor ou igual a zero, define a 'Vida' como 'Morta'
 
 
-==__Objetos:__
+==__'Objeto':__
 
 * Atualiza cada 'Objeto' na lista de objetos do 'Estado'
 * Se o 'Objeto' for um 'Barril' não explodido e estiver na posição afetada, marca-o como explodido
