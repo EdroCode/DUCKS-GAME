@@ -22,25 +22,80 @@ estado11 = Estado mapaValido [] [Minhoca (Just (2,3)) (Viva 100) 1 1 1 1 1]
 estado12 = Estado mapaValido [] [Minhoca (Just (0,0)) (Viva 100) 1 1 1 1 1]
 estado13 = Estado mapaValido [] [Minhoca (Just (2,2)) (Viva 100) 1 1 1 1 1]
 estado14 = Estado mapaValido [] [Minhoca (Just (2,2)) (Viva 100) 1 1 1 1 1, Minhoca (Just (2,3)) (Viva 100) 1 1 1 1 1]
-estado15 = Estado mapaValido [] [Minhoca (Just (2,2)) (Viva 100) 1 1 1 1 1]
+estado15 = Estado mapaValido [] [Minhoca (Just (2,2)) (Viva 100) 0 0 0 0 0]
 estado16 = Estado mapaValido [] [Minhoca (Just (2,4)) (Viva 100) 1 1 1 1 1]
 estado17 = Estado mapaValido [] [Minhoca (Just (2,2)) (Viva 100) 1 1 1 1 1]
 estado18 = Estado mapaValido [] [Minhoca (Just (2,2)) (Viva 100) 1 1 1 1 1, Minhoca (Just (2,3)) (Viva 100) 1 1 1 1 1]
-estado19 = Estado mapaValido [] [Minhoca (Just (2,6)) (Viva 100) 1 1 1 1 1, Minhoca (Just (2,3)) (Viva 100) 1 1 1 1 1]
+estado19 = Estado mapaValido [] [Minhoca (Nothing) (Morta) 1 1 1 1 1, Minhoca (Just (2,3)) (Viva 100) 1 1 1 1 1]
 estado20 = Estado mapaValido [] [Minhoca (Just (2,4)) (Viva 100) 1 1 1 1 1]
 estado21 = Estado mapaValido [] [Minhoca (Just (0,9)) (Viva 100) 1 1 1 1 1, Minhoca (Just (0,8)) (Viva 100) 1 1 1 1 1]
 estado22 = Estado mapaValido [] [Minhoca (Just (2,3)) (Viva 100) 1 1 1 1 1]
 estado23 = Estado mapaValido [] [Minhoca (Just (2,2)) (Viva 100) 1 1 1 1 1]
 estado24 = Estado mapaValido [] [Minhoca (Just (2,3)) (Viva 100) 1 1 1 1 1]
 estado25 = Estado mapaValido [Disparo (3,3) Sul Bazuca Nothing 0] [Minhoca (Just (3,3)) (Viva 100) 1 1 1 1 1, Minhoca (Just (3,4)) (Viva 100) 1 1 1 1 1]
-estado26 = Estado mapaValido [] [Minhoca (Just (2,2)) (Viva 100) 1 1 1 1 1, Minhoca (Just (2,3)) (Viva 100) 1 1 1 1 1]
+estado26 = Estado mapaValido [] [Minhoca (Nothing) (Morta) 1 1 1 1 1, Minhoca (Just (2,3)) (Viva 100) 1 1 1 1 1]
 estado27 = Estado mapaValido [] [Minhoca (Just (2,2)) (Viva 100) 0 0 0 0 0]
 estado28 = Estado mapaValido [] [Minhoca (Just (2,2)) (Viva 100) 1 1 1 1 1]
 estado29 = Estado mapaValido [] [Minhoca (Just (2,2)) (Viva 100) 1 1 1 1 1]
 estado30 = Estado mapaValido [] [Minhoca (Just (2,2)) (Viva 100) 1 1 1 1 1]
 estado31 = Estado mapaValido [] [Minhoca (Just (23,2)) (Viva 100) 1 1 1 1 1]
-
-
+estado32 = Estado
+    { mapaEstado =
+        [[Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar]
+        ,[Terra,Terra,Terra,Terra,Terra]
+        ,[Terra,Terra,Terra,Terra,Terra]
+        ]
+    , objetosEstado =
+        []
+    , minhocasEstado =
+        [Minhoca {posicaoMinhoca = Just (0,4), vidaMinhoca = Viva 100, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 1}
+        ]
+    }
+estado33 = Estado
+    { mapaEstado =
+        [[Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar]
+        ,[Terra,Terra,Terra,Terra,Terra]
+        ,[Terra,Terra,Terra,Terra,Terra]
+        ]
+    , objetosEstado =
+        []
+    , minhocasEstado =
+        [Minhoca {posicaoMinhoca = Just (2,2), vidaMinhoca = Viva 100, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 1}
+        ]
+    }
+estado34 = Estado
+    { mapaEstado =
+        [[Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar]
+        ,[Pedra,Pedra,Ar,Pedra,Pedra]
+        ,[Pedra,Pedra,Pedra,Pedra,Pedra]
+        ,[Pedra,Pedra,Pedra,Pedra,Pedra]
+        ]
+    , objetosEstado =
+        []
+    , minhocasEstado =
+        [Minhoca {posicaoMinhoca = Just (2,2), vidaMinhoca = Viva 100, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 1}
+        ]
+    }
+estado35 = Estado
+    { mapaEstado =
+        [[Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar]
+        ,[Agua,Agua,Ar,Agua,Agua]
+        ,[Agua,Agua,Terra,Agua,Agua]
+        ,[Agua,Agua,Agua,Agua,Agua]
+        ]
+    , objetosEstado =
+        [Barril {posicaoBarril = (2,1), explodeBarril = False}
+        ]
+    , minhocasEstado =
+        [Minhoca {posicaoMinhoca = Just (2,2), vidaMinhoca = Viva 100, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 1}
+        ]
+    }
 
 jogadasTeste =
   [ (0 :: Int, Move Norte, estado1)
@@ -82,6 +137,7 @@ jogadasTeste =
   , (0 :: Int, Move Norte, estado9)
   , (0 :: Int, Move Norte, estado31)
   , (0 :: Int, Dispara Jetpack Norte, estado27)
+  , (0 :: Int, Dispara Jetpack Norte, estado22)
   , (0 :: Int, Dispara Bazuca Sul, estado25)
   , (0 :: Int, Dispara Escavadora Norte, estado26)
   , (0 :: Int, Dispara Mina Norte, estado6)
@@ -93,4 +149,23 @@ jogadasTeste =
   , (0 :: Int, Dispara Escavadora Sul, estado5)
   , (0 :: Int, Dispara Mina Este, estado5)
   , (0 :: Int, Dispara Dinamite Oeste, estado31)
+  , (0 :: Int, Dispara Bazuca Oeste, estado32)
+  , (0 :: Int, Dispara Bazuca Norte, estado32)
+  , (0 :: Int, Move Norte, estado32)
+  , (0 :: Int, Dispara Dinamite Norte, estado32)
+  , (0 :: Int, Dispara Escavadora Norte, estado32)
+  , (0 :: Int, Dispara Mina Norte, estado32)
+  , (0 :: Int, Dispara Jetpack Norte, estado32)
+  , (0 :: Int, Dispara Dinamite Sul, estado33)
+  , (0 :: Int, Dispara Escavadora Sul, estado33)
+  , (0 :: Int, Dispara Mina Sul, estado33)
+  , (0 :: Int, Dispara Jetpack Sul, estado33)
+  , (0 :: Int, Dispara Escavadora Sul, estado34)
+  , (0 :: Int, Dispara Jetpack Oeste, estado35)
+  , (0 :: Int, Dispara Escavadora Oeste, estado35)
+  , (0 :: Int, Dispara Dinamite Oeste, estado35)
+  , (0 :: Int, Dispara Mina Oeste, estado35)
+
+  
   ]
+
