@@ -38,6 +38,23 @@ A função devolve o mesmo `Estado` sem alterações quando a jogada for
 -}
 
 
+
+estadoValido5 = Estado
+    { mapaEstado =
+        [[Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Terra,Terra,Terra,Pedra,Agua,Agua]
+        ,[Terra,Terra,Terra,Terra,Pedra,Agua]
+        ]
+    , objetosEstado =[]
+    , minhocasEstado =
+        [Minhoca {posicaoMinhoca = Just (1,1), vidaMinhoca = Viva 100, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 1}]
+    }
+
+
+jogada1teste = Dispara Jetpack Norte
+
+
 efetuaJogada :: NumMinhoca -> Jogada -> Estado -> Estado
 
 -- DISPARO - Dispara TIpo Direcao

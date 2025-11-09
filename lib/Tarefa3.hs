@@ -223,14 +223,8 @@ avancaObjeto e i o = case o of
               (movePosicao Norte (movePosicao Norte pos), (d-4)*10),(movePosicao Sul (movePosicao Sul pos), (d-4)*10),(movePosicao Este (movePosicao Este pos), (d-4)*10),(movePosicao Oeste (movePosicao Oeste pos), (d-4)*10)
           ]
         
-      7 -> [
-            (pos, 7*10),
-            (movePosicao Norte pos, 50),(movePosicao Sul pos, 50),(movePosicao Oeste pos, 50),(movePosicao Este pos, 50),
-            (movePosicao Noroeste pos, 40),(movePosicao Nordeste pos, 40),(movePosicao Sudeste pos, 40),(movePosicao Sudoeste pos, 40),
-            (movePosicao Norte (movePosicao Norte pos), 30),(movePosicao Sul (movePosicao Sul pos), 30),(movePosicao Este (movePosicao Este pos), 30),(movePosicao Oeste (movePosicao Oeste pos), 30),
-            (movePosicao Noroeste (movePosicao Noroeste pos), 20),(movePosicao Nordeste (movePosicao Nordeste pos), 20),(movePosicao Sudeste (movePosicao Sudeste pos), 20),(movePosicao Sudoeste (movePosicao Sudoeste pos), 20),
-            (movePosicao Norte (movePosicao Norte (movePosicao Norte pos)), 10),(movePosicao Sul (movePosicao Sul (movePosicao Sul pos)), 10),(movePosicao Este (movePosicao Este (movePosicao Este pos)), 10),(movePosicao Oeste (movePosicao Oeste (movePosicao Oeste pos)), 10)
-        ]
+      7 -> [ (pos, 70), (movePosicao Norte pos, 50), (movePosicao Sul pos, 50), (movePosicao Este pos, 50), (movePosicao Oeste pos, 50), (movePosicao Nordeste pos, 40), (movePosicao Noroeste pos, 40), (movePosicao Sudeste pos, 40), (movePosicao Sudoeste pos, 40), (movePosicao Norte (movePosicao Nordeste pos), 40), (movePosicao Norte (movePosicao Noroeste pos), 40), (movePosicao Sul (movePosicao Sudeste pos), 40), (movePosicao Sul (movePosicao Sudoeste pos), 40), (movePosicao Este (movePosicao Nordeste pos), 40), (movePosicao Oeste (movePosicao Noroeste pos), 40), (movePosicao Este (movePosicao Sudeste pos), 40), (movePosicao Oeste (movePosicao Sudoeste pos), 40), (movePosicao Norte (movePosicao Norte pos), 30), (movePosicao Sul (movePosicao Sul pos), 30), (movePosicao Este (movePosicao Este pos), 30), (movePosicao Oeste (movePosicao Oeste pos), 30), (movePosicao Nordeste (movePosicao Nordeste pos), 20), (movePosicao Noroeste (movePosicao Noroeste pos), 20), (movePosicao Sudeste (movePosicao Sudeste pos), 20), (movePosicao Sudoeste (movePosicao Sudoeste pos), 20), (movePosicao Norte (movePosicao Norte (movePosicao Norte pos)), 50), (movePosicao Sul (movePosicao Sul (movePosicao Sul pos)), 50), (movePosicao Este (movePosicao Este (movePosicao Este pos)), 50), (movePosicao Oeste (movePosicao Oeste (movePosicao Oeste pos)), 50) ]
+
        
 
 
