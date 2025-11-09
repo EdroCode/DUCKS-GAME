@@ -13,17 +13,46 @@ import Tarefa0_2025
 import Tarefa2
 import Labs2025
 
+-- * Tipos Auxiliares
 type Dano = Int
 type Danos = [(Posicao,Dano)]
 
--- | Função principal da Tarefa 3. Avanço o estado do jogo um tick.
+-- * Função Principal
+
+{-| Avança o 'Estado' do jogo em um tick('Ticks').
+
+Funcionamento:
+
+* Atualiza o 'Estado' de cada 'Minhoca'
+* Atualiza o 'Estado' de cada 'Objeto'
+* Cria o novo 'Estado' de ambos
+* Aplica o 'Dano' para cada novo 'Estado'
+
+
+
+-}
 avancaEstado :: Estado -> Estado
 avancaEstado e@(Estado mapa objetos minhocas) = foldr aplicaDanos e' danoss
     where
     minhocas' = map (uncurry $ avancaMinhoca e) (zip [0..] minhocas)
     (objetos',danoss) = partitionEithers $ map (uncurry $ avancaObjeto $ e { minhocasEstado = minhocas' }) (zip [0..] objetos)
-    e' = Estado mapa objetos' minhocas'
+    e' = Estado mapa objetos' minhocas' 
 
+-- * Funções Auxiliares
+
+{- |Para um dado 'Estado', dado o índice('NumMinhoca') de uma 'Minhoca' na lista de minhocas e o 'Estado' dessa minhoca, retorna o novo 'Estado' da 'Minhoca' no próximo tick('Ticks').
+
+Funcionamento:
+
+* Verifica se a 'Minhoca' tem posição
+
+* Verifica a 'Vida' da 'Minhoca'
+
+* Calcula a nova posição da 'Minhoca' (cair ou mover)
+
+* Verifica o 'Terreno' na nova 'Posicao' e atualiza a 'Minhoca' conforme o novo 'Terreno'
+
+-}
 avancaMinhoca :: Estado -> NumMinhoca -> Minhoca -> Minhoca
 avancaMinhoca e i minhoca =
   case posicaoMinhoca minhoca of
@@ -204,7 +233,88 @@ avancaObjeto e i o = case o of
         ]
        
 
--- | Para uma lista de posições afetadas por uma explosão, recebe um estado e calcula o novo estado em que esses danos são aplicados.
+
+{- | Para uma lista de posições afetadas por uma explosão, recebe um estado e calcula o novo estado em que esses danos são aplicados.
+
+funcionamento Geral:
+* Atualiza o 'Estado' de cada 'Minhoca'
+* Atualiza o 'Estado' de cada 'Objeto'
+* Cria o novo 'Estado' de ambos
+* Aplica o 'Dano' para cada novo 'Estado'
+
+
+==__Terrenos:__
+* Atualiza o 'Mapa' do 'Estado', destruindo os terrenos destrutíveis nas posições afetadas
+
+@
+atualizaMapa :: Mapa -> Danos -> Mapa
+    atualizaMapa mapa [] = mapa
+    atualizaMapa mapa ((pos, _):ds) =
+      let 
+        terrenoAtual = encontraPosicaoMatriz pos mapa
+        mapa' = case terrenoAtual of
+          Just t -> if eTerrenoDestrutivel t
+                      then destroiPosicao pos mapa
+                      else mapa
+          Nothing -> mapa
+      in atualizaMapa mapa' ds
+@
+
+==__Minhocas:__
+* Atualiza cada 'Minhoca' na lista de 'Minhocas' do 'Estado', aplicando o dano correspondente se a 'Minhoca' estiver na posição afetada
+
+@
+atualizaMinhocas :: [Minhoca] -> [Minhoca]
+    atualizaMinhocas [] = []
+    atualizaMinhocas (h:t) = atualizaMinhoca h : atualizaMinhocas t
+
+    
+    atualizaMinhoca :: Minhoca -> Minhoca
+    atualizaMinhoca minhoca =
+      case posicaoMinhoca minhoca of
+        Nothing -> minhoca
+        Just pos ->
+          case vidaMinhoca minhoca of
+            Morta -> minhoca
+            Viva v ->
+              let dano = somaDanos pos danos
+                  novaVida = v - dano
+              in if novaVida <= 0
+                 then minhoca { vidaMinhoca = Morta }
+                 else minhoca { vidaMinhoca = Viva novaVida }
+
+    somaDanos :: Posicao -> Danos -> Int
+    somaDanos _ [] = 0
+    somaDanos pos ((p, d):ds) =
+      if pos == p
+        then d + somaDanos pos ds
+        else somaDanos pos ds
+@
+
+==__Objetos:__
+* Atualiza cada 'Objeto' na lista de 'Objetos' do 'Estado'
+
+@
+atualizaObjetos :: Danos -> [Objeto] -> [Objeto]
+    atualizaObjetos _ [] = []
+    atualizaObjetos danos (obj:resto) =
+      let pos = posicaoObjeto obj
+          objAtualizado = case obj of
+            Barril _ False ->
+              if posAfetado pos danos
+                then Barril pos True
+                else obj
+            _ -> obj
+      in objAtualizado : atualizaObjetos danos resto
+      where
+
+        posAfetado :: Posicao -> Danos -> Bool
+        posAfetado _ [] = False
+        posAfetado p ((posDano, _):t) =
+          if p == posDano then True else posAfetado p t
+@
+
+-}
 aplicaDanos :: Danos -> Estado -> Estado
 aplicaDanos danos estado = estado {
     minhocasEstado = atualizaMinhocas (minhocasEstado estado),
