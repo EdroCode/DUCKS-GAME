@@ -12,12 +12,35 @@ import Tarefa0_2025
 import Tarefa1
 import Foreign (moveArray)
 
+-- * Efetuar Jogada
 
 
--- | Função principal da Tarefa 2. Recebe o índice de uma minhoca na lista de minhocas, uma jogada, um estado e retorna um novo estado em que essa minhoca efetuou essa jogada.
+{-| Recebe o índice de uma minhoca na lista de minhocas, uma jogada, um estado e retorna um novo estado em que essa minhoca efetuou essa jogada.
+
+
+| Funcionamento:
+
+@
+ Movimentos (`Move`) alteram a posição da minhoca se a posição destino for
+    válida e livre; se a minhoca estiver no ar ou morta a jogada é ignorada.
+@
+@
+Disparos (`Dispara`) consomem munição da minhoca (quando aplicável), podem
+    criar objetos do tipo `Disparo` no estado (ex.: `Bazuca`, `Mina`, `Dinamite`)
+    ou modificar o mapa (ex.: `Escavadora` transforma terreno em `Ar`).
+@
+@
+A função devolve o mesmo `Estado` sem alterações quando a jogada for
+    inválida ou não aplicável (minhoca morta, posição inválida, dono já tem
+    disparo do mesmo tipo, etc.).
+@
+
+-}
+
+
 efetuaJogada :: NumMinhoca -> Jogada -> Estado -> Estado
 
--- * DISPARO - Dispara TIpo Direcao
+-- DISPARO - Dispara TIpo Direcao
 efetuaJogada n (Dispara arma direcao) e = if not (vidaMinhoca minhoca == Morta) -- não esta morta
                                             then if temMunicao minhoca arma
                                                 then if not (elem (arma,n) (listaDonos objetos)) -- Verifica se existe um disparo da mesma arma da mesma minhoca no estado atual
@@ -131,7 +154,7 @@ efetuaJogada n (Dispara arma direcao) e = if not (vidaMinhoca minhoca == Morta) 
                        
 
 
--- * MOVIMENTO
+-- MOVIMENTO
 efetuaJogada n (Move direcao) e = if not (vidaMinhoca minhoca == Morta)  -- * Se a posicao nao for nula (para so aceitar posicoes validas nas funcoes seguintes)
                                     then if not (posicaoMinhoca minhoca == Nothing)
                                                 then if estaNoSolo pos mapa  -- * esta no solo (nao esta no ar)
@@ -179,11 +202,27 @@ efetuaJogada n (Move direcao) e = if not (vidaMinhoca minhoca == Morta)  -- * Se
                             } 
 
 
--- ! removi a função (e novaposlivre) porque era estupida e eu deveria tar maluco se fui eu q escrevi aquilo      
+-- removi a função (e novaposlivre) porque era estupida e eu deveria tar maluco se fui eu q escrevi aquilo      
  
 
 
  -- todo mudar para estaNoAr e a logica da mesma para melhor readability?
+{-|Verifica se uma posição está apoiada em terreno opaco. Retorna True quando a posição existe no mapa, o bloco abaixo é opaco e o bloco atual não é opaco. Retorna False em casos onde a posição está fora do mapa ou quando a condição não se verifica.
+
+@
+estaNoSolo p [] = False
+estaNoSolo pos mapa = case encontraPosicaoMatriz (movePosicao Sul pos) mapa of
+    Nothing -> False
+    Just blocoInferior -> case encontraPosicaoMatriz pos mapa of
+        Nothing -> False
+        Just blocoAtual -> eTerrenoOpaco blocoInferior && not (eTerrenoOpaco blocoAtual)
+@
+
+==__Exemplos:__
+
+>>> estaNoSolo (1,0) mapaOk
+True
+-}
 estaNoSolo :: Posicao -> Mapa -> Bool
 estaNoSolo p [] = False
 estaNoSolo pos mapa = case encontraPosicaoMatriz (movePosicao Sul pos) mapa of
@@ -192,7 +231,22 @@ estaNoSolo pos mapa = case encontraPosicaoMatriz (movePosicao Sul pos) mapa of
         Nothing -> False
         Just blocoAtual -> eTerrenoOpaco blocoInferior && not (eTerrenoOpaco blocoAtual)
 
- 
+{-|Verifica se a posição tem água imediatamente abaixo. Retorna True quando o bloco imediatamente abaixo da posição é Agua. Retorna False caso contrário.
+
+@
+estaEmAgua p [] = False
+estaEmAgua pos mapa = case encontraPosicaoMatriz (movePosicao Sul pos) mapa of
+    Nothing -> False
+    Just Agua -> True
+    Just _ -> False
+@
+
+==__Exemplos:__
+
+>>> estaEmAgua (3,2) mapaOk
+True
+
+-}
 estaEmAgua :: Posicao -> Mapa -> Bool
 estaEmAgua p [] = False
 estaEmAgua pos mapa = case encontraPosicaoMatriz (movePosicao Sul pos) mapa of
