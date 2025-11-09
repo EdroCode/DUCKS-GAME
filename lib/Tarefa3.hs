@@ -81,23 +81,24 @@ avancaMinhoca e i minhoca =
 
   where
     mapa = mapaEstado e
-    objetos = objetosEstado e
     minhocas = minhocasEstado e
 
     estaMinhocaBaixoViva :: Posicao -> Estado -> Bool
     estaMinhocaBaixoViva pos e =
       let
         posAbaixo = movePosicao Sul pos
-
+        
         getMinhocaViva :: Posicao -> [Minhoca] -> Bool
         getMinhocaViva _ [] = False
         getMinhocaViva p (h:t) =
           case posicaoMinhoca h of
-            Just p' | p == p' ->
-              case vidaMinhoca h of
-                Viva a | a > 0 -> True
-                _ -> getMinhocaViva p t
-            _ -> getMinhocaViva p t
+            Just p' ->
+              if p == p'
+                then case vidaMinhoca h of
+                      Viva a -> if a > 0 then True else getMinhocaViva p t
+                      _      -> getMinhocaViva p t
+                else getMinhocaViva p t
+            Nothing -> getMinhocaViva p t
 
       in ePosicaoMatrizValida posAbaixo mapa
          && not (ePosicaoEstadoLivre posAbaixo e)
@@ -190,20 +191,28 @@ avancaObjeto e i o = case o of
     existeDonoMinhoca :: Posicao -> Int -> [Minhoca] -> Bool
     existeDonoMinhoca pos dono minhocas =
       let
+        
         posicoes = pos : [movePosicao Norte pos, movePosicao Sul pos, movePosicao Este pos, movePosicao Oeste pos]
+
         minhocasComIndice = zip [0..] minhocas
 
+       
         existeMinhocaInimiga :: Posicao -> [(Int, Minhoca)] -> Bool
         existeMinhocaInimiga _ [] = False
         existeMinhocaInimiga p ((i, m):ms) =
           case posicaoMinhoca m of
-            Just p' | p == p' && i /= dono ->
-              case vidaMinhoca m of
-                Viva a | a > 0 -> True
-                _ -> existeMinhocaInimiga p ms
+            Just p' | p == p' && i /= dono -> True
             _ -> existeMinhocaInimiga p ms
 
-      in any (\p -> existeMinhocaInimiga p minhocasComIndice) posicoes
+        
+        verificaTodasPosicoes :: [Posicao] -> [(Int, Minhoca)] -> Bool
+        verificaTodasPosicoes [] _ = False
+        verificaTodasPosicoes (p:ps) minhocas =
+          if existeMinhocaInimiga p minhocas
+            then True
+            else verificaTodasPosicoes ps minhocas
+
+      in verificaTodasPosicoes posicoes minhocasComIndice
 
 
 

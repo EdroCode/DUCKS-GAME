@@ -507,14 +507,78 @@ estado33 = Estado
         [Minhoca {posicaoMinhoca = Just (1,1), vidaMinhoca = Viva 20, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 1}
         ]
     }
-
+estado34 = Estado
+    { mapaEstado =
+        [[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Terra,Terra,Terra,Terra,Terra,Terra,Terra,Agua,Agua,Agua]
+        ,[Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Agua,Agua]
+        ]
+    , objetosEstado =
+        [Disparo {posicaoDisparo = (2,0), direcaoDisparo = Norte, tipoDisparo = Mina, tempoDisparo = Nothing, donoDisparo = 0}
+        ]
+    , minhocasEstado =
+        [Minhoca {posicaoMinhoca = Just (1,4), vidaMinhoca = Viva 0, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 1}
+        ,Minhoca {posicaoMinhoca = Just (2,0), vidaMinhoca = Morta, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 1}
+        ]
+    }
+estado35 = Estado
+    { mapaEstado =
+        [[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Terra,Terra,Terra,Terra,Terra,Terra,Terra,Agua,Agua,Agua]
+        ,[Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Agua,Agua]
+        ]
+    , objetosEstado =
+        [Disparo {posicaoDisparo = (2,0), direcaoDisparo = Norte, tipoDisparo = Mina, tempoDisparo = Nothing, donoDisparo = 0}
+        ]
+    , minhocasEstado =
+        [Minhoca {posicaoMinhoca = Just (1,4), vidaMinhoca = Viva 40, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 1}
+        ,Minhoca {posicaoMinhoca = Just (1,0), vidaMinhoca = Viva 40, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 1}
+        ]
+    }
+estado36 = Estado
+    { mapaEstado =
+        [[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Terra,Terra,Terra,Terra,Terra,Terra,Terra,Agua,Agua,Agua]
+        ,[Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Agua,Agua]
+        ]
+    , objetosEstado =
+        [Disparo {posicaoDisparo = (2,5), direcaoDisparo = Norte, tipoDisparo = Mina, tempoDisparo = Nothing, donoDisparo = 0}
+        ]
+    , minhocasEstado =
+        [Minhoca {posicaoMinhoca = Just (2,0), vidaMinhoca = Morta, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 1}
+        ,Minhoca {posicaoMinhoca = Just (1,0), vidaMinhoca = Viva 0, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 1}
+        ]
+    }
+estado37 = Estado
+    { mapaEstado =
+        [[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Terra,Terra,Terra,Terra,Terra,Terra,Terra,Agua,Agua,Agua]
+        ,[Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Agua,Agua]
+        ]
+    , objetosEstado =
+        [Disparo {posicaoDisparo = (3,9), direcaoDisparo = Norte, tipoDisparo = Mina, tempoDisparo = Nothing, donoDisparo = 0}
+        ]
+    , minhocasEstado =
+        [Minhoca {posicaoMinhoca = Just (2,2), vidaMinhoca = Viva 100, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 1}
+        ,Minhoca {posicaoMinhoca = Just (3,7), vidaMinhoca = Morta, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 1}
+        ]
+    }
 
 -- | Definir aqui os testes do grupo para a Tarefa 3
 testesTarefa3 :: [Estado]
 testesTarefa3 = [estado1,estado2,estado3,estado4,estado5,estado6,estado7,estado8, estado10, 
                 estado11, estado12, estado13, estado14, estado15, estado16, estado17, estado18, 
                 estado19, estado20, estado21, estado22, estado23, estado24, estado25, estado26, estado27,
-                estado28, estado29, estado30, estado31, estado32, estado33]
+                estado28, estado29, estado30, estado31, estado32, estado33, estado34, estado35, estado36,
+                estado37]
 
 dataTarefa3 :: IO TaskData
 dataTarefa3 = do
