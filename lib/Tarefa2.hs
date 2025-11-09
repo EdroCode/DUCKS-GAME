@@ -81,12 +81,12 @@ efetuaJogada n (Dispara arma direcao) e = if not (vidaMinhoca minhoca == Morta) 
                                                                     else Estado{mapaEstado=mapa,objetosEstado=objetos,minhocasEstado=atualizaIndiceLista n (minhoca{escavadoraMinhoca = escavadoraMinhoca minhoca-1}) minhocas}                                                
                                                                 else e{minhocasEstado = minhocasFinais}
 
-                                                        Bazuca -> if ePosicaoMatrizValida novaPos mapa
+                                                        Bazuca -> if ePosicaoMatrizValida novaPos mapa && ePosicaoEstadoLivre novaPos e
 
                                                                 then Estado{mapaEstado=mapaEstado e,objetosEstado = (objetosEstado e ++ [Disparo{posicaoDisparo=novaPos, direcaoDisparo=direcao, tipoDisparo=Bazuca, tempoDisparo=Nothing, donoDisparo=n}]), minhocasEstado = minhocasFinais}
                                                                 else e{minhocasEstado = minhocasFinais} 
 
-                                                        Mina -> if ePosicaoMatrizValida novaPos mapa
+                                                        Mina -> if ePosicaoMatrizValida novaPos mapa 
                                                                 then if ePosicaoMapaLivre novaPos mapa
                                                                     then Estado{mapaEstado=mapaEstado e,objetosEstado = (objetosEstado e ++ [Disparo{posicaoDisparo=novaPos, direcaoDisparo=direcao, tipoDisparo=Mina, tempoDisparo=Nothing, donoDisparo=n}]), minhocasEstado = minhocasFinais}
                                                                     else Estado{mapaEstado=mapaEstado e,objetosEstado = (objetosEstado e ++ [Disparo{posicaoDisparo=pos, direcaoDisparo=direcao, tipoDisparo=Mina, tempoDisparo=Nothing, donoDisparo=n}]), minhocasEstado = minhocasFinais}
@@ -146,7 +146,7 @@ efetuaJogada n (Dispara arma direcao) e = if not (vidaMinhoca minhoca == Morta) 
                                                             Just Agua ->
                                                                 case arma of
                                                                     Jetpack    -> if ePosicaoEstadoLivre novaPos e then (Just novaPos, Morta) else (Just pos, vidaMinhoca minhoca)
-                                                                    Escavadora -> (Just novaPos, Morta)
+                                                                    Escavadora -> if ePosicaoEstadoLivre novaPos e then (Just novaPos, Morta) else (Just pos, vidaMinhoca minhoca)
                                                                     _          -> (posicaoMinhoca minhoca, vidaMinhoca minhoca)
                                                             Just Terra ->
                                                                 case arma of
@@ -162,7 +162,7 @@ efetuaJogada n (Dispara arma direcao) e = if not (vidaMinhoca minhoca == Morta) 
                                                             _ ->
                                                                 case arma of
                                                                     Jetpack    ->  if ePosicaoEstadoLivre novaPos e then (Just novaPos, vidaMinhoca minhoca) else (Just pos, vidaMinhoca minhoca)
-                                                                    Escavadora -> (Just novaPos, vidaMinhoca minhoca)
+                                                                    Escavadora -> if ePosicaoEstadoLivre novaPos e then (Just novaPos, vidaMinhoca minhoca) else (Just pos, vidaMinhoca minhoca)
                                                                     _          -> (posicaoMinhoca minhoca, vidaMinhoca minhoca)
 
                                                 in atualizaMunicao minhoca

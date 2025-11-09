@@ -256,11 +256,10 @@ Funcionalidade:
 -}
 listaDonos :: [Objeto] -> [(TipoArma, Int)]
 listaDonos [] = []
-listaDonos (h:t) = (tipo,indice) : listaDonos t
-                where
-                    indice = donoDisparo h
-                    tipo = tipoDisparo h
-               
+listaDonos (h:t)
+  | ehDisparo h = (tipoDisparo h, donoDisparo h) : listaDonos t
+  | otherwise   = listaDonos t
+
 
 
 
