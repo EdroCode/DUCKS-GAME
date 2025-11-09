@@ -320,9 +320,5 @@ verificaVida m = case vida of
 
 
 
--- todo -> Disparos podem ser repetidos caso nao sejam do mesmo dono ( FEITO )
--- todo bloco anterior ao disparo da bazuca ( FEITO )
--- todo UMA MINA E UMA DINAMITE PODEM ESTAR NA POSICAO DA MINHOCA OU OUTRO OBJETO ( FEITO )
-
 
 

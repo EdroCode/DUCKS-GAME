@@ -87,21 +87,10 @@ avancaMinhoca e i minhoca =
       let
         posAbaixo = movePosicao Sul pos
         
-        getMinhocaViva :: Posicao -> [Minhoca] -> Bool
-        getMinhocaViva _ [] = False
-        getMinhocaViva p (h:t) =
-          case posicaoMinhoca h of
-            Just p' ->
-              if p == p'
-                then case vidaMinhoca h of
-                      Viva a -> if a > 0 then True else getMinhocaViva p t
-                      _      -> getMinhocaViva p t
-                else getMinhocaViva p t
-            Nothing -> getMinhocaViva p t
 
       in ePosicaoMatrizValida posAbaixo mapa
          && not (ePosicaoEstadoLivre posAbaixo e)
-         && getMinhocaViva posAbaixo minhocas
+        
 
 
 {- | Para um dado 'Estado', dado o índice('NumObjeto') de um 'Objeto' na lista de objetos e o estado desse objeto, retorna o novo estado do objeto no próximo tick ou, caso o objeto exploda, uma lista de posições afetadas com o dano associado. Cada 'Objeto' possui um comportamento diferente

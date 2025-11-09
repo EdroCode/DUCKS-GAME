@@ -124,8 +124,8 @@ efetuaJogada n (Dispara arma direcao) e = if not (vidaMinhoca minhoca == Morta) 
                                         
                                         where    
                                             
-                                            -- * minhoca estudada
-                                            minhoca = case encontraIndiceLista n minhocas of Just m -> m -- ! atencao
+
+                                            minhoca = case encontraIndiceLista n minhocas of Just m -> m 
                                             pos = case posicaoMinhoca minhoca of Just a -> a
                                             
                                             -- -------------
@@ -156,15 +156,28 @@ efetuaJogada n (Dispara arma direcao) e = if not (vidaMinhoca minhoca == Morta) 
                                                                 Jetpack    -> (Nothing, Morta)  -- jetpack fora do mapa -> morre
                                                                 Escavadora -> (posicaoMinhoca minhoca, vidaMinhoca minhoca)  -- escavadora n mexe
                                                                 _          -> (posicaoMinhoca minhoca, vidaMinhoca minhoca)  -- outras arma fica parada
-                                                        else case bloco of
+                                                        else 
+                                                            
+                                                            case bloco of
                                                             Just Agua ->
                                                                 case arma of
-                                                                    Jetpack    -> (Just novaPos, Morta)
+                                                                    Jetpack    -> if ePosicaoEstadoLivre novaPos e then (Just novaPos, Morta) else (Just pos, vidaMinhoca minhoca)
                                                                     Escavadora -> (Just novaPos, Morta)
                                                                     _          -> (posicaoMinhoca minhoca, vidaMinhoca minhoca)
+                                                            Just Terra ->
+                                                                case arma of
+                                                                    Jetpack    -> (Just pos, vidaMinhoca minhoca)
+                                                                    Escavadora -> (Just novaPos, vidaMinhoca minhoca)
+                                                                    _          -> (posicaoMinhoca minhoca, vidaMinhoca minhoca)
+                                                            Just Pedra ->
+                                                                case arma of
+                                                                    Jetpack    -> (Just pos, vidaMinhoca minhoca)
+                                                                    Escavadora -> (Just novaPos, vidaMinhoca minhoca)
+                                                                    _          -> (posicaoMinhoca minhoca, vidaMinhoca minhoca)
+
                                                             _ ->
                                                                 case arma of
-                                                                    Jetpack    -> (Just novaPos, vidaMinhoca minhoca)
+                                                                    Jetpack    ->  if ePosicaoEstadoLivre novaPos e then (Just novaPos, vidaMinhoca minhoca) else (Just pos, vidaMinhoca minhoca)
                                                                     Escavadora -> (Just novaPos, vidaMinhoca minhoca)
                                                                     _          -> (posicaoMinhoca minhoca, vidaMinhoca minhoca)
 
@@ -178,10 +191,10 @@ efetuaJogada n (Dispara arma direcao) e = if not (vidaMinhoca minhoca == Morta) 
                                             temMunicao :: Minhoca -> TipoArma -> Bool
                                             temMunicao m arma = case arma of
                                                 Jetpack -> jetpackMinhoca m > 0
-                                                Escavadora -> jetpackMinhoca m > 0
-                                                Bazuca -> jetpackMinhoca m > 0
-                                                Mina -> jetpackMinhoca m > 0
-                                                Dinamite -> jetpackMinhoca m > 0
+                                                Escavadora -> escavadoraMinhoca m > 0
+                                                Bazuca -> bazucaMinhoca m > 0
+                                                Mina -> minaMinhoca m > 0
+                                                Dinamite -> dinamiteMinhoca m > 0
                                            
 
 
