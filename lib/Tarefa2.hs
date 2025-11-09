@@ -21,8 +21,8 @@ import Foreign (moveArray)
 | Funcionamento:
 
 @
- Movimentos (`Move`) alteram a posição da minhoca se a posição destino for
-    válida e livre; se a minhoca estiver no ar ou morta a jogada é ignorada.
+ Movimentos (`Move`) alteram a 'Posicao' da 'Minhoca' se a posição destino for
+    válida e livre; se a minhoca estiver no 'Ar' ou 'Morta' a 'Jogada' é ignorada.
 @
 @
 Disparos (`Dispara`) consomem munição da minhoca (quando aplicável), podem
@@ -34,6 +34,27 @@ A função devolve o mesmo `Estado` sem alterações quando a jogada for
     inválida ou não aplicável (minhoca morta, posição inválida, dono já tem
     disparo do mesmo tipo, etc.).
 @
+
+==__Exemplos:__
+
+@
+estadoValido5 = Estado
+    { mapaEstado =
+        [[Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Terra,Terra,Terra,Pedra,Agua,Agua]
+        ,[Terra,Terra,Terra,Terra,Pedra,Agua]
+        ]
+    , objetosEstado =[]
+    , minhocasEstado =
+        [Minhoca {posicaoMinhoca = Just (1,1), vidaMinhoca = Viva 100, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 1}]
+    }
+ 
+@
+
+>jogada1teste = Dispara Jetpack Norte
+
+>>>efetuaJogada 0 jogada1teste estadoValido5 = Estado {mapaEstado = [[Ar,Ar,Ar,Ar,Ar,Ar],[Ar,Ar,Ar,Ar,Ar,Ar],[Terra,Terra,Terra,Pedra,Agua,Agua],[Terra,Terra,Terra,Terra,Pedra,Agua]], objetosEstado = [], minhocasEstado = [Minhoca {posicaoMinhoca = Just (0,1), vidaMinhoca = Viva 100, jetpackMinhoca = 0, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 1}]}
 
 -}
 
@@ -226,19 +247,29 @@ efetuaJogada n (Move direcao) e = if not (vidaMinhoca minhoca == Morta)  -- * Se
  -- todo mudar para estaNoAr e a logica da mesma para melhor readability?
 {-|Verifica se uma posição está apoiada em terreno opaco. Retorna True quando a posição existe no mapa, o bloco abaixo é opaco e o bloco atual não é opaco. Retorna False em casos onde a posição está fora do mapa ou quando a condição não se verifica.
 
-@
-estaNoSolo p [] = False
-estaNoSolo pos mapa = case encontraPosicaoMatriz (movePosicao Sul pos) mapa of
-    Nothing -> False
-    Just blocoInferior -> case encontraPosicaoMatriz pos mapa of
-        Nothing -> False
-        Just blocoAtual -> eTerrenoOpaco blocoInferior && not (eTerrenoOpaco blocoAtual)
-@
+Funcionamento:
+
+* Retorna 'False' se a posição está fora do mapa
+* Retorna 'True' se o bloco abaixo da posição for opaco e o bloco atual não for opaco
+* Retorna 'False' caso contrário
 
 ==__Exemplos:__
 
->>> estaNoSolo (1,0) mapaOk
+@
+mapaOk = 
+    [ [Ar,Ar,Ar,Ar,Ar]
+    , [Ar,Ar,Ar,Ar,Ar]
+    , [Terra,Terra,Terra,Pedra,Agua]
+    , [Terra,Terra,Terra,Terra,Pedra]
+    ]
+@
+
+>>> estaNoSolo (1,2) mapaOk
 True
+
+>>> estaNoSolo (2,3) mapaOk
+False
+
 -}
 estaNoSolo :: Posicao -> Mapa -> Bool
 estaNoSolo p [] = False
@@ -250,17 +281,26 @@ estaNoSolo pos mapa = case encontraPosicaoMatriz (movePosicao Sul pos) mapa of
 
 {-|Verifica se a posição tem água imediatamente abaixo. Retorna True quando o bloco imediatamente abaixo da posição é Agua. Retorna False caso contrário.
 
-@
-estaEmAgua p [] = False
-estaEmAgua pos mapa = case encontraPosicaoMatriz (movePosicao Sul pos) mapa of
-    Nothing -> False
-    Just Agua -> True
-    Just _ -> False
-@
+Funcionamento:
+
+* Retorna 'False' se a posição está fora do mapa
+* Retorna 'True' se o bloco imediatamente abaixo da posição for Agua
+* Retorna 'False' caso contrário
 
 ==__Exemplos:__
+@
+mapaOk = 
+    [ [Ar,Ar,Ar,Ar,Ar]
+    , [Ar,Ar,Ar,Ar,Ar]
+    , [Terra,Terra,Terra,Agua,Agua]
+    , [Terra,Terra,Terra,Agua,Agua]
+    ]
+@
 
 >>> estaEmAgua (3,2) mapaOk
+False
+
+>>> estaEmAgua (2,3) mapaOk
 True
 
 -}

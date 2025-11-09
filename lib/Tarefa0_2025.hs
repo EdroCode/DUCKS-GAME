@@ -51,15 +51,6 @@ ePosicaoMapaLivre (x,y) [] = False
 ePosicaoMapaLivre (0,y) (h:t) = encontraLinhaMapa y h
 ePosicaoMapaLivre (x,y) (h:t) = ePosicaoMapaLivre (x-1,y) t
 
--- Auxiliares 
-encontraLinhaMapa :: Int -> [Terreno] -> Bool
-encontraLinhaMapa i [] = False
-encontraLinhaMapa 0 (h:t) = not (eTerrenoOpaco h)
-encontraLinhaMapa i (h:t) = encontraLinhaMapa (i-1) t 
--- *! SO esta livre se terreno opaco +e falso,
-    
--- ---------------------
-
 -- | Verifica se uma posição do estado está livre, i.e., pode ser ocupada por um objeto ou minhoca.
 --
 -- __NB:__ Uma posição está livre se o mapa estiver livre e se não estiver já uma minhoca ou um barril nessa posição.
@@ -71,15 +62,35 @@ ePosicaoEstadoLivre pos estado =
     objetos = objetosEstado estado
     minhocas = minhocasEstado estado
 
+-- | Destrói uma dada posição no mapa (tipicamente como consequência de uma explosão).
+--
+-- __NB__: Só terrenos @Terra@ pode ser destruídos.
+-- Assumo que seja destruir e substituir por Ar
+destroiPosicao :: Posicao -> Mapa -> Mapa
+destroiPosicao pos mapa = atualizaPosicaoMatriz pos Ar mapa
 
---Auxiliares -----------------
+-- |Adiciona um novo objeto a um estado.
+--
+-- __NB__: A posição onde é inserido não é relevante.
+adicionaObjeto :: Objeto -> Estado -> Estado
+adicionaObjeto obj estado = estado {objetosEstado = obj : objetosEstado estado}
 
+-- * Auxiliares 
+
+-- | Verifica se numa linha do 'Mapa' a 'Posicao' dada é livre (não 'Opaca').(Utilizado na função 'ePosicaoMapaLivre')
+encontraLinhaMapa :: Int -> [Terreno] -> Bool
+encontraLinhaMapa i [] = False
+encontraLinhaMapa 0 (h:t) = not (eTerrenoOpaco h)
+encontraLinhaMapa i (h:t) = encontraLinhaMapa (i-1) t 
+
+
+-- | Verifica se numa lista de minhocas já existe uma 'Minhoca' na dada 'Posicao'.(Utilizado na função 'ePosicaoEstadoLivre')
 existeMinhoca :: Posicao -> [Minhoca] -> Bool
 existeMinhoca pos [] = False
 existeMinhoca (x,y) (h:t) = let pos = posicaoMinhoca h
                             in if pos == Just (x,y) then True else existeMinhoca (x,y) t
                        
-                       
+-- | Verifica se numa lista de objetos já existe um 'Barril' na dada 'Posicao'.(Utilizado na função 'ePosicaoEstadoLivre')                   
 existeBarril :: Posicao -> [Objeto] -> Bool
 existeBarril pos [] = False
 existeBarril pos (h:t) =
@@ -90,21 +101,20 @@ existeBarril pos (h:t) =
               else existeBarril pos t
         else existeBarril pos t
 
--- * Verifica se o objeto fornecido é um disparo se não, é Barril
 
+-- | Verifica se um 'Objeto' é um 'Disparo'.(Utilizado na função 'existeBarril')
 ehDisparo :: Objeto -> Bool
 ehDisparo d@Disparo{} = True
 ehDisparo _ = False
 
+-- | Devolve a 'Posição' de um 'Objeto'.(Utilizado na função 'existeBarril')
 posicaoObjeto :: Objeto -> Posicao
 posicaoObjeto d@(Disparo {})  = posicaoDisparo d
 posicaoObjeto b@(Barril {}) = posicaoBarril b
 
 
--- -----------------
 
-
--- | Verifica se numa lista de objetos já existe um disparo feito para uma dada arma por uma dada minhoca.
+-- | Verifica se numa lista de objetos já existe um 'Disparo' feito para uma dada arma('TipoArma') por uma dada minhoca('NumMinhoca').
 minhocaTemDisparo :: TipoArma -> NumMinhoca -> [Objeto] -> Bool
 minhocaTemDisparo _ _ [] = False 
 minhocaTemDisparo tipo indiceMinhoca (h:ls) = if (i == indiceMinhoca && t == tipo) then True else minhocaTemDisparo tipo indiceMinhoca ls
@@ -114,16 +124,5 @@ minhocaTemDisparo tipo indiceMinhoca (h:ls) = if (i == indiceMinhoca && t == tip
 
 
 
--- | Destrói uma dada posição no mapa (tipicamente como consequência de uma explosão).
---
--- __NB__: Só terrenos @Terra@ pode ser destruídos.
--- Assumo que seja destruir e substituir por Ar
-destroiPosicao :: Posicao -> Mapa -> Mapa
-destroiPosicao pos mapa = atualizaPosicaoMatriz pos Ar mapa
 
--- Adiciona um novo objeto a um estado.
---
--- __NB__: A posição onde é inserido não é relevante.
-adicionaObjeto :: Objeto -> Estado -> Estado
-adicionaObjeto obj estado = estado {objetosEstado = obj : objetosEstado estado}
 
