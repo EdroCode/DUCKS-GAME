@@ -20,7 +20,7 @@ encontraQuantidadeArmaMinhoca tipo m = case tipo of
     Mina -> minaMinhoca m
     Dinamite -> dinamiteMinhoca m
 
--- | Atualia a quantidade de munições disponíveis de uma minhoca para uma dada arma.
+-- | Atualiza a quantidade de munições disponíveis de uma minhoca para uma dada arma.
 atualizaQuantidadeArmaMinhoca :: TipoArma -> Minhoca -> Int -> Minhoca
 atualizaQuantidadeArmaMinhoca tipo m i = case tipo of
     Jetpack -> m {jetpackMinhoca = jetpackMinhoca m + i}

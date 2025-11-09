@@ -22,7 +22,7 @@ objetosValido =[]
 
 -}
 
-{-| Função principal da Tarefa 1. Recebe um estado e retorna se este é válido ou não.
+{-| Função principal da Tarefa 1. Recebe um 'Estado' e retorna se este é válido ou não.
 
 == __Exemplo de Utilização:__
 
@@ -60,9 +60,13 @@ validaEstado e = eMapaValido mapa && eObjetosValido e objetos && eMinhocasValida
 
 -- * Funções Auxiliares
 
-{- |A função 'eMapaValido' valida se o mapa é estruturalmente coerente.  
-Um mapa é válido se todas as suas linhas têm o mesmo comprimento  
-e se contém pelo menos uma linha.
+{- |A função 'eMapaValido' valida se o 'Mapa' é estruturalmente coerente.  
+
+Funcionalidade:
+
+* Verifica se o 'Mapa' é uma matriz válida, ou seja, todas as linhas têm o mesmo número de colunas.
+* Retorna False se o 'Mapa' estiver vazio.
+
 
 @
 eMapaValido [] = False    
@@ -87,7 +91,18 @@ Verifica disparos, posições válidas e coerência de donos.
 
 
 == __Exemplos:__
->>> eobjetoValido Estado {mapaEstado = mapaValido, objetosEstado = [objetoValido], minhocasEstado = [minhocaValida]} [objetoValido]
+
+@
+mapaValido =
+        [[Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Terra,Terra,Terra,Pedra,Agua,Agua]
+        ,[Terra,Terra,Terra,Terra,Pedra,Agua]
+        ]
+objetoValido = Disparo{posicaoDisparo=(1,4), direcaoDisparo=Norte, tipoDisparo=Bazuca, tempoDisparo=Nothing, donoDisparo=0}
+minhocaValida = Minhoca{posicaoMinhoca=Just (1,1), vidaMinhoca=Viva 100, jetpackMinhoca=1, escavadoraMinhoca=1, bazucaMinhoca=1, minaMinhoca=1, dinamiteMinhoca=1}
+@
+>>> eObjetosValido Estado{mapaEstado=mapaValido, objetosEstado=[objetoValido], minhocasEstado=[minhocaValida]} [objetoValido]
 True
 
 -}
@@ -124,12 +139,23 @@ eObjetosValido e (h:t) =
 
 Funcionalidade:
 
-* Verifica se o tempo do disparo é valido
-* Verifica se a posicao do disparo é valida (so para bazuca)
+* Verifica se o tempo do disparo é valido('tempoDisparo')
+* Verifica se a 'Posicao' do disparo é valida
 * Verifica se o dono do disparo é valido
-* Verifica se o disparo nao colide com outro 'Objeto' ou 'Minhoca'(so para mina e dinamite)
+* Verifica se o disparo nao colide com outro 'Objeto' ou 'Minhoca'(so para 'Mina' e 'Dinamite')
 
 == __Exemplos:__
+@
+mapaValido =
+        [[Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Terra,Terra,Terra,Pedra,Agua,Agua]
+        ,[Terra,Terra,Terra,Terra,Pedra,Agua]
+        ]
+@
+>>> disparoValido mapaValido Disparo{posicaoDisparo=(1,4), direcaoDisparo=Norte, tipoDisparo=Bazuca, tempoDisparo=Nothing, donoDisparo=0}
+True
+
 
 -}
 
@@ -138,10 +164,11 @@ disparoValido m d@Disparo{tipoDisparo = Bazuca} = if (tempoDisparo d == Nothing 
 disparoValido m d@Disparo{tipoDisparo = Mina} = if (tempoDisparo d <= Just 2 && tempoDisparo d >= Just 0 && ePosicaoMapaLivre (posicaoObjeto d) m) || (tempoDisparo d == Nothing && ePosicaoMapaLivre (posicaoObjeto d) m) then True else False
 disparoValido m d@Disparo{tipoDisparo = Dinamite} = if (tempoDisparo d <= Just 4 && tempoDisparo d >= Just 0 && ePosicaoMapaLivre (posicaoObjeto d) m) then True else False
 
-{-| Verifica se o disparo de bazuca é valido
+{-| Verifica se o 'Disparo' de 'Bazuca' é valido
 
 Funcionalidade:
-* Verifica se o bloco anterior ao disparo é livre (não opaco)
+
+* Verifica se o bloco anterior ao 'Disparo' é livre (não opaco)
 * Verifica se o disparo não colide com outro 'Objeto' ou 'Minhoca'
 
 == __Exemplos:__
@@ -163,11 +190,8 @@ disparoBazucaValido obj mapa = if (ePosicaoMapaLivre prevPos mapa) then True els
 
 -- * Verificação dos Donos
 
--- tem de ser um indice valido na lista das minhocas (ex 3 minhocas indices [0,1,2], logo i tem de estar no intervcalo 0 2)
--- O mesmo dono não pode ter simultaneamente mais do que um disparo de cada tipo.
--- Logo
 
-{-| Verifica se o dono do disparo é valido
+{-| Verifica se o dono do 'Disparo' é valido
 
 Funcionalidade:
 
@@ -243,15 +267,33 @@ listaDonos (h:t) = (tipo,indice) : listaDonos t
 {-| Valida se as minhocas são validas
 
 Funcionalidade:
+
 * Verifica se a 'Posicao' da minhoca é valida
-* Verifica se a morte da minhoca é valida(morteOk)
-* Verifica se a vida da minhoca é valida(vidaOk)
-* Verifica se as armas da minhoca são validas(armasValidas)
+* Verifica se a morte da minhoca é valida('validaMorte')
+* Verifica se a vida da minhoca é valida('verificaVida')
+* Verifica se as armas da minhoca são validas
 
 
 == __Exemplos:__
->>> eMinhocasValidas Estado {mapaEstado = mapaValido, objetosEstado = [objetoValido], minhocasEstado = [minhocaValida]} [minhocaValida]
+
+@
+estadoValido = Estado
+    { mapaEstado =
+        [[Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Terra,Terra,Terra,Pedra,Agua,Agua]
+        ,[Terra,Terra,Terra,Terra,Pedra,Agua]
+        ]
+    , objetosEstado =[]
+    , minhocasEstado =
+        [Minhoca {posicaoMinhoca = Just (1,1), vidaMinhoca = Viva 100, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 1}]
+    }
+@
+>>> eMinhocasValidas estadoValido (minhocasEstado estadoValido)
 True
+
+>>> eMinhocasValidas estadoInvalido (minhocasEstado estadoInvalido)
+False
 -}
 
 eMinhocasValidas :: Estado -> [Minhoca] -> Bool
@@ -271,10 +313,6 @@ eMinhocasValidas e (h:t) = posicaoValida && morteOk && vidaOk && eMinhocasValida
 
 -- *Auxiliares Minhoca
 
-
--- Verifica se a minhoca esta dentro de água, e caso esteja, verifica se a mesma esta morta
--- Retorna True se a minhoca estiver valida (pos valida e nao morta) e False caso esteja em agua e nao esteja morta
-
 {-| Verifica se a morte da minhoca é valida
 
 Funcionalidade:
@@ -287,6 +325,7 @@ Funcionalidade:
 True
 
 -}
+
 validaMorte :: Minhoca -> Mapa -> Bool
 validaMorte minh [] = False
 validaMorte minh m = case posicaoMinhoca minh of
@@ -300,7 +339,7 @@ validaMorte minh m = case posicaoMinhoca minh of
                     terrenoAtual = case (encontraPosicaoMatriz pos m) of
                                         Just a -> a 
                                         Nothing -> Ar 
--- Verifica se a vida da minhoca é valida
+
 {-| Verifica se a vida da minhoca é valida
 
 
