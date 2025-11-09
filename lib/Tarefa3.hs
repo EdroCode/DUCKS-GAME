@@ -35,25 +35,36 @@ avancaEstado e@(Estado mapa objetos minhocas) = foldr aplicaDanos e' danoss
 
 -- | Para um dado estado, dado o índice de uma minhoca na lista de minhocas e o estado dessa minhoca, retorna o novo estado da minhoca no próximo tick.
 avancaMinhoca :: Estado -> NumMinhoca -> Minhoca -> Minhoca
-avancaMinhoca e i minhoca = case encontraPosicaoMatriz posicaoFinal mapa of
-                                Nothing ->  minhoca{posicaoMinhoca = Nothing, vidaMinhoca = Morta}
-                                Just Agua -> minhoca{posicaoMinhoca = Just posicaoFinal, vidaMinhoca = Morta}
-                                Just Ar -> minhoca{posicaoMinhoca = Just posicaoFinal}
-                                _ -> minhoca{posicaoMinhoca = Just posicaoFinal}
-                               
-                    where
+avancaMinhoca e i minhoca =
+  case posicaoMinhoca minhoca of
+    Nothing -> minhoca  
+    Just pos ->
+      case vidaMinhoca minhoca of
+        Morta -> minhoca
+        Viva 0 -> case terreno of
+          Nothing -> minhoca { posicaoMinhoca = Nothing, vidaMinhoca = Morta }
+          Just Ar -> minhoca {posicaoMinhoca = Just posicaoFinal,vidaMinhoca = Morta }
+          Just Agua -> minhoca {posicaoMinhoca = Just posicaoFinal,vidaMinhoca = Morta }
+          _ -> minhoca {posicaoMinhoca = Just posicaoFinal,vidaMinhoca = Morta }
 
-                        -- Desdobrar minhoca
-                        pos = case posicaoMinhoca minhoca of Just a -> a
-                        posicaoFinal = if estaNoSolo pos mapa 
-                            then pos
-                            else movePosicao Sul pos
-                        
+        Viva _ ->
+          case terreno of
+            Nothing -> minhoca { posicaoMinhoca = Nothing, vidaMinhoca = Morta }
+            Just Agua -> minhoca { posicaoMinhoca = Just posicaoFinal, vidaMinhoca = Morta }
+            Just Ar -> minhoca { posicaoMinhoca = Just posicaoFinal }
+            _ -> minhoca { posicaoMinhoca = Just posicaoFinal }
+      where
+        posicaoFinal = if estaNoSolo pos mapa then pos else movePosicao Sul pos
+        terreno = encontraPosicaoMatriz posicaoFinal mapa
 
-                        -- Desdobrar estado
-                        mapa = mapaEstado e
-                        objetos = objetosEstado e
-                        minhocas = minhocasEstado e
+        
+
+  where
+    mapa = mapaEstado e
+    objetos = objetosEstado e
+    minhocas = minhocasEstado e
+    
+    
 
 
 
@@ -87,12 +98,16 @@ avancaObjeto e i o = case o of
         case tempo of
           Just 0 -> Right (calculaExplosao pos 3)
           Just _ ->
-            if not (estaNoSolo pos mapa) || estaEmAgua pos mapa
+            let
+              tempoNovo = case tempo of
+                Just t  -> Just (t - 1)
+                Nothing -> Nothing
+            in if not (estaNoSolo pos mapa) || estaEmAgua pos mapa
               then
                 if dir == Sul
-                  then Left (Disparo { posicaoDisparo = movePosicao dir pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = tempo, donoDisparo = dono })
-                  else Left o
-              else Left (Disparo { posicaoDisparo = movePosicao dir pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = tempo, donoDisparo = dono })
+                  then Left (Disparo { posicaoDisparo = movePosicao dir pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = tempoNovo, donoDisparo = dono })
+                  else Left (Disparo { posicaoDisparo = movePosicao Sul pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = tempoNovo, donoDisparo = dono })
+              else Left (Disparo { posicaoDisparo = movePosicao Sul pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = tempoNovo, donoDisparo = dono })
           Nothing -> if not (existeDonoMinhoca pos dono minhocas) -- * Da true se nao existe nenhnuma minhoca alem do dono na posicao
                       then Left o
                       else Left (Disparo { posicaoDisparo = movePosicao dir pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = Just 2, donoDisparo = dono })
@@ -102,16 +117,15 @@ avancaObjeto e i o = case o of
         case tempo of -- dinamite não tem tempo nulo
           Just 0 -> Right (calculaExplosao pos 7)
           Just _ ->
-            
             if not (estaNoSolo pos mapa) -- esta no ar
               then
                 let
-                  
-                  (x,y) = pos
                     
+                  
+                      
                   (novaPos, novaDir) = case dir of
-                        Norte -> ((x, y - 1), Norte)      -- cai vertical, aponta para Norte
-                        Sul   -> ((x, y - 1), Norte)    
+                        Norte -> (movePosicao Sul pos, Norte)      -- cai vertical, aponta para Norte
+                        Sul   -> (movePosicao Sul pos, Norte)    
                         _     -> rodaPosicaoDirecao (pos, dir) -- move e roda 45° para a direita
                   
                 in Left (Disparo { posicaoDisparo = novaPos, direcaoDisparo = novaDir, tipoDisparo = tipo, tempoDisparo = tempoNovo, donoDisparo = dono })
@@ -165,6 +179,7 @@ avancaObjeto e i o = case o of
 aplicaDanos :: Danos -> Estado -> Estado
 aplicaDanos danos estado = estado {
     minhocasEstado = atualizaMinhocas (minhocasEstado estado),
+    objetosEstado = atualizaObjetos danos (objetosEstado estado),
     mapaEstado = atualizaMapa (mapaEstado estado) danos
   }
   where
@@ -176,11 +191,14 @@ aplicaDanos danos estado = estado {
     atualizaMapa mapa [] = mapa
     atualizaMapa mapa ((pos, _):ds) =
       let 
-        terrenoAtual = case encontraPosicaoMatriz pos mapa of Just a -> a
-        mapa' = if eTerrenoDestrutivel (terrenoAtual)
-                    then destroiPosicao pos mapa
-                    else mapa
+        terrenoAtual = encontraPosicaoMatriz pos mapa
+        mapa' = case terrenoAtual of
+          Just t -> if eTerrenoDestrutivel t
+                      then destroiPosicao pos mapa
+                      else mapa
+          Nothing -> mapa
       in atualizaMapa mapa' ds
+
     
     -- * Minhocas
     

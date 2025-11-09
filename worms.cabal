@@ -78,6 +78,7 @@ executable t3-feedback
         Magic
         EstadosArquivo
         JogadasArquivo
+        
     other-extensions:
     main-is: Tarefa3Test.hs
     build-depends:
