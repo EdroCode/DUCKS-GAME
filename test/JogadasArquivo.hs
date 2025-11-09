@@ -38,6 +38,7 @@ estado27 = Estado mapaValido [] [Minhoca (Just (2,2)) (Viva 100) 0 0 0 0 0]
 estado28 = Estado mapaValido [] [Minhoca (Just (2,2)) (Viva 100) 1 1 1 1 1]
 estado29 = Estado mapaValido [] [Minhoca (Just (2,2)) (Viva 100) 1 1 1 1 1]
 estado30 = Estado mapaValido [] [Minhoca (Just (2,2)) (Viva 100) 1 1 1 1 1]
+estado31 = Estado mapaValido [] [Minhoca (Just (23,2)) (Viva 100) 1 1 1 1 1]
 
 
 
@@ -79,7 +80,7 @@ jogadasTeste =
   , (0 :: Int, Move Oeste, estado6)
   , (0 :: Int, Move Norte, estado7)
   , (0 :: Int, Move Norte, estado9)
-  , (0 :: Int, Move Norte, estado3)
+  , (0 :: Int, Move Norte, estado31)
   , (0 :: Int, Dispara Jetpack Norte, estado27)
   , (0 :: Int, Dispara Bazuca Sul, estado25)
   , (0 :: Int, Dispara Escavadora Norte, estado26)
@@ -91,5 +92,5 @@ jogadasTeste =
   , (0 :: Int, Dispara Jetpack Norte, estado3)
   , (0 :: Int, Dispara Escavadora Sul, estado5)
   , (0 :: Int, Dispara Mina Este, estado5)
-  , (0 :: Int, Dispara Dinamite Oeste, estado5)
+  , (0 :: Int, Dispara Dinamite Oeste, estado31)
   ]
