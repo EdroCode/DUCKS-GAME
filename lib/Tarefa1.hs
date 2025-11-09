@@ -12,31 +12,29 @@ import Tarefa0_2025
 
 
 
-{-| Função principal da Tarefa 1. Recebe um estado e retorna se este é valído ou não.
+{-| Função principal da Tarefa 1. Recebe um estado e retorna se este é válido ou não.
+
+== __Exemplo de Utilização:__
+
+Um exemplo de estado válido seria:
 
 @
-validaEstado e = eMapaValido mapa && eObjetosValido e objetos && eMinhocasValidas e minhocas
-    where
-        mapa = mapaEstado e
-        objetos = objetosEstado e
-        minhocas = minhocasEstado e
+estadoValido = Estado
+    { mapaEstado =
+        [[Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Terra,Terra,Terra,Pedra,Agua,Agua]
+        ,[Terra,Terra,Terra,Terra,Pedra,Agua]
+        ]
+    , objetosEstado =[]
+    , minhocasEstado =
+        [Minhoca {posicaoMinhoca = Just (1,1), vidaMinhoca = Viva 100, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 1}]
+    }
 @
 
-== __EstadosValidos:__
+Ao validar o estado anterior, a função retorna True
 
->minhocaValida = Minhoca{posicaoMinhoca=Just (3,0), vidaMinhoca=Morta, jetpackMinhoca=100, escavadoraMinhoca=200, bazucaMinhoca=150, minaMinhoca=3, dinamiteMinhoca=1}
-@
-mapaValido = [[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar],
-             [Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar],
-             [Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar],
-             [Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar],
-             [Terra,Terra,Terra,Terra,Terra,Ar,Ar,Ar,Ar,Ar],
-             [Terra,Terra,Terra,Terra,Terra,Pedra,Pedra,Agua,Agua,Agua]]
-@
->objetoValido = Disparo{posicaoDisparo=(1,4), direcaoDisparo=Norte, tipoDisparo=Mina, tempoDisparo=Just 2, donoDisparo=0}
-
-== __Exemplos:__
->>> validaEstado Estado {mapaEstado = mapaValido, objetosEstado = [objetoValido], minhocasEstado = [minhocaValida]}
+>>> validaEstado estadoValido
 True
 
 
@@ -52,66 +50,31 @@ validaEstado e = eMapaValido mapa && eObjetosValido e objetos && eMinhocasValida
 
 -- * Funções Auxiliares
 
-{- |Função auxiliar de validaEstado. Valida se o mapa é valido
+{- |A função 'eMapaValido' valida se o mapa é estruturalmente coerente.  
+Um mapa é válido se todas as suas linhas têm o mesmo comprimento  
+e se contém pelo menos uma linha.
 
 @
 eMapaValido [] = False    
 eMapaValido m = (eMatrizValida m) 
 @
 
-==__Função Auxiliar:__
-@
-eMatrizValida :: Matriz a -> Bool
-eMatrizValida [] = False
-eMatrizValida [h] = True
-eMatrizValida (h1:h2:t) = length h1 == length h2 && eMatrizValida (h2:t)
-@
-
-== __Exemplos:__
+== __Exemplos de Utilização:__
 >>> eMapaValido [[Ar,Ar,Ar],[Ar,Ar,Ar],[Ar,Ar,Ar]]
 True
 >>> eMapaInvalido [[Ar,Ar,Terra],[Ar,Ar],[Ar,Ar,Terra]]
 False
 
 -}
+
 eMapaValido :: Mapa -> Bool 
 eMapaValido [] = False    
 eMapaValido m = (eMatrizValida m)  
 
 
-{- |Função auxiliar de validaEstado. Valida se o objeto é valido
+{- | A função 'eMapaValido' valida se os objetos de um estado são consistentes.  
+Verifica disparos, posições válidas e coerência de donos.
 
-@
-eObjetosValido _ [] = True
-eObjetosValido e (h:t) =
-    if ehDisparo h == True
-        then
-            if not (existeBarril (posicaoObjeto h) t)
-                && objetoValido h
-                && disparoValido mapa h
-                && donoValido e h
-            then eObjetosValido e t
-            else False
-        else
-            if ePosicaoMapaLivre (posicaoObjeto h) mapa
-                && ePosicaoEstadoLivre (posicaoObjeto h) e{objetosEstado = t}
-            then eObjetosValido e t
-            else False
-                        
-    where
-        mapa = mapaEstado e
-        minhocas = minhocasEstado e -- * MINHOCAS
-        
-        
-
-        objetoValido obj = case obj of
-            Disparo{tipoDisparo = Escavadora} -> False
-            Disparo{tipoDisparo = Jetpack}  -> False
-            Disparo{tipoDisparo = Bazuca} -> disparoValido mapa obj
-            Disparo{tipoDisparo = Mina} -> disparoValido mapa obj
-            Disparo{tipoDisparo = Dinamite} -> disparoValido mapa obj
-            _ -> True
-@
 
 == __Exemplos:__
 >>> eobjetoValido Estado {mapaEstado = mapaValido, objetosEstado = [objetoValido], minhocasEstado = [minhocaValida]} [objetoValido]

@@ -119,7 +119,7 @@ rodaPosicaoDirecao (pos, d) = (p, novaDirecao) -- Retorna a tupla (Posicao, Dire
             Noroeste -> Norte
             Sudoeste -> Oeste
         
-        p = movePosicao novaDirecao pos
+        p = movePosicao d pos
 
 -- * Funções recursivas.
 

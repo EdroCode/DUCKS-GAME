@@ -75,10 +75,7 @@ executable t2-feedback
 executable t3-feedback
     import:           warnings
     other-modules:
-        Magic
-        EstadosArquivo
-        JogadasArquivo
-        
+        Magic   
     other-extensions:
     main-is: Tarefa3Test.hs
     build-depends:

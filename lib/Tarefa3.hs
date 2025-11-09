@@ -24,50 +24,55 @@ avancaEstado e@(Estado mapa objetos minhocas) = foldr aplicaDanos e' danoss
     (objetos',danoss) = partitionEithers $ map (uncurry $ avancaObjeto $ e { minhocasEstado = minhocas' }) (zip [0..] objetos)
     e' = Estado mapa objetos' minhocas'
 
-
-
-
-
-
-
-
-
-
--- | Para um dado estado, dado o índice de uma minhoca na lista de minhocas e o estado dessa minhoca, retorna o novo estado da minhoca no próximo tick.
 avancaMinhoca :: Estado -> NumMinhoca -> Minhoca -> Minhoca
 avancaMinhoca e i minhoca =
   case posicaoMinhoca minhoca of
-    Nothing -> minhoca  
+    Nothing -> minhoca
     Just pos ->
-      case vidaMinhoca minhoca of
-        Morta -> minhoca
-        Viva 0 -> case terreno of
-          Nothing -> minhoca { posicaoMinhoca = Nothing, vidaMinhoca = Morta }
-          Just Ar -> minhoca {posicaoMinhoca = Just posicaoFinal,vidaMinhoca = Morta }
-          Just Agua -> minhoca {posicaoMinhoca = Just posicaoFinal,vidaMinhoca = Morta }
-          _ -> minhoca {posicaoMinhoca = Just posicaoFinal,vidaMinhoca = Morta }
+      let
+        posicaoTentativa = if estaNoSolo pos mapa || estaMinhocaBaixoViva pos e
+                              then pos
+                              else movePosicao Sul pos
 
-        Viva _ ->
-          case terreno of
-            Nothing -> minhoca { posicaoMinhoca = Nothing, vidaMinhoca = Morta }
-            Just Agua -> minhoca { posicaoMinhoca = Just posicaoFinal, vidaMinhoca = Morta }
-            Just Ar -> minhoca { posicaoMinhoca = Just posicaoFinal }
-            _ -> minhoca { posicaoMinhoca = Just posicaoFinal }
-      where
-        posicaoFinal = if estaNoSolo pos mapa then pos else movePosicao Sul pos
-        terreno = encontraPosicaoMatriz posicaoFinal mapa
-
-        
+        -- Se a posição tentativa for inválida, a minhoca morre e desaparece
+        posicaoFinalValida = ePosicaoMatrizValida posicaoTentativa mapa
+        terreno = encontraPosicaoMatriz posicaoTentativa mapa
+      in if not posicaoFinalValida
+            then minhoca { posicaoMinhoca = Nothing, vidaMinhoca = Morta }
+            else case vidaMinhoca minhoca of
+              Morta -> minhoca { posicaoMinhoca = Just posicaoTentativa, vidaMinhoca = Morta }
+              Viva 0 -> case terreno of
+                Just Agua -> minhoca { posicaoMinhoca = Just posicaoTentativa, vidaMinhoca = Morta }
+                Just Ar   -> minhoca { posicaoMinhoca = Just posicaoTentativa, vidaMinhoca = Morta }
+                _         -> minhoca { posicaoMinhoca = Just posicaoTentativa, vidaMinhoca = Morta }
+              Viva _ -> case terreno of
+                Just Agua -> minhoca { posicaoMinhoca = Just posicaoTentativa, vidaMinhoca = Morta }
+                Just Ar   -> minhoca { posicaoMinhoca = Just posicaoTentativa }
+                _         -> minhoca { posicaoMinhoca = Just posicaoTentativa }
 
   where
     mapa = mapaEstado e
     objetos = objetosEstado e
     minhocas = minhocasEstado e
-    
-    
 
+    estaMinhocaBaixoViva :: Posicao -> Estado -> Bool
+    estaMinhocaBaixoViva pos e =
+      let
+        posAbaixo = movePosicao Sul pos
 
+        getMinhocaViva :: Posicao -> [Minhoca] -> Bool
+        getMinhocaViva _ [] = False
+        getMinhocaViva p (h:t) =
+          case posicaoMinhoca h of
+            Just p' | p == p' ->
+              case vidaMinhoca h of
+                Viva a | a > 0 -> True
+                _ -> getMinhocaViva p t
+            _ -> getMinhocaViva p t
 
+      in ePosicaoMatrizValida posAbaixo mapa
+         && not (ePosicaoEstadoLivre posAbaixo e)
+         && getMinhocaViva posAbaixo minhocas
 
 
 
@@ -107,11 +112,18 @@ avancaObjeto e i o = case o of
                 if dir == Sul
                   then Left (Disparo { posicaoDisparo = movePosicao dir pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = tempoNovo, donoDisparo = dono })
                   else Left (Disparo { posicaoDisparo = movePosicao Sul pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = tempoNovo, donoDisparo = dono })
-              else Left (Disparo { posicaoDisparo = movePosicao Sul pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = tempoNovo, donoDisparo = dono })
-          Nothing -> if not (existeDonoMinhoca pos dono minhocas) -- * Da true se nao existe nenhnuma minhoca alem do dono na posicao
-                      then Left o
-                      else Left (Disparo { posicaoDisparo = movePosicao dir pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = Just 2, donoDisparo = dono })
+              else Left (Disparo { posicaoDisparo = pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = tempoNovo, donoDisparo = dono })
+          Nothing -> if not (existeDonoMinhoca pos dono minhocas) 
+                      then if not (estaNoSolo pos mapa) || estaEmAgua pos mapa
+                        then Left (Disparo { posicaoDisparo = movePosicao Sul pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = Nothing, donoDisparo = dono })
+                        else Left (Disparo { posicaoDisparo = pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = Nothing, donoDisparo = dono })
+                      else if not (estaNoSolo pos mapa) || estaEmAgua pos mapa
+                        then Left (Disparo { posicaoDisparo = movePosicao Sul pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = Nothing, donoDisparo = dono })
+                        else Left (Disparo { posicaoDisparo = pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = Just 2, donoDisparo = dono })
       
+                        
+                        
+                        
       
       Dinamite ->
         case tempo of -- dinamite não tem tempo nulo
@@ -119,17 +131,20 @@ avancaObjeto e i o = case o of
           Just _ ->
             if not (estaNoSolo pos mapa) -- esta no ar
               then
-                let
-                    
-                  
-                      
+                let  
                   (novaPos, novaDir) = case dir of
                         Norte -> (movePosicao Sul pos, Norte)      -- cai vertical, aponta para Norte
                         Sul   -> (movePosicao Sul pos, Norte)    
                         _     -> rodaPosicaoDirecao (pos, dir) -- move e roda 45° para a direita
                   
                 in Left (Disparo { posicaoDisparo = novaPos, direcaoDisparo = novaDir, tipoDisparo = tipo, tempoDisparo = tempoNovo, donoDisparo = dono })
-              else Left (Disparo { posicaoDisparo = pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = tempoNovo, donoDisparo = dono })
+              else let  
+                  (novaPos, novaDir) = case dir of
+                        Norte -> (pos, Norte)     
+                        Sul   -> (pos, Norte)    
+                        _     -> rodaPosicaoDirecao (pos, dir)
+                  
+                in Left (Disparo { posicaoDisparo = novaPos, direcaoDisparo = novaDir, tipoDisparo = tipo, tempoDisparo = tempoNovo, donoDisparo = dono })
             where tempoNovo = case tempo of Just t  -> Just (t - 1)
 
   -- todos os right precisam ser completos, falta definir a funcao que calcule a area das explosoes e a lista de danos para conseguir usar isso como output
@@ -144,10 +159,24 @@ avancaObjeto e i o = case o of
       -- todo podera ser otimizado com a funcao auxiliar da tarefa0
       -- ! rever talvez
     existeDonoMinhoca :: Posicao -> Int -> [Minhoca] -> Bool
-    existeDonoMinhoca pos n [] = False
-    existeDonoMinhoca (x,y) n (h:t) = let pos = posicaoMinhoca h
-                                    in if pos == Just (x,y) && n /= 0 then True else existeMinhoca (x,y) t
-    
+    existeDonoMinhoca pos dono minhocas =
+      let
+        posicoes = pos : [movePosicao Norte pos, movePosicao Sul pos, movePosicao Este pos, movePosicao Oeste pos]
+        minhocasComIndice = zip [0..] minhocas
+
+        existeMinhocaInimiga :: Posicao -> [(Int, Minhoca)] -> Bool
+        existeMinhocaInimiga _ [] = False
+        existeMinhocaInimiga p ((i, m):ms) =
+          case posicaoMinhoca m of
+            Just p' | p == p' && i /= dono ->
+              case vidaMinhoca m of
+                Viva a | a > 0 -> True
+                _ -> existeMinhocaInimiga p ms
+            _ -> existeMinhocaInimiga p ms
+
+      in any (\p -> existeMinhocaInimiga p minhocasComIndice) posicoes
+
+
 
     -- todo -> Isto definitivamente não é a forma mais otimizada de fazer isto, mas devido ao tempo é melhor usar assim por enquanto
     -- todo -> Atualmente so se usa explosoes 3,5 e 7 logo isto serve, mas no futuro é importante transformar numa função generalizada
