@@ -238,10 +238,9 @@ avancaObjeto e i o = case o of
 
 Funcionamento Geral:
 
-* Atualiza o 'Estado' de cada 'Minhoca'
-* Atualiza o 'Estado' de cada 'Objeto'
-* Cria o novo 'Estado' de ambos
-* Aplica o 'Dano' para cada novo 'Estado'
+* Atualiza os componentes de cada 'Minhoca'
+* Atualiza os componentes de cada 'Objeto'
+* Cria um novo 'Estado' contendo as minhocas e os objetos atualizados de acordo com o dano recebido.
 
 
 ==__Terrenos:__
