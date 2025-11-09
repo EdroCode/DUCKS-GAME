@@ -9,8 +9,18 @@ module Tarefa1 where
 import Labs2025
 import Tarefa0_2025
 
+{-
+mapaValido =
+        [[Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Terra,Terra,Terra,Pedra,Agua,Agua]
+        ,[Terra,Terra,Terra,Terra,Pedra,Agua]
+        ]
+minhocasValida =
+        [Minhoca {posicaoMinhoca = Just (1,1), vidaMinhoca = Viva 100, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 1}]
+objetosValido =[]
 
-
+-}
 
 {-| Função principal da Tarefa 1. Recebe um estado e retorna se este é válido ou não.
 
@@ -116,14 +126,16 @@ eObjetosValido e (h:t) =
 
 -- *Auxiliares Objeto  
 
-{-| Verifica se o disparo é valido
+{-| Verifica se o 'Disparo' é valido
 
-@
-disparoValido m d@Disparo{tipoDisparo = Bazuca} = if (tempoDisparo d == Nothing && disparoBazucaValido d m) then True else False
-disparoValido m d@Disparo{tipoDisparo = Mina} = if (tempoDisparo d <= Just 2 && tempoDisparo d >= Just 0 && ePosicaoMapaLivre (posicaoObjeto d) m) || (tempoDisparo d == Nothing && ePosicaoMapaLivre (posicaoObjeto d) m) then True else False
-disparoValido m d@Disparo{tipoDisparo = Dinamite} = if (tempoDisparo d <= Just 4 && tempoDisparo d >= Just 0 && ePosicaoMapaLivre (posicaoObjeto d) m) then True else False
-disparoValido m _ = True
-@
+Funcionalidade:
+
+* Verifica se o tempo do disparo é valido
+* Verifica se a posicao do disparo é valida (so para bazuca)
+* Verifica se o dono do disparo é valido
+* Verifica se o disparo nao colide com outro 'Objeto' ou 'Minhoca'(so para mina e dinamite)
+
+== __Exemplos:__
 
 -}
 
@@ -135,13 +147,17 @@ disparoValido m _ = True
 
 {-| Verifica se o disparo de bazuca é valido
 
-@
-disparoBazucaValido obj mapa = if (ePosicaoMapaLivre prevPos mapa) then True else False
-                    where
-                        pos = posicaoObjeto obj
-                        dir = direcaoDisparo obj
-                        prevPos = movePosicao (direcaoOposta dir) pos
-@
+Funcionalidade:
+* Verifica se o bloco anterior ao disparo é livre (não opaco)
+* Verifica se o disparo não colide com outro 'Objeto' ou 'Minhoca'
+
+== __Exemplos:__
+
+>>> disparoBazucaValido Disparo{posicaoDisparo=(3,4), direcaoDisparo=Norte, tipoDisparo=Bazuca, tempoDisparo=Nothing, donoDisparo=0} mapaValido
+False
+>>> disparoBazucaValido Disparo{posicaoDisparo=(1,4), direcaoDisparo=Norte, tipoDisparo=Bazuca, tempoDisparo=Nothing, donoDisparo=0} mapaValido
+True
+
 
 -}
 
@@ -160,30 +176,29 @@ disparoBazucaValido obj mapa = if (ePosicaoMapaLivre prevPos mapa) then True els
 
 {-| Verifica se o dono do disparo é valido
 
-@
-donoValido e obj = if indiceValido && verificaLista (listaDonos listaDisparos) then True else False
-            where
-                indiceDono = donoDisparo obj
-                minhocas = minhocasEstado e
-                objetos = objetosEstado e
-                listaDisparos = disparosEstado objetos
-                
-                verificaLista :: [(TipoArma, Int)] -> Bool
-                verificaLista [] = True
-                verificaLista (h:t) = if elem h t then False else True
+Funcionalidade:
 
-                disparosEstado :: [Objeto] -> [Objeto]
-                disparosEstado [] = []
-                disparosEstado (h:t) = if ehDisparo h then h : disparosEstado t else disparosEstado t
-@
+* Verifica se o indice do dono é valido na lista de minhocas
+* Verifica se o dono não tem mais do que um disparo do mesmo tipo
+* Verifica se o dono existe na lista de minhocas do estado
 
 == __Exemplos:__
->>> donoValido Estado {mapaEstado = mapaValido, objetosEstado = [objetoValido], minhocasEstado = [minhocaValida]} objetoValido
+
+@
+estado1 = Estado { mapaEstado = [[Ar]], 
+                   objetosEstado = [Disparo {posicaoDisparo = (1,1), 
+                   direcaoDisparo = Norte, tipoDisparo = Mina, 
+                   tempoDisparo = Just 2, donoDisparo = 0}], 
+                   minhocasEstado = [Minhoca {posicaoMinhoca = Just (1,1), 
+                   vidaMinhoca = Viva 100, 
+                   jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 1}] }   
+
+@
+>>>donoValido estado1 (head (objetosEstado estado1))
 True
->>> donoValido Estado {mapaEstado = mapaValido, objetosEstado = [objetoInvalido], minhocasEstado = [minhocaValida]} objetoInvalido
-False
 
 -}
+
 donoValido :: Estado -> Objeto -> Bool
 donoValido e obj = if indiceValido && verificaLista (listaDonos listaDisparos) then True else False
             where
@@ -210,14 +225,13 @@ donoValido e obj = if indiceValido && verificaLista (listaDonos listaDisparos) t
                 disparosEstado [] = []
                 disparosEstado (h:t) = if ehDisparo h then h : disparosEstado t else disparosEstado t
 
-{-| Função auxiliar para donoValido. Devolve uma lista com o tipo de arma e o dono de cada disparo
-@
-listaDonos [] = []
-listaDonos (h:t) = (tipo,indice) : listaDonos t
-                where
-                    indice = donoDisparo h
-                    tipo = tipoDisparo h
-@
+{-| Função auxiliar para 'donoValido'. Devolve uma lista com o tipo de arma e o dono('NumMinhoca') de cada 'Disparo'
+
+Funcionalidade:
+
+* Cria uma lista de tuplos ('TipoArma', 'NumMinhoca') a partir de uma lista de objetos
+* Cada tuplo representa o tipo de arma e o dono do disparo correspondente
+
 == __Exemplos:__
 >>> listaDonos [Disparo{posicaoDisparo=(1,4), direcaoDisparo=Norte, tipoDisparo=Mina, tempoDisparo=Just 2, donoDisparo=0}, Disparo{posicaoDisparo=(2,3), direcaoDisparo=Sul, tipoDisparo=Dinamite, tempoDisparo=Just 3, donoDisparo=1}]
 [(Mina,0),(Dinamite,1)]
@@ -235,19 +249,13 @@ listaDonos (h:t) = (tipo,indice) : listaDonos t
 
 {-| Valida se as minhocas são validas
 
-@
-eMinhocasValidas _ [] = True
-eMinhocasValidas e (h:t) = posicaoValida && morteOk && vidaOk && eMinhocasValidas e t && armasValidas
-  where
-    posicaoValida = case posicaoMinhoca h of
-        Nothing   -> True  
-        Just p    -> ePosicaoEstadoLivre p e{minhocasEstado = t}
+Funcionalidade:
+* Verifica se a 'Posicao' da minhoca é valida
+* Verifica se a morte da minhoca é valida(morteOk)
+* Verifica se a vida da minhoca é valida(vidaOk)
+* Verifica se as armas da minhoca são validas(armasValidas)
 
-    morteOk = validaMorte h (mapaEstado e)
-    vidaOk  = verificaVida h
 
-    armasValidas = if jetpackMinhoca h >= 0 && escavadoraMinhoca h >= 0 && bazucaMinhoca h >= 0 && minaMinhoca h >= 0 && dinamiteMinhoca h >= 0 then True else False
-@
 == __Exemplos:__
 >>> eMinhocasValidas Estado {mapaEstado = mapaValido, objetosEstado = [objetoValido], minhocasEstado = [minhocaValida]} [minhocaValida]
 True
@@ -275,25 +283,15 @@ eMinhocasValidas e (h:t) = posicaoValida && morteOk && vidaOk && eMinhocasValida
 -- Retorna True se a minhoca estiver valida (pos valida e nao morta) e False caso esteja em agua e nao esteja morta
 
 {-| Verifica se a morte da minhoca é valida
-@
-validaMorte minh [] = False
-validaMorte minh m = case posicaoMinhoca minh of
-    Nothing ->
-        vidaMinhoca minh == Morta
 
-    Just pos -> case terrenoAtual of
-                                    Agua -> vidaMinhoca minh == Morta
-                                    outro    -> True
-                where
-                    terrenoAtual = case (encontraPosicaoMatriz pos m) of
-                                        Just a -> a 
-                                        Nothing -> Ar
-@
+Funcionalidade:
+
+* Verifica se a 'Posicao' da minhoca é 'Nothing' e se a vida é 'Morta'
+* Verifica a 'Posicao' da minhoca e se o terreno nessa posição é 'Agua' e se a vida é 'Morta'
+
 == __Exemplos:__
 >>> validaMorte Minhoca{posicaoMinhoca=Just (5,8), vidaMinhoca=Morta, jetpackMinhoca=100, escavadoraMinhoca=200, bazucaMinhoca=150, minaMinhoca=3, dinamiteMinhoca=1} mapaValido
 True
->>> validaMorte Minhoca{posicaoMinhoca=Just (5,8), vidaMinhoca=Viva 50, jetpackMinhoca=100, escavadoraMinhoca=200, bazucaMinhoca=150, minaMinhoca=3, dinamiteMinhoca=1} mapaValido
-False
 
 -}
 validaMorte :: Minhoca -> Mapa -> Bool
@@ -312,19 +310,13 @@ validaMorte minh m = case posicaoMinhoca minh of
 -- Verifica se a vida da minhoca é valida
 {-| Verifica se a vida da minhoca é valida
 
-@
-verificaVida m = case vida of
-                    Morta -> True
-                    Viva a -> if (a >= 0 && a <= 100) then True else False
-    where
-        vida = vidaMinhoca m
-@
 
 == __Exemplos:__
 >>> verificaVida Minhoca{posicaoMinhoca=Just (3,0), vidaMinhoca=Morta, jetpackMinhoca=100, escavadoraMinhoca=200, bazucaMinhoca=150, minaMinhoca=3, dinamiteMinhoca=1}
 True
 >>> verificaVida Minhoca{posicaoMinhoca=Just (3,0), vidaMinhoca=Viva 150, jetpackMinhoca=100, escavadoraMinhoca=200, bazucaMinhoca=150, minaMinhoca=3, dinamiteMinhoca=1}
 False
+
 -}
 verificaVida :: Minhoca -> Bool
 verificaVida m = case vida of

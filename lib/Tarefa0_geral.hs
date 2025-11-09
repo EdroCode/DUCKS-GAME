@@ -64,19 +64,6 @@ movePosicao d (x, y) = case d of
     Sudoeste  -> (x + 1, y - 1)
 
 
--- * Auxiliar 
-
-direcaoOposta :: Direcao -> Direcao
-direcaoOposta Norte    = Sul
-direcaoOposta Sul      = Norte
-direcaoOposta Este     = Oeste
-direcaoOposta Oeste    = Este
-direcaoOposta Nordeste = Sudoeste
-direcaoOposta Sudoeste = Nordeste
-direcaoOposta Noroeste = Sudeste
-direcaoOposta Sudeste  = Noroeste
-
--- * ----------------------------
 
 
 -- | Versão da função 'movePosicao' que garante que o movimento não se desloca para fora de uma janela.
@@ -151,10 +138,7 @@ encontraPosicaoMatriz (0,c) (h:t) = encontraLista c h
 encontraPosicaoMatriz (l,c) (h:t) = encontraPosicaoMatriz (l-1,c) t
 
 
-encontraLista :: Int -> [a] -> Maybe a
-encontraLista i [] = Nothing
-encontraLista i (h:t) |i == 0 = Just h 
-                      |otherwise = encontraLista (i-1) t
+
 
 
 
@@ -167,15 +151,30 @@ atualizaPosicaoMatriz _ _ [] = []
 atualizaPosicaoMatriz (0,c) x (h:t) = substituirLista c x h : t
 atualizaPosicaoMatriz (l,c) x (h:t) = h : atualizaPosicaoMatriz (l - 1, c) x t
 
-substituirLista :: Int -> a -> [a] -> [a]
-substituirLista _ _ [] = []
-substituirLista 0 x (_:t) = x : t
-substituirLista i x (h:t) = h : substituirLista (i - 1) x t
 
 
+-- | Verifica se uma matriz é válida, no sentido em que modela um rectângulo.
+--
+-- __NB:__ Todas as linhas devem ter o mesmo número de colunas. 
+eMatrizValida :: Matriz a -> Bool
+eMatrizValida [] = False
+eMatrizValida [h] = True
+eMatrizValida (h1:h2:t) = length h1 == length h2 && eMatrizValida (h2:t)
 
 
--- ** //////////////////////////////////////
+-- * Auxiliares
+
+-- | Devolve a 'Direcao' oposta à dada.
+
+direcaoOposta :: Direcao -> Direcao
+direcaoOposta Norte    = Sul
+direcaoOposta Sul      = Norte
+direcaoOposta Este     = Oeste
+direcaoOposta Oeste    = Este
+direcaoOposta Nordeste = Sudoeste
+direcaoOposta Sudoeste = Nordeste
+direcaoOposta Noroeste = Sudeste
+direcaoOposta Sudeste  = Noroeste
 
 -- | Aplica uma sequência de movimentações a uma posição, pela ordem em que ocorrem na lista.
 moveDirecoesPosicao :: [Direcao] -> Posicao -> Posicao
@@ -188,12 +187,14 @@ moveDirecaoPosicoes :: Direcao -> [Posicao] -> [Posicao]
 moveDirecaoPosicoes dir [] = []
 moveDirecaoPosicoes dir (h:t) = movePosicao dir h : moveDirecaoPosicoes dir t
 
--- | Verifica se uma matriz é válida, no sentido em que modela um rectângulo.
---
--- __NB:__ Todas as linhas devem ter o mesmo número de colunas. 
-eMatrizValida :: Matriz a -> Bool
-eMatrizValida [] = False
-eMatrizValida [h] = True
-eMatrizValida (h1:h2:t) = length h1 == length h2 && eMatrizValida (h2:t)
+-- | Função auxiliar de 'encontraPosicaoMatriz'. Devolve o elemento numa dada posição de uma lista.
+encontraLista :: Int -> [a] -> Maybe a
+encontraLista i [] = Nothing
+encontraLista i (h:t) |i == 0 = Just h 
+                      |otherwise = encontraLista (i-1) t
 
-
+-- | Função auxiliar de 'atualizaPosicaoMatriz'. Substitui o elemento numa dada posição de uma lista.
+substituirLista :: Int -> a -> [a] -> [a]
+substituirLista _ _ [] = []
+substituirLista 0 x (_:t) = x : t
+substituirLista i x (h:t) = h : substituirLista (i - 1) x t
