@@ -87,7 +87,7 @@ efetuaJogada n (Dispara arma direcao) e = if not (vidaMinhoca minhoca == Morta) 
                                                                 else e{minhocasEstado = minhocasFinais} 
 
                                                         Mina -> if ePosicaoMatrizValida novaPos mapa 
-                                                                then if ePosicaoMapaLivre novaPos mapa
+                                                                then if ePosicaoMapaLivre novaPos mapa && not (existeBarril novaPos objetos)
                                                                     then Estado{mapaEstado=mapaEstado e,objetosEstado = (objetosEstado e ++ [Disparo{posicaoDisparo=novaPos, direcaoDisparo=direcao, tipoDisparo=Mina, tempoDisparo=Nothing, donoDisparo=n}]), minhocasEstado = minhocasFinais}
                                                                     else Estado{mapaEstado=mapaEstado e,objetosEstado = (objetosEstado e ++ [Disparo{posicaoDisparo=pos, direcaoDisparo=direcao, tipoDisparo=Mina, tempoDisparo=Nothing, donoDisparo=n}]), minhocasEstado = minhocasFinais}
 
@@ -95,7 +95,7 @@ efetuaJogada n (Dispara arma direcao) e = if not (vidaMinhoca minhoca == Morta) 
                                                                 else e{minhocasEstado = minhocasFinais} 
                                                         
                                                         Dinamite -> if ePosicaoMatrizValida novaPos mapa
-                                                                then if ePosicaoMapaLivre novaPos mapa
+                                                                then if ePosicaoMapaLivre novaPos mapa && not (existeBarril novaPos objetos)
                                                                     then Estado{mapaEstado=mapaEstado e,objetosEstado = (objetosEstado e ++ [Disparo{posicaoDisparo=novaPos, direcaoDisparo=direcao, tipoDisparo=Dinamite, tempoDisparo=Just 4, donoDisparo=n}]), minhocasEstado = minhocasFinais}
                                                                     else Estado{mapaEstado=mapaEstado e,objetosEstado = (objetosEstado e ++ [Disparo{posicaoDisparo=pos, direcaoDisparo=direcao, tipoDisparo=Dinamite, tempoDisparo=Just 4, donoDisparo=n}]), minhocasEstado = minhocasFinais}
                                                                      
