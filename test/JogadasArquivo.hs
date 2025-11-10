@@ -163,6 +163,7 @@ jogadasTeste =
   , (0 :: Int, Dispara Escavadora Sul, estado34)
   , (0 :: Int, Dispara Jetpack Oeste, estado35)
   , (0 :: Int, Dispara Escavadora Oeste, estado35)
+  , (0 :: Int, Dispara Escavadora Sudoeste, estado35)
   , (0 :: Int, Dispara Dinamite Oeste, estado35)
   , (0 :: Int, Dispara Mina Oeste, estado35)
 
