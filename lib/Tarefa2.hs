@@ -12,9 +12,6 @@ import Tarefa0_2025
 import Tarefa1
 import Foreign (moveArray)
 
--- * Efetuar Jogada
-
-
 {-| Recebe o índice de uma minhoca na lista de minhocas, uma jogada, um estado e retorna um novo estado em que essa minhoca efetuou essa jogada.
 
 
@@ -216,7 +213,7 @@ efetuaJogada n (Move direcao) e = if not (vidaMinhoca minhoca == Morta)  -- * Se
                             minhocaFinal = -- * NOva pos n é opaca
                                 if ePosicaoMatrizValida novaPos mapa
                                     then if ePosicaoEstadoLivre novaPos e
-                                        then if not ((encontraPosicaoMatriz novaPos mapa) == Just Agua) 
+                                        then if (encontraPosicaoMatriz novaPos mapa) /= Just Agua 
                                             then minhoca { posicaoMinhoca = Just novaPos } 
                                             else minhoca { posicaoMinhoca = Just novaPos,  vidaMinhoca = Morta } 
                                         else minhoca

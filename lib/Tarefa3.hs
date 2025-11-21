@@ -218,8 +218,6 @@ avancaObjeto e i o = case o of
                 in Left (Disparo { posicaoDisparo = novaPos, direcaoDisparo = novaDir, tipoDisparo = tipo, tempoDisparo = tempoNovo, donoDisparo = dono })
             where tempoNovo = case tempo of Just t  -> Just (t - 1)
 
-  -- todos os right precisam ser completos, falta definir a funcao que calcule a area das explosoes e a lista de danos para conseguir usar isso como output
-
 
   where
     mapa = mapaEstado e
@@ -228,7 +226,7 @@ avancaObjeto e i o = case o of
 
 
       -- todo podera ser otimizado com a funcao auxiliar da tarefa0
-      -- ! rever talvez
+      
     existeDonoMinhoca :: Posicao -> Int -> [Minhoca] -> Bool
     existeDonoMinhoca pos dono minhocas =
       let
