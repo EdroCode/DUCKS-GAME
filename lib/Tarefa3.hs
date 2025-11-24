@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Redundant if" #-}
 {-|
 Module      : Tarefa3
 Description : Avançar tempo do jogo.
@@ -80,7 +82,6 @@ avancaMinhoca e i minhoca =
 
   where
     mapa = mapaEstado e
-    minhocas = minhocasEstado e
 
     estaMinhocaBaixoViva :: Posicao -> Estado -> Bool
     estaMinhocaBaixoViva pos e =
@@ -159,6 +160,7 @@ avancaObjeto e i o = case o of
       else Right (calculaExplosao posBarril 5)
 
   Disparo pos dir tipo tempo dono -> case tipo of
+      
       Bazuca ->
         let posNova = movePosicao dir pos
             tempoNovo = case tempo of
@@ -217,7 +219,7 @@ avancaObjeto e i o = case o of
                   
                 in Left (Disparo { posicaoDisparo = novaPos, direcaoDisparo = novaDir, tipoDisparo = tipo, tempoDisparo = tempoNovo, donoDisparo = dono })
             where tempoNovo = case tempo of Just t  -> Just (t - 1)
-
+      
 
   where
     mapa = mapaEstado e

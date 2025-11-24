@@ -1,3 +1,7 @@
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Use notElem" #-}
+{-# HLINT ignore "Replace case with fromMaybe" #-}
+{-# HLINT ignore "Eta reduce" #-}
 {-|
 Module      : Tarefa1
 Description : Validação de estados.
@@ -81,9 +85,9 @@ False
 
 -}
 
-eMapaValido :: Mapa -> Bool 
-eMapaValido [] = False    
-eMapaValido m = (eMatrizValida m)  
+eMapaValido :: Mapa -> Bool
+eMapaValido [] = False
+eMapaValido m = eMatrizValida m
 
 
 {- | A função 'eMapaValido' valida se os objetos de um estado são consistentes.  
@@ -112,18 +116,14 @@ eObjetosValido _ [] = True
 eObjetosValido e (h:t) =
     if ehDisparo h == True
         then
-            if not (existeBarril (posicaoObjeto h) t)
-                && objetoValido h
-                && disparoValido mapa h
-                && donoValido e h
-            then eObjetosValido e t
-            else False
+            if not (existeBarril (posicaoObjeto h) t) && objetoValido h && disparoValido mapa h && donoValido e h
+                then eObjetosValido e t
+                else False
         else
-            if ePosicaoMapaLivre (posicaoObjeto h) mapa
-                && ePosicaoEstadoLivre (posicaoObjeto h) e{objetosEstado = t}
-            then eObjetosValido e t
-            else False
-                        
+            if ePosicaoMapaLivre (posicaoObjeto h) mapa && ePosicaoEstadoLivre (posicaoObjeto h) e{objetosEstado = t}
+                then eObjetosValido e t
+                else False
+
     where
         mapa = mapaEstado e
 
@@ -133,7 +133,7 @@ eObjetosValido e (h:t) =
             Disparo{tipoDisparo = Bazuca} -> disparoValido mapa obj
             Disparo{tipoDisparo = Mina} -> disparoValido mapa obj
             Disparo{tipoDisparo = Dinamite} -> disparoValido mapa obj
-            
+
 
 {-| Verifica se o 'Disparo' é valido
 
@@ -160,9 +160,9 @@ True
 -}
 
 disparoValido :: Mapa -> Objeto -> Bool
-disparoValido m d@Disparo{tipoDisparo = Bazuca} = if (tempoDisparo d == Nothing && disparoBazucaValido d m) then True else False
-disparoValido m d@Disparo{tipoDisparo = Mina} = if (tempoDisparo d <= Just 2 && tempoDisparo d >= Just 0 && ePosicaoMapaLivre (posicaoObjeto d) m) || (tempoDisparo d == Nothing && ePosicaoMapaLivre (posicaoObjeto d) m) then True else False
-disparoValido m d@Disparo{tipoDisparo = Dinamite} = if (tempoDisparo d <= Just 4 && tempoDisparo d >= Just 0 && ePosicaoMapaLivre (posicaoObjeto d) m) then True else False
+disparoValido m d@Disparo{tipoDisparo = Bazuca} = tempoDisparo d == Nothing && disparoBazucaValido d m
+disparoValido m d@Disparo{tipoDisparo = Mina} = (tempoDisparo d <= Just 2 && tempoDisparo d >= Just 0 && ePosicaoMapaLivre (posicaoObjeto d) m) || (tempoDisparo d == Nothing && ePosicaoMapaLivre (posicaoObjeto d) m)
+disparoValido m d@Disparo{tipoDisparo = Dinamite} = tempoDisparo d <= Just 4 && tempoDisparo d >= Just 0 && ePosicaoMapaLivre (posicaoObjeto d) m
 
 {-| Verifica se o 'Disparo' de 'Bazuca' é valido
 
@@ -182,7 +182,7 @@ True
 -}
 
 disparoBazucaValido :: Objeto -> Mapa -> Bool -- e livre se n tiver opaco
-disparoBazucaValido obj mapa = if (ePosicaoMapaLivre prevPos mapa) then True else False
+disparoBazucaValido obj mapa = ePosicaoMapaLivre prevPos mapa
                     where
                         pos = posicaoObjeto obj
                         dir = direcaoDisparo obj
@@ -217,24 +217,24 @@ True
 -}
 
 donoValido :: Estado -> Objeto -> Bool
-donoValido e obj = if indiceValido && verificaLista (listaDonos listaDisparos) then True else False
+donoValido e obj = indiceValido && verificaLista (listaDonos listaDisparos)
             where
                 indiceDono = donoDisparo obj
                 minhocas = minhocasEstado e
                 objetos = objetosEstado e
                 listaDisparos = disparosEstado objetos
                 -- Primeira verificação (é um indice valido na lista de minhocas)
-                indiceValido = if indiceDono <= (length minhocas - 1) && indiceDono >= 0 then True else False
+                indiceValido = indiceDono <= (length minhocas - 1) && indiceDono >= 0
 
 
                 -- Recebe os objetos do estado e devolve uma lista com (tipo de arma, dono)
                 -- Exemplo [(Dinamite, 0,(Mina,0)] -> Valida
                 -- Exemplo [(Dinamite, 0),(Dinamite,0)] -> Invalido
 
-                
+
                 verificaLista :: [(TipoArma, Int)] -> Bool
                 verificaLista [] = True
-                verificaLista (h:t) = if elem h t then False else True
+                verificaLista (h:t) = not (h `elem` t)
 
 
                 -- Devolve os objetos disparos
@@ -300,13 +300,13 @@ eMinhocasValidas _ [] = True
 eMinhocasValidas e (h:t) = posicaoValida && morteOk && vidaOk && eMinhocasValidas e t && armasValidas
   where
     posicaoValida = case posicaoMinhoca h of
-        Nothing   -> True  
+        Nothing   -> True
         Just p    -> ePosicaoEstadoLivre p e{minhocasEstado = t}
 
     morteOk = validaMorte h (mapaEstado e)
     vidaOk  = verificaVida h
 
-    armasValidas = if jetpackMinhoca h >= 0 && escavadoraMinhoca h >= 0 && bazucaMinhoca h >= 0 && minaMinhoca h >= 0 && dinamiteMinhoca h >= 0 then True else False
+    armasValidas = jetpackMinhoca h >= 0 && escavadoraMinhoca h >= 0 && bazucaMinhoca h >= 0 && minaMinhoca h >= 0 && dinamiteMinhoca h >= 0
 
 
 
@@ -335,9 +335,9 @@ validaMorte minh m = case posicaoMinhoca minh of
                                     Agua -> vidaMinhoca minh == Morta
                                     outro    -> True
                 where
-                    terrenoAtual = case (encontraPosicaoMatriz pos m) of
-                                        Just a -> a 
-                                        Nothing -> Ar 
+                    terrenoAtual = case encontraPosicaoMatriz pos m of
+                                        Just a -> a
+                                        Nothing -> Ar
 
 {-| Verifica se a vida da minhoca é valida
 
@@ -352,7 +352,7 @@ False
 verificaVida :: Minhoca -> Bool
 verificaVida m = case vida of
                     Morta -> True
-                    Viva a -> (a >= 0 && a <= 100)
+                    Viva a -> a >= 0 && a <= 100
     where
         vida = vidaMinhoca m
 
