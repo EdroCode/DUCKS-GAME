@@ -323,17 +323,17 @@ Funcionalidade:
 >>> validaMorte Minhoca{posicaoMinhoca=Just (5,8), vidaMinhoca=Morta, jetpackMinhoca=100, escavadoraMinhoca=200, bazucaMinhoca=150, minaMinhoca=3, dinamiteMinhoca=1} mapaValido
 True
 
--}
+-} 
 
 validaMorte :: Minhoca -> Mapa -> Bool
-validaMorte minh [] = False
+validaMorte _ [] = False
 validaMorte minh m = case posicaoMinhoca minh of
     Nothing ->
         vidaMinhoca minh == Morta
 
     Just pos -> case terrenoAtual of
                                     Agua -> vidaMinhoca minh == Morta
-                                    outro    -> True
+                                    _    -> True
                 where
                     terrenoAtual = case encontraPosicaoMatriz pos m of
                                         Just a -> a

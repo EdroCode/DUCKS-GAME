@@ -1,3 +1,7 @@
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Redundant ==" #-}
+{-# HLINT ignore "Redundant if" #-}
+{-# HLINT ignore "Eta reduce" #-}
 {-|
 Module      : Tarefa0_2025
 Description : Funções auxiliares.
@@ -47,9 +51,9 @@ eTerrenoOpaco t = if t == Pedra || t == Terra then True else False
 --  
 -- __NB:__ Uma posição está livre se não contiver um terreno opaco.
 ePosicaoMapaLivre :: Posicao -> Mapa -> Bool
-ePosicaoMapaLivre (x,y) [] = False
-ePosicaoMapaLivre (0,y) (h:t) = encontraLinhaMapa y h
-ePosicaoMapaLivre (x,y) (h:t) = ePosicaoMapaLivre (x-1,y) t
+ePosicaoMapaLivre (_,_) [] = False
+ePosicaoMapaLivre (0,y) (h:_) = encontraLinhaMapa y h
+ePosicaoMapaLivre (x,y) (_:t) = ePosicaoMapaLivre (x-1,y) t
 
 -- | Verifica se uma posição do estado está livre, i.e., pode ser ocupada por um objeto ou minhoca.
 --
@@ -79,32 +83,29 @@ adicionaObjeto obj estado = estado {objetosEstado = obj : objetosEstado estado}
 
 -- | Verifica se numa linha do 'Mapa' a 'Posicao' dada é livre (não 'Opaca').(Utilizado na função 'ePosicaoMapaLivre')
 encontraLinhaMapa :: Int -> [Terreno] -> Bool
-encontraLinhaMapa i [] = False
-encontraLinhaMapa 0 (h:t) = not (eTerrenoOpaco h)
-encontraLinhaMapa i (h:t) = encontraLinhaMapa (i-1) t 
+encontraLinhaMapa _ [] = False
+encontraLinhaMapa 0 (h:_) = not (eTerrenoOpaco h)
+encontraLinhaMapa i (_:t) = encontraLinhaMapa (i-1) t 
 
 
 -- | Verifica se numa lista de minhocas já existe uma 'Minhoca' na dada 'Posicao'.(Utilizado na função 'ePosicaoEstadoLivre')
 existeMinhoca :: Posicao -> [Minhoca] -> Bool
-existeMinhoca pos [] = False
+existeMinhoca _ [] = False
 existeMinhoca (x,y) (h:t) = let pos = posicaoMinhoca h
                             in if pos == Just (x,y) then True else existeMinhoca (x,y) t
                        
 -- | Verifica se numa lista de objetos já existe um 'Barril' na dada 'Posicao'.(Utilizado na função 'ePosicaoEstadoLivre')                   
 existeBarril :: Posicao -> [Objeto] -> Bool
-existeBarril pos [] = False
+existeBarril _ [] = False
 existeBarril pos (h:t) =
   let p = posicaoObjeto h
-  in if (ehDisparo h == False)
-       then if p == pos
+  in if ehDisparo h == False && p == pos
               then True
               else existeBarril pos t
-        else existeBarril pos t
-
 
 -- | Verifica se um 'Objeto' é um 'Disparo'.(Utilizado na função 'existeBarril')
 ehDisparo :: Objeto -> Bool
-ehDisparo d@Disparo{} = True
+ehDisparo Disparo{} = True
 ehDisparo _ = False
 
 -- | Devolve a 'Posição' de um 'Objeto'.(Utilizado na função 'existeBarril')
