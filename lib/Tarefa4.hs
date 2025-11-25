@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 {-|
 Module      : Tarefa4
 Description : Implementar uma tática de jogo.
@@ -11,6 +12,7 @@ import Data.Either
 import Labs2025
 import Tarefa2
 import Tarefa3
+import Tarefa0_2025 (ePosicaoEstadoLivre, existeMinhoca)
 
 -- | Função principal da Tarefa 4. Dado um estado retorna uma lista de jogadas, com exatamente 100 jogadas.
 tatica :: Estado -> [(NumMinhoca,Jogada)]
@@ -44,4 +46,68 @@ avancaObjetoJogada e objetos (i,objeto') = if elem objeto' objetos
 
 -- | Para um número de ticks desde o início da tática, dado um estado, determina a próxima jogada.
 jogadaTatica :: Ticks -> Estado -> (NumMinhoca,Jogada)
-jogadaTatica t e = undefined
+jogadaTatica _ e = let minhoca = head (minhocasEstado e)
+                       
+                       pos = case posicaoMinhoca minhoca of Just a -> a
+                       newDir = moveCheck pos Este e 
+                   in
+                    (0, Move newDir)
+
+-- tatica possivel, suicidio multipli com terrenos
+
+
+moveCheck :: Posicao -> Direcao -> Estado -> Direcao
+moveCheck pos dir e = if posValida then dir else (case getXWay dir of
+    Este -> direcaoOposta (getXWay dir)
+    Oeste -> direcaoOposta (getXWay dir)
+    _ -> dir)
+                    where
+                        
+                        novaPos = movePosicao dir pos
+                        posValida = ePosicaoEstadoLivre novaPos e
+
+                        getXWay :: Direcao -> Direcao
+                        getXWay d = case d of
+                            Noroeste  -> Oeste
+                            Sudoeste  -> Oeste
+                            Nordeste  -> Este
+                            Sudeste   -> Este
+                            _         -> d
+
+ola :: Estado
+ola = Estado
+    { mapaEstado =
+        [[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Terra,Terra,Terra,Ar,Pedra,Agua,Agua,Agua,Agua,Agua]
+        ,[Terra,Terra,Terra,Terra,Pedra,Pedra,Agua,Agua,Agua,Agua]
+        ,[Terra,Terra,Terra,Terra,Terra,Pedra,Pedra,Pedra,Agua,Agua]
+        ]
+    , objetosEstado =
+        []
+    , minhocasEstado =
+        [Minhoca {posicaoMinhoca = Just (2,1), vidaMinhoca = Viva 70, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 1}
+        ,Minhoca {posicaoMinhoca = Just (2,4), vidaMinhoca = Viva 50, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 1}
+        ]
+    }
+
+areaDetect :: Int -> Posicao -> Estado -> Bool
+areaDetect range pos e =  all (`ePosicaoEstadoLivre` e) (getArea range pos) 
+
+getArea :: Int -> (Int, Int) -> [(Int, Int)]
+getArea d (x, y) = geraLinha (x - d)
+  where
+    geraLinha i =
+      if i > x + d
+         then []
+         else geraColuna i (y - d) ++ geraLinha (i + 1)
+
+    geraColuna i j
+      | j > y + d = []
+      | (i, j) == (x, y) = geraColuna i (j + 1)
+      | otherwise = (i, j) : geraColuna i (j + 1)
+
+
+
+
