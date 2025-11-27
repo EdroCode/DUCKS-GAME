@@ -3,7 +3,7 @@ module Main where
 import Labs2025
 import Tarefa1
 import Magic
-
+import OracleT1
 
 -- * Comandos para testar (rodar na cmd - bash - na pasta do ficheiro)
 -- * cabal clean && rm -rf t1-feedback.tix
@@ -848,8 +848,8 @@ estado60 = Estado
 
 
 -- | Definir aqui os testes do grupo para a Tarefa 1
-testesTarefa1 :: [Estado]
-testesTarefa1 = 
+testesTarefa1s :: [Estado]
+testesTarefa1s = 
     [estado1
     , estado2
     , estado3

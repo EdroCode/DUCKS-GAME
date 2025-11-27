@@ -3,7 +3,7 @@ module Main where
 import Labs2025
 import Tarefa3
 import Magic
-
+import OracleT3
 
 -- * Comandos para testar (rodar na cmd - bash - na pasta do ficheiro)
 -- * cabal clean && rm -rf t3-feedback.tix
@@ -573,13 +573,6 @@ estado37 = Estado
     }
 
 
--- | Definir aqui os testes do grupo para a Tarefa 3
-testesTarefa3 :: [Estado]
-testesTarefa3 = [estado1,estado2,estado3,estado4,estado5,estado6,estado7,estado8, estado10, 
-                estado11, estado12, estado13, estado14, estado15, estado16, estado17, estado18, 
-                estado19, estado20, estado21, estado22, estado23, estado24, estado25, estado26, estado27,
-                estado28, estado29, estado30, estado31, estado32, estado33, estado34, estado35, estado36,
-                estado37]
 
 dataTarefa3 :: IO TaskData
 dataTarefa3 = do

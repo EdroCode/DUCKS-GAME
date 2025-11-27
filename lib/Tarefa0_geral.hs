@@ -94,19 +94,18 @@ origemAoCentro (dy, dx) (y, x) = (y - div dy 2, x - div dx 2)
 -- <<https://haslab.github.io/Teaching/LI1/2526/img/rodaposicaodirecao.png>>
 
 rodaPosicaoDirecao :: (Posicao,Direcao) -> (Posicao,Direcao)
-rodaPosicaoDirecao (pos, d) = (p, novaDirecao) -- Retorna a tupla (Posicao, Direcao)
-    where
-        novaDirecao = case d of
-            Norte    -> Nordeste
-            Sul      -> Sudoeste
-            Este     -> Sudeste
-            Oeste    -> Noroeste
-            Nordeste -> Este
-            Sudeste  -> Sul
-            Noroeste -> Norte
-            Sudoeste -> Oeste
+rodaPosicaoDirecao (pos, d) = let p = movePosicao d pos
+                              in case d of
+                                    Norte    -> (p,Sul)
+                                    Sul      -> (p,Norte)
+                                    Este     -> (movePosicao Sudeste pos,Sudeste)
+                                    Oeste    -> (movePosicao Sudoeste pos,Sudoeste)
+                                    Nordeste -> (p,Este)
+                                    Sudeste  -> (p,Sul)
+                                    Noroeste -> (p,Oeste)
+                                    Sudoeste -> (p,Sul) -- ! refazer isto - ta a dar problemas
 
-        p = movePosicao d pos
+        
 
 -- * Funções recursivas.
 

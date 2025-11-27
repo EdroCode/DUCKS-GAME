@@ -87,6 +87,7 @@ False
 
 eMapaValido :: Mapa -> Bool
 eMapaValido [] = False
+eMapaValido ([]:_) = False
 eMapaValido m = eMatrizValida m
 
 
@@ -95,7 +96,6 @@ Verifica disparos, posições válidas e coerência de donos.
 
 
 == __Exemplos:__
-
 @
 mapaValido =
         [[Ar,Ar,Ar,Ar,Ar,Ar]
@@ -182,7 +182,7 @@ True
 -}
 
 disparoBazucaValido :: Objeto -> Mapa -> Bool -- e livre se n tiver opaco
-disparoBazucaValido obj mapa = ePosicaoMapaLivre prevPos mapa
+disparoBazucaValido obj mapa = ePosicaoMapaLivre prevPos mapa || not (ePosicaoMatrizValida prevPos mapa) && ePosicaoMatrizValida pos mapa
                     where
                         pos = posicaoObjeto obj
                         dir = direcaoDisparo obj
@@ -339,22 +339,6 @@ validaMorte minh m = case posicaoMinhoca minh of
                                         Just a -> a
                                         Nothing -> Ar
 
-{-| Verifica se a vida da minhoca é valida
-
-
-== __Exemplos:__
->>> verificaVida Minhoca{posicaoMinhoca=Just (3,0), vidaMinhoca=Morta, jetpackMinhoca=100, escavadoraMinhoca=200, bazucaMinhoca=150, minaMinhoca=3, dinamiteMinhoca=1}
-True
->>> verificaVida Minhoca{posicaoMinhoca=Just (3,0), vidaMinhoca=Viva 150, jetpackMinhoca=100, escavadoraMinhoca=200, bazucaMinhoca=150, minaMinhoca=3, dinamiteMinhoca=1}
-False
-
--}
-verificaVida :: Minhoca -> Bool
-verificaVida m = case vida of
-                    Morta -> True
-                    Viva a -> a >= 0 && a <= 100
-    where
-        vida = vidaMinhoca m
 
 
 

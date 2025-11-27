@@ -63,7 +63,7 @@ estadoValido5 = Estado
 efetuaJogada :: NumMinhoca -> Jogada -> Estado -> Estado
 
 -- DISPARO - Dispara TIpo Direcao
-efetuaJogada n (Dispara arma direcao) e = if vidaMinhoca minhoca /= Morta && temMunicao minhoca arma && not (elem (arma,n) (listaDonos objetos)) -- Verifica se existe um disparo da mesma arma da mesma minhoca no estado atual
+efetuaJogada n (Dispara arma direcao) e = if indiceValido n e && vidaMinhoca minhoca /= Morta && temMunicao minhoca arma && not (elem (arma,n) (listaDonos objetos)) -- Verifica se existe um disparo da mesma arma da mesma minhoca no estado atual
                                                     then case arma of
 
                                                         Jetpack -> if ePosicaoMatrizValida novaPos mapa && ePosicaoEstadoLivre novaPos e
@@ -79,14 +79,17 @@ efetuaJogada n (Dispara arma direcao) e = if vidaMinhoca minhoca /= Morta && tem
                                                                     else Estado{mapaEstado=mapa,objetosEstado=objetos,minhocasEstado=atualizaIndiceLista n (minhoca{escavadoraMinhoca = escavadoraMinhoca minhoca-1}) minhocas}
                                                                 else e{minhocasEstado = minhocasFinais}
 
-                                                        Bazuca -> if ePosicaoMatrizValida novaPos mapa && ePosicaoEstadoLivre novaPos e
+                                                        Bazuca -> if ePosicaoMatrizValida novaPos mapa 
 
                                                                 then Estado{mapaEstado=mapaEstado e,objetosEstado = objetosEstado e ++ [Disparo{posicaoDisparo=novaPos, direcaoDisparo=direcao, tipoDisparo=Bazuca, tempoDisparo=Nothing, donoDisparo=n}], minhocasEstado = minhocasFinais}
                                                                 else e{minhocasEstado = minhocasFinais}
 
-                                                        Mina -> if ePosicaoMatrizValida novaPos mapa
+                                                        Mina -> if ePosicaoMatrizValida novaPos mapa 
                                                                 then if ePosicaoMapaLivre novaPos mapa && not (existeBarril novaPos objetos)
-                                                                    then Estado{mapaEstado=mapaEstado e,objetosEstado = objetosEstado e ++ [Disparo{posicaoDisparo=novaPos, direcaoDisparo=direcao, tipoDisparo=Mina, tempoDisparo=Nothing, donoDisparo=n}], minhocasEstado = minhocasFinais}
+                                                                    then if ePosicaoEstadoLivre novaPos e 
+                                                                        then Estado{mapaEstado=mapaEstado e,objetosEstado = objetosEstado e ++ [Disparo{posicaoDisparo=novaPos, direcaoDisparo=direcao, tipoDisparo=Mina, tempoDisparo=Nothing, donoDisparo=n}], minhocasEstado = minhocasFinais}
+                                                                        else Estado{mapaEstado=mapaEstado e,objetosEstado = objetosEstado e ++ [Disparo{posicaoDisparo=pos, direcaoDisparo=direcao, tipoDisparo=Mina, tempoDisparo=Nothing, donoDisparo=n}], minhocasEstado = minhocasFinais}
+
                                                                     else Estado{mapaEstado=mapaEstado e,objetosEstado = objetosEstado e ++ [Disparo{posicaoDisparo=pos, direcaoDisparo=direcao, tipoDisparo=Mina, tempoDisparo=Nothing, donoDisparo=n}], minhocasEstado = minhocasFinais}
 
 
@@ -94,7 +97,9 @@ efetuaJogada n (Dispara arma direcao) e = if vidaMinhoca minhoca /= Morta && tem
 
                                                         Dinamite -> if ePosicaoMatrizValida novaPos mapa
                                                                 then if ePosicaoMapaLivre novaPos mapa && not (existeBarril novaPos objetos)
-                                                                    then Estado{mapaEstado=mapaEstado e,objetosEstado = objetosEstado e ++ [Disparo{posicaoDisparo=novaPos, direcaoDisparo=direcao, tipoDisparo=Dinamite, tempoDisparo=Just 4, donoDisparo=n}], minhocasEstado = minhocasFinais}
+                                                                    then if ePosicaoEstadoLivre novaPos e 
+                                                                        then Estado{mapaEstado=mapaEstado e,objetosEstado = objetosEstado e ++ [Disparo{posicaoDisparo=novaPos, direcaoDisparo=direcao, tipoDisparo=Dinamite, tempoDisparo=Just 4, donoDisparo=n}], minhocasEstado = minhocasFinais}
+                                                                        else Estado{mapaEstado=mapaEstado e,objetosEstado = objetosEstado e ++ [Disparo{posicaoDisparo=pos, direcaoDisparo=direcao, tipoDisparo=Dinamite, tempoDisparo=Just 4, donoDisparo=n}], minhocasEstado = minhocasFinais}
                                                                     else Estado{mapaEstado=mapaEstado e,objetosEstado = objetosEstado e ++ [Disparo{posicaoDisparo=pos, direcaoDisparo=direcao, tipoDisparo=Dinamite, tempoDisparo=Just 4, donoDisparo=n}], minhocasEstado = minhocasFinais}
 
                                                                 else e{minhocasEstado = minhocasFinais}
@@ -171,14 +176,15 @@ efetuaJogada n (Dispara arma direcao) e = if vidaMinhoca minhoca /= Morta && tem
 
 
                                             temMunicao :: Minhoca -> TipoArma -> Bool
-                                            temMunicao m arma = case arma of
+                                            temMunicao m armaMinh = case armaMinh of
                                                 Jetpack -> jetpackMinhoca m > 0
                                                 Escavadora -> escavadoraMinhoca m > 0
                                                 Bazuca -> bazucaMinhoca m > 0
                                                 Mina -> minaMinhoca m > 0
                                                 Dinamite -> dinamiteMinhoca m > 0
-
-
+                                            
+                                            indiceValido :: Int -> Estado -> Bool
+                                            indiceValido nMinhoca estado = nMinhoca <= length (minhocasEstado estado)
 
                                             blocoTargeted = case encontraPosicaoMatriz novaPos mapa of Just a -> a
 

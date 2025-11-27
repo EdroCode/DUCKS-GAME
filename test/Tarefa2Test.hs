@@ -4,11 +4,7 @@ import Labs2025
 import Tarefa2
 import Magic
 import JogadasArquivo
-
-
--- | Definir aqui os testes do grupo para a Tarefa 2
-testesTarefa2 :: [(NumMinhoca,Jogada,Estado)]
-testesTarefa2 = jogadasTeste
+import OracleT2
 
 dataTarefa2 :: IO TaskData
 dataTarefa2 = do
