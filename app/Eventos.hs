@@ -1,16 +1,9 @@
-
--- Módulo responsável por tratar os eventos do usuário (teclado, mouse, etc)
 module Eventos where
 
-
--- Importa os módulos principais do jogo
 import Graphics.Gloss.Interface.Pure.Game
 import Worms
 import Labs2025
 import Tarefa2
-
-
-
 
 -- | Função principal que reage aos eventos do usuário e atualiza o estado do jogo
 reageEventos :: Event -> Worms -> Worms
@@ -22,22 +15,18 @@ reageEventos (EventKey (SpecialKey KeyDown) Down _ _) (Menu sel) = Menu (min 2 (
 
 -- Seleção de opção no menu
 reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (Menu sel)
-	| sel == 0 = Playing sampleEstado 0.0 0 -- Inicia o jogo
-	| sel == 1 = Help -- Abre tela de ajuda
-	| sel == 2 = Quit -- Sai do jogo
-	| otherwise = Menu sel -- Mantém menu se opção inválida
+	| sel == 0 = Playing novoEstado 0.0 0 
+	| sel == 1 = Help 
+	| sel == 2 = Quit 
+	| otherwise = Menu sel 
 
 
 -- Voltar do Help para o menu
 reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) Help = Menu 0
 reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) Help = Menu 0
 
-
-
 -- Voltar do jogo para o menu
 reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (Playing _ _ _) = Menu 0
-
-
 
 -- Qualquer outro evento não altera o estado
 reageEventos _ s = s

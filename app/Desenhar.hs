@@ -15,7 +15,6 @@ desenha Quit = Translate (-50) 0 $ Scale 0.5 0.5 $ Text "Aperte ESC para confirm
 desenha Help = drawHelp
 
 
--- ===== Menu drawing =====
 drawMenu :: Int -> Picture
 drawMenu sel = Pictures
 	[ Translate (-220) 120 $ Scale 0.6 0.6 $ Color black $ Text "WORMS"
@@ -33,8 +32,6 @@ drawHelp = Pictures
 	, Translate (-360) (-120) $ Scale 0.18 0.18 $ Color (greyN 0.5) $ Text "Pressione ESC ou Enter para voltar ao menu"
 	]
 
-
--- ===== Game drawing =====
 cellSize :: Float
 cellSize = 48
 
@@ -46,14 +43,13 @@ drawGame est = Pictures [Translate (-640) 240 $ Scale 0.12 0.12 $ Color black $ 
 		infoMapa = "mapa: " ++ show (length mapa) ++ "x" ++ show (if null mapa then 0 else length (head mapa))
 		objs = objetosEstado est
 		ms = minhocasEstado est
-		world = Pictures [drawMapa mapa, drawObjects objs mapa, drawMinhocas ms mapa]
+		world = Pictures [drawMapa mapa, drawObjetos objs mapa, drawMinhocas ms mapa]
 
 
 -- | Converte coordenadas do mapa (linha, coluna) para coordenadas em pixels
--- usadas pelo Gloss. O canto superior esquerdo do mapa fica deslocado para
--- centrar o mapa na janela, e cada célula tem tamanho `cellSize`.
-posToPoint :: Mapa -> Posicao -> (Float, Float)
-posToPoint mapa (r,c) = (x,y)
+-- centrar o mapa na janela, e cada célula tem tamanho 48(cellSize).
+converteMapa :: Mapa -> Posicao -> (Float, Float)
+converteMapa mapa (r,c) = (x,y)
 	where
 		linha = length mapa
 		cols = if null mapa then 0 else length (head mapa)
@@ -71,25 +67,25 @@ drawMapa mapa = Pictures $ concatMap drawRow (zip [0..] mapa)
 		drawRow (r, row) = map (drawTile r) (zip [0..] row)
 		drawTile r (c, t) = Translate x y $ Pictures [colorTile t, Color (greyN 0.6) $ rectangleWire cellSize cellSize]
 			where
-				(x,y) = posToPoint mapa (r,c)
+				(x,y) = converteMapa mapa (r,c)
 				colorTile Ar = Color (greyN 0.95) $ rectangleSolid cellSize cellSize
 				colorTile Agua = Color (makeColor 0 0.4 1 0.6) $ rectangleSolid cellSize cellSize
 				colorTile Terra = Color (makeColor 0.6 0.4 0.2 1) $ rectangleSolid cellSize cellSize
 				colorTile Pedra = Color (greyN 0.5) $ rectangleSolid cellSize cellSize
 
 -- | Desenha objetos no mapa (disparos, minas, dinamites, barris, ...)
-drawObjects :: [Objeto] -> Mapa -> Picture
-drawObjects objs mapa = Pictures $ map drawO objs
+drawObjetos :: [Objeto] -> Mapa -> Picture
+drawObjetos objs mapa = Pictures $ map drawO objs
 	where
 		drawO o@(Disparo {}) = Translate x y $ case tipoDisparo o of
 			Bazuca -> Pictures [Color red $ circleSolid (cellSize * 0.25), Color black $ Scale 0.15 0.15 $ Text (show (donoDisparo o))]
 			Mina -> Color (makeColor 0.9 0.7 0 1) $ circleSolid (cellSize * 0.18)
 			Dinamite -> Color (makeColor 0.9 0.2 0.2 1) $ rectangleSolid (cellSize * 0.3) (cellSize * 0.3)
 			_ -> Color black $ circleSolid (cellSize * 0.12)
-			where (x,y) = posToPoint mapa (posicaoObjeto o)
+			where (x,y) = converteMapa mapa (posicaoObjeto o)
 
 		drawO b@(Barril {}) = Translate x y $ Pictures [Color (makeColor 0.3 0.15 0 1) $ rectangleSolid (cellSize*0.4) (cellSize*0.4), Color black $ rectangleWire (cellSize*0.4) (cellSize*0.4)]
-			where (x,y) = posToPoint mapa (posicaoObjeto b)
+			where (x,y) = converteMapa mapa (posicaoObjeto b)
 
 -- | Desenha as minhocas. Cada minhoca aparece com um círculo colorido
 -- e um rótulo que indica o índice e a vida restante.
@@ -100,7 +96,7 @@ drawMinhocas ms mapa = Pictures $ map drawM (zip [0..] ms)
 			Nothing -> Blank
 			Just p -> Translate x y $ Pictures [Color (cor m) $ circleSolid (cellSize * 0.28), Color black $ Scale 0.12 0.12 $ Text (label i m)]
 				where
-					(x,y) = posToPoint mapa p
+					(x,y) = converteMapa mapa p
 		cor m = case vidaMinhoca m of
 			Morta -> makeColor 0 0 0 1
 			Viva v -> if v <= 25 then makeColor 1 0.3 0 1 else makeColor 0 0.8 0 1
