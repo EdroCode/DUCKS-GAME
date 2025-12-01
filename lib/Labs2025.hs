@@ -110,3 +110,14 @@ data Jogada
     -- | Mover-se numa dada direção.
     | Move Direcao
     deriving (Eq,Ord,Show,Read)
+
+
+-- | Lista das oito direcções possíveis num tabuleiro ou grelha.
+-- Inclui as quatro direcções cardeais e as quatro diagonais.
+axis8 :: [Direcao]
+axis8 = [Norte, Sul, Este, Oeste, Nordeste, Noroeste, Sudeste, Sudoeste]
+
+-- | Lista das quatro direcções cardeais.
+-- Representa movimentos apenas em linha recta, sem diagonais.
+axis4 :: [Direcao]
+axis4 = [Norte, Sul, Este, Oeste]
