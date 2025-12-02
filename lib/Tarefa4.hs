@@ -12,9 +12,10 @@ import Data.Either
 import Labs2025
 import Tarefa2
 import Tarefa3
-import Tarefa0_2025 (ePosicaoEstadoLivre, existeMinhoca, verificaVida, encontraQuantidadeArmaMinhoca)
+import Tarefa0_2025 (ePosicaoEstadoLivre, existeMinhoca, existeBarril, verificaVida, encontraQuantidadeArmaMinhoca, ehDisparo, existeBarril)
 import Text.ParserCombinators.ReadP (look)
 import Data.Maybe (fromMaybe)
+import Data.List
 
 -- | Função principal da Tarefa 4. Dado um estado retorna uma lista de jogadas, com exatamente 100 jogadas.
 tatica :: Estado -> [(NumMinhoca,Jogada)]
@@ -54,58 +55,63 @@ avancaObjetoJogada e objetos (i,objeto') = if elem objeto' objetos
 jogadaTatica :: Ticks -> Estado -> (NumMinhoca, Jogada)
 jogadaTatica ticks e =
   case minhocasEstado e of
-    [] -> (100, Move Sul)  -- nenhuma minhoca
+    [] -> (100, Move Sul)  -- ! falar com stor 
     minhocas ->
       let (i, minhoca) = escolherMinhoca minhocas
-          pos          = case posicaoMinhoca minhoca of Just a -> a
+          pos = case posicaoMinhoca minhoca of Just a -> a
           (onSight, posMira) = minhocaOnSight e pos
           jogadasRestantes   = 100 - ticks
-
+          
           
       in case (onSight, posMira) of
-           (True, Just alvo) -> (i, Dispara Bazuca Oeste)
-           (False, Nothing)               -> (i, Move Sul) -- TODO: lógica de mina/suicídio
-           (_, Nothing)                   -> (i, Move Sul)
-           _ -> error " ola"
+           (True, Just alvo) -> if gotAmmo minhoca Bazuca then (i, Dispara Bazuca (getDir8 pos alvo)) else suicidioFase jogadasRestantes i minhoca
+           _ -> suicidioFase jogadasRestantes i minhoca -- todo suicidio
 
-
-
+-- nome temporario representa o processo de suicidio
+suicidioFase :: Ticks -> Int -> Minhoca -> (NumMinhoca, Jogada)
+suicidioFase ticksRestantes i minhoca = 
+                if ticksRestantes < 10  -- todo depois mudar o 5
+                  then if gotAmmo minhoca Mina
+                    then (i, Dispara Mina Norte)
+                    else if gotAmmo minhoca Dinamite 
+                          then (i, Dispara Dinamite Norte)
+                          else if gotAmmo minhoca Bazuca
+                            then (i, Dispara Bazuca Sul)
+                            else (i, Move Sul)
+                  else (i, Move Sul)  -- todo Nao faz  -> movimento depois      
 
 -- Para criar este Bot decidi uma ordem de prioridade para qualquer minhoca que seja controlada
 -- O bot primeiro escolhera a minhoca com menos vida com uma posicao valida
 -- Assim o objetivo da mesma sera:
 
 -- 1. Existe mina inimiga no mapa? Sim - vai ate ela Nao - Procede
--- 2. O principal é causar danos as minhocas na sua linha de visao usando a bazuca.
+-- 2. O principal é causar danos as minhocas/barris na sua linha de visao usando a bazuca.
 -- 3. Caso nao tenha ninguem na sua linha de visao ela deve colocar uma mina perto dela
--- e suicidar se
+-- e suicidar se com a dinamite
 -- todo implementar sistema de ativacao de mina por minhocas externas
 -- todo implementar sistema de escolha baseado nos ticks restantes
+-- todo possivel suicidio seria tambem correr para as bordas (simples ou com agoritmo)
 
 
 
 
-
-
-
-
-
-
-
--- Escolhe a Minhoca com mais Vida -> Trabalha apenas com minhocas em posicoes validas
+-- Escolhe a Minhoca com menos Vida -> Trabalha apenas com minhocas em posicoes validas
 escolherMinhoca :: [Minhoca] -> (Int, Minhoca)
-escolherMinhoca minhocas = foldl escolher (1, h) (zip [2..] t)
+escolherMinhoca minhocas =
+  let (h:t) = getMinhocasValidas minhocas
+  in foldl escolher (0, h) (zip [1..] t)
   where
     escolher (i1, m1) (i2, m2) =
       if vidaMinhoca m2 < vidaMinhoca m1
          then (i2, m2)
          else (i1, m1)
-      
-    (h:t) = getMinhocasValidas minhocas 
 
 getMinhocasValidas :: [Minhoca] -> [Minhoca]
 getMinhocasValidas [] = []
-getMinhocasValidas (h:t) = if posicaoMinhoca h /= Nothing then h : getMinhocasValidas t else getMinhocasValidas t
+getMinhocasValidas (h:t) =
+    if posicaoMinhoca h /= Nothing
+       then h : getMinhocasValidas t
+       else getMinhocasValidas t
 
 
 escolherAtaque:: Minhoca -> Posicao -> Posicao -> Jogada
@@ -143,7 +149,11 @@ minhocaOnSight e pos =
         posicoesLV    = getPosicoesBazuca mapa pos
         minhocasVivas = filter verificaVida (minhocasEstado e)
 
+        barris = getBarris (objetosEstado e)
+
         minhocasInSight = filter (`existeMinhoca` minhocasVivas) posicoesLV
+        barrisInSight = filter (`existeBarril` barris) posicoesLV
+
 
         maisPerto = escolheMaisPerto pos minhocasInSight
 
@@ -156,6 +166,11 @@ minhocaOnSight e pos =
         comparaDist :: Posicao -> Posicao -> Posicao -> Posicao
         comparaDist p melhor atual =
             if distAtoB p atual < distAtoB p melhor then atual else melhor
+        
+        -- retorna uma lista dos barris presentes no mapa
+        getBarris :: [Objeto] -> [Objeto]
+        getBarris [] = []
+        getBarris (h:t) = if ehDisparo h then getBarris t else h : getBarris t
 
     in (not (null minhocasInSight), maisPerto)
 
