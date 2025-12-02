@@ -16,6 +16,7 @@ import Tarefa0_2025 (ePosicaoEstadoLivre, existeMinhoca, existeBarril, verificaV
 import Text.ParserCombinators.ReadP (look)
 import Data.Maybe (fromMaybe, fromJust)
 import Data.List
+import Foreign.Marshal (moveArray)
 
 -- | Função principal da Tarefa 4. Dado um estado retorna uma lista de jogadas, com exatamente 100 jogadas.
 tatica :: Estado -> [(NumMinhoca,Jogada)]
@@ -64,53 +65,67 @@ jogadaTatica ticks e =
       minhocasValidas ->
 
         if jogadasRestantes > tickingBomb e
-          
+
           then -- * Jogadas Normais
-            let 
-              i = escolherMinhoca minhocas
-              minhoca = (getMinhocasValidas minhocas) !! i
+            let
+              i = jogadasRestantes `mod` length minhocasValidas
+              minhoca = minhocasValidas !! i
 
               pos = case posicaoMinhoca minhoca of Just a -> a
-                                                  
-                                                  
-              (onSight, posMira) = minhocaOnSight e pos
-              
-            in case (onSight, posMira) of
-              (True, Just alvo) -> if gotAmmo minhoca Bazuca then (i, Dispara Bazuca (getDir8 pos alvo)) else defaultBotMove
-              _ -> defaultBotMove-- todo nao se suicida mas move se
 
+
+              (onSight, posMira) = minhocaOnSight e pos
+
+            in case (onSight, posMira) of
+              (True, Just alvo) -> if gotAmmo minhoca Bazuca then (i, Dispara Bazuca (getDir8 pos alvo)) else digFase e i minhoca
+              _ -> digFase e i minhoca
 
 
           else -- * Trigger Suicidio
             let
-              suicideGroup =  (minhocasEstado e)
-              suicideIndex = 0
+              suicideGroup = minhocasEstado e
+              suicideIndex = (jogadasRestantes `mod` length minhocasValidas)
 
-              suicider = suicideGroup !! suicideIndex
+              suicider = minhocasValidas !! suicideIndex
               pos = case posicaoMinhoca suicider of Just a -> a
+              -- todo sort por vida
 
-              bloco = getPosTer mapa Agua (getPosicoesSquare mapa pos)
-              
+              posBloco = getPosicoesSquare mapa pos
 
-            in 
+              bloco = getPosTer mapa Agua posBloco
+
+
+            in
               case bloco of
-                Just a -> suicidioFase (Just a) (Just (getDir8 pos a)) e suicideIndex suicider
-              
-                Nothing -> suicidioFase Nothing Nothing e suicideIndex suicider
-            
+                Just a -> suicidioFase (Just (getDir8 pos a)) e suicideIndex suicider
+
+                Nothing -> suicidioFase Nothing e suicideIndex suicider
+
   where
         jogadasRestantes = 100 - ticks
         mapa = mapaEstado e
 
 -- nome temporario representa o processo de suicidio
-suicidioFase :: Maybe Posicao -> Maybe Direcao -> Estado -> Int -> Minhoca -> (NumMinhoca, Jogada)
-suicidioFase pos dir e i minhoca
+suicidioFase :: Maybe Direcao -> Estado -> Int -> Minhoca -> (NumMinhoca, Jogada)
+suicidioFase dir _ i minhoca
   | gotAmmo minhoca Mina = (i, Dispara Mina Norte)
   | gotAmmo minhoca Dinamite = (i, Dispara Dinamite Norte)
   | gotAmmo minhoca Bazuca = (i, Dispara Bazuca Sul)
-  | pos /= Nothing = (i, Dispara Escavadora (fromJust dir))
-  | otherwise = (i, Move Sul)
+  | dir /= Nothing = (i, Move (fromJust dir))
+  | otherwise = defaultBotMove
 
+digFase :: Estado -> Int -> Minhoca -> (NumMinhoca, Jogada)
+digFase e i minhoca = let -- todo nao se suicida mas move se
+                      mapa = mapaEstado e
+                      pos = case posicaoMinhoca minhoca of Just a -> a
+                      posBloco = getPosicoesSquare mapa pos
+                      bloco = getPosTer mapa Terra posBloco
+
+                    in
+                      case bloco of
+                        Just a -> if lastBlockValid mapa a then (i, Dispara Escavadora (getDir8 pos a)) else defaultBotMove
+
+                        Nothing -> defaultBotMove
 
 
 
@@ -203,8 +218,9 @@ minhocaOnSight e pos =
     in (not (null minhocasInSight), maisPerto)
 
 
-
-
+-- | Verifica se a posição inferior ao bloco na posição está fora da Matriz, ou seja se é valido ou nao
+lastBlockValid :: Mapa -> Posicao -> Bool
+lastBlockValid mapa pos = let posInferior = movePosicao Sul pos in ePosicaoMatrizValida posInferior mapa
 
 getDimensoesMatriz :: Mapa -> (Int, Int)
 getDimensoesMatriz m = (length m, length (head m))  -- (dY, dX)
@@ -241,7 +257,7 @@ getPosicoesSquare mapa pos = sort (concatMap (posicoesDirecao mapa pos) direcoes
         posicoesDirecao :: Mapa -> Posicao -> Direcao -> [Posicao]
         posicoesDirecao m p dir =
           let (dY, dX) = getDimensoesMatriz m
-              (y, x)   = movePosicao dir p  
+              (y, x)   = movePosicao dir p
           in if y < 0 || x < 0 || y >= dY || x >= dX
                 then []
                 else [(y, x)]
@@ -273,7 +289,7 @@ tickingBomb e = let
 
   tempoArmas = getGunTimeCount (nub armas)
 
-
+  threshold = 5 -- Valor default para segurança
 
   getTerroristas :: [Minhoca] -> (Int, [Minhoca])
   getTerroristas [] = (0, [])
@@ -299,7 +315,8 @@ tickingBomb e = let
 
 
 
-  in tempoArmas + numTerr
+
+  in tempoArmas + numTerr + threshold
 
 -- Ordem prioridade para o suicidio
 -- Dinamite
@@ -426,7 +443,13 @@ getArea d (x, y) = geraLinha (x - d)
 
 
 
-
+mapa1 = [[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Terra,Terra,Terra,Ar,Pedra,Agua,Agua,Agua,Agua,Agua]
+        ,[Terra,Terra,Terra,Terra,Pedra,Pedra,Agua,Agua,Agua,Agua]
+        ,[Terra,Terra,Terra,Terra,Terra,Pedra,Pedra,Pedra,Agua,Agua]
+        ]
 
 
 
