@@ -15,6 +15,26 @@ janelaAltura :: Float
 janelaAltura = 1080
 
 
+
+-- * Assets
+
+data Assets = Assets
+  { imgWorm :: Picture
+  , imgBarrel :: Picture
+  , imgBackground :: Picture
+  , grassImg :: Picture
+  , waterImg :: Picture
+  , stoneImg :: Picture
+  }
+
+type EstadoGloss = (Estado, Assets)
+
+
+
+
+
+
+
 -- | Menu do jogo
 desenha :: Worms -> Picture
 desenha (Menu sel) = drawMenu sel

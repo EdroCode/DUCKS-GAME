@@ -92,7 +92,7 @@ suicidioFase ticksRestantes i minhoca =
 -- todo implementar sistema de escolha baseado nos ticks restantes
 -- todo possivel suicidio seria tambem correr para as bordas (simples ou com agoritmo)
 
-
+-- ! final tick mudar de minhoca caso tenha de suicidar
 
 
 -- Escolhe a Minhoca com menos Vida -> Trabalha apenas com minhocas em posicoes validas
