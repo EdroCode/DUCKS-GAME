@@ -9,10 +9,10 @@ import Tarefa0_2025
 
 
 janelaLargura :: Float
-janelaLargura = 1920
+janelaLargura = 1080
 
 janelaAltura :: Float
-janelaAltura = 1080
+janelaAltura = 720
 
 
 
@@ -36,11 +36,11 @@ type EstadoGloss = (Estado, Assets)
 
 
 -- | Menu do jogo
-desenha :: Worms -> Picture
-desenha (Menu sel) = drawMenu sel
-desenha (Playing est _ _) = drawGame est
-desenha Quit = Translate (-50) 0 $ Scale 0.5 0.5 $ Text "Aperte ESC para confirmar saída."
-desenha Help = drawHelp
+desenha :: [Picture] -> Worms -> Picture
+desenha p (Menu sel) = drawMenu sel
+desenha p (Playing est _ _) = drawGame p est
+desenha p Quit = Translate (-50) 0 $ Scale 0.5 0.5 $ Text "Aperte ESC para confirmar saída."
+desenha p Help = drawHelp
 
 
 drawMenu :: Int -> Picture
@@ -61,11 +61,11 @@ drawHelp = Pictures
 	]
 
 cellSize :: Float
-cellSize = 48
+cellSize = 16
 
-drawGame :: Estado -> Picture
+drawGame :: [Picture] -> Estado -> Picture
 -- Mostra uma linha de status e, ao centro, o mundo (mapa + objetos + minhocas)
-drawGame est = Pictures [Translate (-640) 240 $ Scale 0.12 0.12 $ Color black $ Text infoMapa, Translate (-150) 0 world]
+drawGame p est = Pictures [Translate (-640) 240 $ Scale 0.12 0.12 $ Color black $ Text infoMapa, Translate (-150) 0 world]
 	where
 		mapa = mapaEstado est
 		infoMapa = "mapa: " ++ show (length mapa) ++ "x" ++ show (if null mapa then 0 else length (head mapa))
@@ -84,7 +84,7 @@ drawGame est = Pictures [Translate (-640) 240 $ Scale 0.12 0.12 $ Color black $ 
 
 		world =
 			Scale scaleFactor scaleFactor $
-				Pictures [drawMapa mapa, drawObjetos objs mapa, drawMinhocas ms mapa]
+				Pictures [drawMapa p mapa, drawObjetos objs mapa, drawMinhocas ms mapa]
 
 
 -- | Converte coordenadas do mapa (linha, coluna) para coordenadas em pixels
@@ -102,17 +102,17 @@ converteMapa mapa (r,c) = (x,y)
 		y = top - fromIntegral r * cellSize
 
 -- | Desenha todas as células do mapa (cada tile com uma cor simples)
-drawMapa :: Mapa -> Picture
-drawMapa mapa = Pictures $ concatMap drawRow (zip [0..] mapa)
+drawMapa :: [Picture] -> Mapa -> Picture
+drawMapa p mapa = Pictures $ concatMap drawRow (zip [0..] mapa)
 	where
 		drawRow (r, row) = map (drawTile r) (zip [0..] row)
 		drawTile r (c, t) = Translate x y $ Pictures [colorTile t, Color (greyN 0.6) $ rectangleWire cellSize cellSize]
 			where
 				(x,y) = converteMapa mapa (r,c)
 				colorTile Ar = Color (greyN 0.95) $ rectangleSolid cellSize cellSize
-				colorTile Agua = Color (makeColor 0 0.4 1 0.6) $ rectangleSolid cellSize cellSize
-				colorTile Terra = Color (makeColor 0.6 0.4 0.2 1) $ rectangleSolid cellSize cellSize
-				colorTile Pedra = Color (greyN 0.5) $ rectangleSolid cellSize cellSize
+				colorTile Agua = p !! 1 
+				colorTile Terra = p !! 0
+				colorTile Pedra = p !! 2
 
 -- | Desenha objetos no mapa (disparos, minas, dinamites, barris, ...)
 drawObjetos :: [Objeto] -> Mapa -> Picture
@@ -141,5 +141,5 @@ drawMinhocas ms mapa = Pictures $ map drawM (zip [0..] ms)
 		cor m = case vidaMinhoca m of
 			Morta -> makeColor 0 0 0 1
 			Viva v -> if v <= 25 then makeColor 1 0.3 0 1 else makeColor 0 0.8 0 1
-		label i m = "M" ++ show i ++ " " ++ case vidaMinhoca m of {Morta -> "MORTA"; Viva n -> show n}
+		label i m = "" ++ case vidaMinhoca m of {Morta -> ""; Viva n -> show n}
 
