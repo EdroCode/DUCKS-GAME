@@ -56,6 +56,7 @@ data Minhoca = Minhoca
     , minaMinhoca :: Int
     -- | Munições de @Dinamite@.
     , dinamiteMinhoca :: Int
+    
     }
     deriving (Eq,Ord,Show,Read)
 
@@ -121,3 +122,6 @@ axis8 = [Norte, Sul, Este, Oeste, Nordeste, Noroeste, Sudeste, Sudoeste]
 -- Representa movimentos apenas em linha recta, sem diagonais.
 axis4 :: [Direcao]
 axis4 = [Norte, Sul, Este, Oeste]
+
+defaultBotMove  :: (NumMinhoca, Jogada)
+defaultBotMove = (0, Move Sul)

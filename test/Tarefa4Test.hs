@@ -20,7 +20,7 @@ testes = [Estado { mapaEstado =
         []
     , minhocasEstado =
         [Minhoca {posicaoMinhoca = Just (2,1), vidaMinhoca = Viva 70, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 1}
-        ,Minhoca {posicaoMinhoca = Just (1,4), vidaMinhoca = Viva 50, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 1}
+        ,Minhoca {posicaoMinhoca = Just (1,4), vidaMinhoca = Viva 70, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 1}
         ]
     }, Estado
     { mapaEstado =
@@ -36,7 +36,7 @@ testes = [Estado { mapaEstado =
     , objetosEstado =
         []
     , minhocasEstado =
-        [Minhoca {posicaoMinhoca = Just (4,1), vidaMinhoca = Viva 30, jetpackMinhoca = 1, escavadoraMinhoca = 0, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 0}
+        [Minhoca {posicaoMinhoca = Just (4,1), vidaMinhoca = Viva 100, jetpackMinhoca = 1, escavadoraMinhoca = 0, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 0}
         ,Minhoca {posicaoMinhoca = Just (4,9), vidaMinhoca = Viva 100, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 1}
         ]
     }]

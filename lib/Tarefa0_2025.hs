@@ -139,3 +139,10 @@ verificaVida m = case vida of
                     Viva a -> a >= 0 && a <= 100
     where
         vida = vidaMinhoca m
+
+-- | Verifica se uma minhoca esta viva
+eMinhocaViva :: Minhoca -> Bool
+eMinhocaViva m = case vidaMinhoca m of 
+                    Morta -> False
+                    Viva 0 -> False
+                    Viva _ -> True
