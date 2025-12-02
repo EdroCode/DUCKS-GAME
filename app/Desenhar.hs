@@ -7,6 +7,14 @@ import Labs2025
 import Tarefa0_geral
 import Tarefa0_2025
 
+
+janelaLargura :: Float
+janelaLargura = 1920
+
+janelaAltura :: Float
+janelaAltura = 1080
+
+
 -- | Menu do jogo
 desenha :: Worms -> Picture
 desenha (Menu sel) = drawMenu sel
@@ -43,7 +51,20 @@ drawGame est = Pictures [Translate (-640) 240 $ Scale 0.12 0.12 $ Color black $ 
 		infoMapa = "mapa: " ++ show (length mapa) ++ "x" ++ show (if null mapa then 0 else length (head mapa))
 		objs = objetosEstado est
 		ms = minhocasEstado est
-		world = Pictures [drawMapa mapa, drawObjetos objs mapa, drawMinhocas ms mapa]
+		
+		linha = length mapa
+		cols = if null mapa then 0 else length (head mapa)
+		largura = fromIntegral cols * cellSize
+		altura  = fromIntegral linha * cellSize
+
+		sx = janelaLargura  / largura
+		sy = janelaAltura / altura
+		scaleFactor = 0.9 * min sx sy   -- 0.9 para deixar margem
+
+
+		world =
+			Scale scaleFactor scaleFactor $
+				Pictures [drawMapa mapa, drawObjetos objs mapa, drawMinhocas ms mapa]
 
 
 -- | Converte coordenadas do mapa (linha, coluna) para coordenadas em pixels

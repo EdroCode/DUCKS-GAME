@@ -8,6 +8,8 @@ import Worms
 import Tempo
 
 
+
+
 janela :: Display
 janela = InWindow "Worms" (1920, 1080) (0, 0)
 
