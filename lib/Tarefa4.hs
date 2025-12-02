@@ -14,7 +14,7 @@ import Tarefa2
 import Tarefa3
 import Tarefa0_2025 (ePosicaoEstadoLivre, existeMinhoca, existeBarril, verificaVida, encontraQuantidadeArmaMinhoca, ehDisparo, existeBarril)
 import Text.ParserCombinators.ReadP (look)
-import Data.Maybe (fromMaybe)
+import Data.Maybe (fromMaybe, fromJust)
 import Data.List
 
 -- | Função principal da Tarefa 4. Dado um estado retorna uma lista de jogadas, com exatamente 100 jogadas.
@@ -61,19 +61,19 @@ jogadaTatica ticks e =
           pos = case posicaoMinhoca minhoca of Just a -> a
           (onSight, posMira) = minhocaOnSight e pos
           jogadasRestantes   = 100 - ticks
-          
-          
-      in case (onSight, posMira) of
-           (True, Just alvo) -> if gotAmmo minhoca Bazuca then (i, Dispara Bazuca (getDir8 pos alvo)) else suicidioFase jogadasRestantes i minhoca
-           _ -> suicidioFase jogadasRestantes i minhoca -- todo suicidio
 
+
+      in case (onSight, posMira) of
+           (True, Just alvo) -> if gotAmmo minhoca Bazuca then (i, Dispara Bazuca (getDir8 pos alvo)) else suicidioFase jogadasRestantes e i minhoca
+           _ -> suicidioFase jogadasRestantes e i minhoca 
+           
 -- nome temporario representa o processo de suicidio
-suicidioFase :: Ticks -> Int -> Minhoca -> (NumMinhoca, Jogada)
-suicidioFase ticksRestantes i minhoca = 
-                if ticksRestantes < 10  -- todo depois mudar o 5
+suicidioFase :: Ticks -> Estado -> Int -> Minhoca -> (NumMinhoca, Jogada)
+suicidioFase ticksRestantes e i minhoca =
+                if ticksRestantes < tickingBomb e 
                   then if gotAmmo minhoca Mina
                     then (i, Dispara Mina Norte)
-                    else if gotAmmo minhoca Dinamite 
+                    else if gotAmmo minhoca Dinamite
                           then (i, Dispara Dinamite Norte)
                           else if gotAmmo minhoca Bazuca
                             then (i, Dispara Bazuca Sul)
@@ -166,7 +166,7 @@ minhocaOnSight e pos =
         comparaDist :: Posicao -> Posicao -> Posicao -> Posicao
         comparaDist p melhor atual =
             if distAtoB p atual < distAtoB p melhor then atual else melhor
-        
+
         -- retorna uma lista dos barris presentes no mapa
         getBarris :: [Objeto] -> [Objeto]
         getBarris [] = []
@@ -235,23 +235,6 @@ distAtoB (x,y) (a,b) = sqrt ((dx * dx) + (dy * dy))
     dy = fromIntegral (y - b)
 
 
--- Ordem prioridade para o suicidio
--- Dinamite
--- Bazuca
-
-canSuicide :: Minhoca -> (Maybe TipoArma,Bool)
-canSuicide m
-  | dinamiteMinhoca m > 0 = (Just Dinamite, True)
-  | bazucaMinhoca m > 0 = (Just Bazuca,True)
-  | otherwise = (Nothing, False)
-
-
-commitSuicide :: Maybe TipoArma -> Jogada
-commitSuicide tipo = case tipo of 
-    Just Dinamite -> Dispara Dinamite Norte
-    Just Bazuca -> Dispara Bazuca Sul
-
-
 
 
 moveCheck :: Posicao -> Direcao -> Estado -> Direcao
@@ -288,6 +271,77 @@ getArea d (x, y) = geraLinha (x - d)
       | j > y + d = []
       | (i, j) == (x, y) = geraColuna i (j + 1)
       | otherwise = (i, j) : geraColuna i (j + 1)
+
+
+
+
+-- FUncao que devolve o tempo necessario para que todas as minhocas se suicidem no estado
+-- Este tempo é calculado de algumas formas
+-- Tempo para dinamite explodir - se houver dinamite  (colocar -1 tick, explodir - 4)
+-- Tempo para bazuca explodir - se tiver balas (colocar 1- tick, explodir - 1)
+-- Tempo para colocar mina - se tiver mina
+-- Tempo para registrar explosao - 1 tick
+
+
+tickingBomb :: Estado -> Ticks
+tickingBomb e = let
+
+  minhocas = minhocasEstado e
+  (numTerr, terroristas) = getTerroristas minhocas
+  armas = getArmasSuicidio terroristas
+
+  tempoArmas = getGunTimeCount (nub armas)
+
+
+
+  getTerroristas :: [Minhoca] -> (Int, [Minhoca])
+  getTerroristas [] = (0, [])
+  getTerroristas (h:t) =
+      let (cont, lista) = getTerroristas t
+          (_, podeSuicidar) = canSuicide h
+      in if podeSuicidar
+        then (cont + 1, h : lista)
+        else (cont, lista)
+
+  -- Devolve as armas usadas para suicidio
+  getArmasSuicidio :: [Minhoca] -> [TipoArma]
+  getArmasSuicidio [] = []
+  getArmasSuicidio (h:t) = let (arma, _) = canSuicide h
+                          in fromJust arma : getArmasSuicidio t
+
+  -- Devolve o tempo das armas para explodirem
+  getGunTimeCount :: [TipoArma] -> Int
+  getGunTimeCount [] = 0
+  getGunTimeCount (h:t) = case h of
+    Bazuca -> 1 + getGunTimeCount t 
+    Dinamite ->  5 + getGunTimeCount t
+
+  
+
+  in tempoArmas + numTerr 
+
+-- Ordem prioridade para o suicidio
+-- Dinamite
+-- Bazuca
+
+canSuicide :: Minhoca -> (Maybe TipoArma,Bool)
+canSuicide m
+  | dinamiteMinhoca m > 0 = (Just Dinamite, True)
+  | bazucaMinhoca m > 0 = (Just Bazuca,True)
+  | otherwise = (Nothing, False)
+
+
+commitSuicide :: Maybe TipoArma -> Jogada
+commitSuicide tipo = case tipo of
+    Just Dinamite -> Dispara Dinamite Norte
+    Just Bazuca -> Dispara Bazuca Sul
+
+
+
+
+
+
+
 
 
 
@@ -342,8 +396,8 @@ ola = Estado
     , objetosEstado =
         []
     , minhocasEstado =
-        [Minhoca {posicaoMinhoca = Just (2,1), vidaMinhoca = Viva 70, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 0}
-        ,Minhoca {posicaoMinhoca = Just (1,4), vidaMinhoca = Viva 50, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 0}
+        [Minhoca {posicaoMinhoca = Just (2,1), vidaMinhoca = Viva 70, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 1}
+        ,Minhoca {posicaoMinhoca = Just (1,4), vidaMinhoca = Viva 50, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 1}
         ]
     }
 
