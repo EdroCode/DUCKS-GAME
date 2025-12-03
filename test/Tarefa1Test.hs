@@ -145,7 +145,7 @@ estado10 = Estado
         ]
     , objetosEstado =
         [Disparo {posicaoDisparo = (2,6), direcaoDisparo = Norte, tipoDisparo = Mina, tempoDisparo = Nothing, donoDisparo = 0}
-        ]
+        ,Disparo {posicaoDisparo = (2,5), direcaoDisparo = Oeste, tipoDisparo = Bazuca, tempoDisparo = Nothing, donoDisparo = 0}]
     , minhocasEstado =
         [Minhoca {posicaoMinhoca = Just (1,3), vidaMinhoca = Viva 100, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 1}
         ,Minhoca {posicaoMinhoca = Just (2,3), vidaMinhoca = Viva 100, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 1}

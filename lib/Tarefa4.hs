@@ -68,7 +68,7 @@ jogadaTatica ticks e =
 
           then -- * Jogadas Normais
             let
-              i = jogadasRestantes `mod` length minhocasValidas
+              i = ticks `mod` length minhocasValidas
               minhoca = minhocasValidas !! i
 
               pos = case posicaoMinhoca minhoca of Just a -> a
@@ -92,14 +92,24 @@ jogadaTatica ticks e =
 
               posBloco = getPosicoesSquare mapa pos
 
-              bloco = getPosTer mapa Agua posBloco
+              blocoAgua = getPosTer mapa Agua posBloco
+              blocoTerra = getPosTer mapa Terra posBloco
 
+              (_, blocoMina) = temMinaPos pos mapa (objetosEstado e)
 
             in
-              case bloco of
+              case blocoAgua of
                 Just a -> suicidioFase (Just (getDir8 pos a)) e suicideIndex suicider
 
-                Nothing -> suicidioFase Nothing e suicideIndex suicider
+                Nothing -> case blocoTerra of
+                  Just b -> if lastBlockValid mapa b then suicidioFase Nothing e suicideIndex suicider else (suicideIndex,Dispara Escavadora (getDir8 pos b))
+                  Nothing -> case blocoMina of
+                    Just posM -> (suicideIndex, Move (getDir8 pos posM))
+                    Nothing -> suicidioFase Nothing e suicideIndex suicider
+                    
+                    
+                    
+                    
 
   where
         jogadasRestantes = 100 - ticks
@@ -114,19 +124,32 @@ suicidioFase dir _ i minhoca
   | dir /= Nothing = (i, Move (fromJust dir))
   | otherwise = defaultBotMove
 
+
+-- todo fazer sistema que caso norte esteja ocupado usar outra direcao
+
 digFase :: Estado -> Int -> Minhoca -> (NumMinhoca, Jogada)
 digFase e i minhoca = let -- todo nao se suicida mas move se
                       mapa = mapaEstado e
                       pos = case posicaoMinhoca minhoca of Just a -> a
                       posBloco = getPosicoesSquare mapa pos
-                      bloco = getPosTer mapa Terra posBloco
+                      blocoTerra = getPosTer mapa Terra posBloco
+                      posInferior = movePosicao Sul pos
 
-                    in
-                      case bloco of
-                        Just a -> if lastBlockValid mapa a then (i, Dispara Escavadora (getDir8 pos a)) else defaultBotMove
+                      blocoAr = getPosTerLivre e Ar pos posBloco
 
-                        Nothing -> defaultBotMove
 
+                      in
+                        case blocoTerra of
+                          Just a -> if lastBlockValid mapa a then (i, Dispara Escavadora (getDir8 pos a)) else defaultBotMove
+
+                          Nothing -> case getMinhocasValidas (minhocasEstado e) of 
+                            [] -> defaultBotMove
+                            minhocasValidas ->  
+                              if existeMinhoca posInferior minhocasValidas
+                                then case blocoAr of
+                                  Just a -> (i, Move (getDir8 pos a))
+                                  Nothing -> defaultBotMove
+                                else defaultBotMove
 
 
 
@@ -148,21 +171,6 @@ digFase e i minhoca = let -- todo nao se suicida mas move se
 -- ! final tick mudar de minhoca caso tenha de suicidar
 
 
-abss = Estado { mapaEstado =
-        [[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
-        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
-        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
-        ,[Terra,Terra,Terra,Ar,Pedra,Agua,Agua,Agua,Agua,Agua]
-        ,[Terra,Terra,Terra,Terra,Pedra,Pedra,Agua,Agua,Agua,Agua]
-        ,[Terra,Terra,Terra,Terra,Terra,Pedra,Pedra,Pedra,Agua,Agua]
-        ]
-    , objetosEstado =
-        []
-    , minhocasEstado =
-        [Minhoca {posicaoMinhoca = Just (2,1), vidaMinhoca = Viva 70, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 1}
-        ,Minhoca {posicaoMinhoca = Just (1,4), vidaMinhoca = Viva 50, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 1}
-        ]
-    }
 
 -- * ALGORITMOS DE ESCOLHA DE MINHOCAS
 
@@ -270,6 +278,36 @@ getPosTer mapa tipo (h:t) = case encontraPosicaoMatriz h mapa of
   Just a -> if tipo == a then Just h else getPosTer mapa tipo t
   Nothing -> Nothing
 
+temMinaPos :: Posicao -> Mapa -> [Objeto] -> (Bool, Maybe Posicao)
+temMinaPos pos mapa objs = case minas of 
+  [] -> (False, Nothing)
+  a -> checkMina (head a) posMina
+
+  where
+    minas = filter ehMina objs
+    posMina = getPosicoesSquare mapa pos
+
+    
+
+    ehMina :: Objeto -> Bool
+    ehMina d@(Disparo _ _ arma _ _) = ehDisparo d && (case arma of
+        Mina ->  True
+        _ -> False)
+
+    checkMina :: Objeto -> [Posicao] -> (Bool, Maybe Posicao)
+    checkMina _ [] = (False, Nothing)
+    checkMina d@(Disparo posM _ _ _ _) (h:t) = if posM == h then (True, Just posM) else checkMina d t
+
+getPosTerLivre :: Estado -> Terreno -> Posicao -> [Posicao] -> Maybe Posicao
+getPosTerLivre _ _ _ [] = Nothing
+getPosTerLivre e tipo p ((y,x):t) = case encontraPosicaoMatriz (y,x) mapa of
+    Just a -> if tipo == a && (y,x) /= (movePosicao Norte p) && ePosicaoEstadoLivre (y,x) e then Just (y,x) else getPosTerLivre e tipo p t
+    Nothing -> Nothing
+  where
+    mapa = mapaEstado e  
+
+objs = [Disparo {posicaoDisparo = (0,1), direcaoDisparo = Norte, tipoDisparo = Dinamite, tempoDisparo = Nothing, donoDisparo = 0}, Disparo {posicaoDisparo = (2,5), direcaoDisparo = Oeste, tipoDisparo = Bazuca, tempoDisparo = Nothing, donoDisparo = 0}]
+
 -- * PROCESSAMENTO DE SUICIDIO
 
 -- FUncao que devolve o tempo necessario para que todas as minhocas se suicidem no estado
@@ -289,7 +327,7 @@ tickingBomb e = let
 
   tempoArmas = getGunTimeCount (nub armas)
 
-  threshold = 5 -- Valor default para segurança
+  threshold = 5 + length minhocas -- Valor default para segurança
 
   getTerroristas :: [Minhoca] -> (Int, [Minhoca])
   getTerroristas [] = (0, [])

@@ -69,6 +69,46 @@ testes = [Estado { mapaEstado =
         [Minhoca {posicaoMinhoca = Nothing, vidaMinhoca = Viva 70, jetpackMinhoca = 1, escavadoraMinhoca = 100, bazucaMinhoca = 0, minaMinhoca = 1, dinamiteMinhoca = 0}
         ,Minhoca {posicaoMinhoca = Nothing, vidaMinhoca = Viva 70, jetpackMinhoca = 1, escavadoraMinhoca = 100, bazucaMinhoca = 0, minaMinhoca = 1, dinamiteMinhoca = 0}
         ]
+    },
+    Estado
+    { mapaEstado =
+        [[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Terra,Ar,Terra,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Terra,Terra,Terra,Terra,Pedra,Agua,Agua,Agua,Agua,Agua]
+        ,[Terra,Terra,Terra,Terra,Pedra,Pedra,Agua,Agua,Agua,Agua]
+        ,[Terra,Terra,Terra,Terra,Terra,Pedra,Pedra,Pedra,Agua,Agua]
+        ]
+    , objetosEstado =
+        [Disparo {posicaoDisparo = (2,3), direcaoDisparo = Norte, tipoDisparo = Mina, tempoDisparo = Nothing, donoDisparo = 1}
+        ]
+    , minhocasEstado =
+        [Minhoca {posicaoMinhoca = Just (1,2), vidaMinhoca = Viva 70, jetpackMinhoca = 1, escavadoraMinhoca = 10, bazucaMinhoca = 0, minaMinhoca = 1, dinamiteMinhoca = 0}
+        ,Minhoca {posicaoMinhoca = Just (2,4), vidaMinhoca = Viva 70, jetpackMinhoca = 1, escavadoraMinhoca = 13, bazucaMinhoca = 0, minaMinhoca = 1, dinamiteMinhoca = 0}
+        ]
+    },
+    Estado
+    { mapaEstado =
+        [[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Terra,Terra,Ar,Ar,Ar,Terra,Terra,Terra,Terra]
+        ,[Ar,Ar,Ar,Ar,Pedra,Agua,Agua,Agua,Agua,Agua,Pedra,Terra,Terra,Terra,Ar,Ar,Terra,Terra,Terra,Terra]
+        ,[Ar,Ar,Terra,Ar,Pedra,Pedra,Agua,Agua,Agua,Agua,Pedra,Terra,Terra,Terra,Ar,Ar,Terra,Terra,Terra,Terra]
+        ,[Terra,Terra,Terra,Terra,Terra,Pedra,Pedra,Pedra,Agua,Agua,Pedra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra]
+        ,[Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra]
+        ,[Terra,Terra,Terra,Terra,Terra,Terra,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Terra]
+        ,[Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Terra,Terra]
+        ,[Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra]
+        ]
+    , objetosEstado =
+        [Barril {posicaoBarril = (1,16), explodeBarril = False}
+        ]
+    , minhocasEstado =
+        [Minhoca {posicaoMinhoca = Just (4,3), vidaMinhoca = Viva 70, jetpackMinhoca = 1, escavadoraMinhoca = 6, bazucaMinhoca = 0, minaMinhoca = 1, dinamiteMinhoca = 0}
+        ,Minhoca {posicaoMinhoca = Just (4,0), vidaMinhoca = Viva 60, jetpackMinhoca = 1, escavadoraMinhoca = 9, bazucaMinhoca = 0, minaMinhoca = 1, dinamiteMinhoca = 0}
+        ,Minhoca {posicaoMinhoca = Just (7,6), vidaMinhoca = Viva 100, jetpackMinhoca = 1, escavadoraMinhoca = 6, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 2}
+        ,Minhoca {posicaoMinhoca = Just (1,11), vidaMinhoca = Viva 100, jetpackMinhoca = 1, escavadoraMinhoca = 6, bazucaMinhoca = 4, minaMinhoca = 1, dinamiteMinhoca = 3}
+        ]
     }]
 
 
