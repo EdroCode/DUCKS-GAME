@@ -84,7 +84,7 @@ drawGame p est = Pictures [Translate (-640) 240 $ Scale 0.12 0.12 $ Color black 
 
 		world =
 			Scale scaleFactor scaleFactor $
-				Pictures [drawMapa p mapa, drawObjetos objs mapa, drawMinhocas ms mapa]
+				Pictures [drawMapa p mapa, drawObjetos p objs mapa, drawMinhocas p ms mapa]
 
 
 -- | Converte coordenadas do mapa (linha, coluna) para coordenadas em pixels
@@ -115,31 +115,43 @@ drawMapa p mapa = Pictures $ concatMap drawRow (zip [0..] mapa)
 				colorTile Pedra = p !! 2
 
 -- | Desenha objetos no mapa (disparos, minas, dinamites, barris, ...)
-drawObjetos :: [Objeto] -> Mapa -> Picture
-drawObjetos objs mapa = Pictures $ map drawO objs
+drawObjetos :: [Picture] -> [Objeto] -> Mapa -> Picture
+drawObjetos p objs mapa = Pictures $ map drawO objs
 	where
 		drawO o@(Disparo {}) = Translate x y $ case tipoDisparo o of
-			Bazuca -> Pictures [Color red $ circleSolid (cellSize * 0.25), Color black $ Scale 0.15 0.15 $ Text (show (donoDisparo o))]
+			Bazuca -> bazucaDir p (direcaoDisparo o)
 			Mina -> Color (makeColor 0.9 0.7 0 1) $ circleSolid (cellSize * 0.18)
 			Dinamite -> Color (makeColor 0.9 0.2 0.2 1) $ rectangleSolid (cellSize * 0.3) (cellSize * 0.3)
 			_ -> Color black $ circleSolid (cellSize * 0.12)
 			where (x,y) = converteMapa mapa (posicaoObjeto o)
 
-		drawO b@(Barril {}) = Translate x y $ Pictures [Color (makeColor 0.3 0.15 0 1) $ rectangleSolid (cellSize*0.4) (cellSize*0.4), Color black $ rectangleWire (cellSize*0.4) (cellSize*0.4)]
+		drawO b@(Barril {}) = Translate x y $ p !! 5
 			where (x,y) = converteMapa mapa (posicaoObjeto b)
+
+-- | altera a direção da imagem da bazuca conforme a direção do disparo(p !! 6)
+
+bazucaDir :: [Picture] -> Direcao -> Picture
+bazucaDir p dir = case dir of
+		Este -> p !! 6
+		Oeste -> Rotate 180 (p !! 6)
+		Norte -> Rotate 90 (p !! 6)
+		Sul -> Rotate 270 (p !! 6)
+		Sudeste -> Rotate 45 (p !! 6)
+		Sudoeste -> Rotate 135 (p !! 6)
+		Nordeste -> Rotate 315 (p !! 6)
+		Noroeste -> Rotate 225 (p !! 6)
 
 -- | Desenha as minhocas. Cada minhoca aparece com um círculo colorido
 -- e um rótulo que indica o índice e a vida restante.
-drawMinhocas :: [Minhoca] -> Mapa -> Picture
-drawMinhocas ms mapa = Pictures $ map drawM (zip [0..] ms)
+drawMinhocas :: [Picture] -> [Minhoca] -> Mapa -> Picture
+drawMinhocas p ms mapa = Pictures $ map drawM (zip [0..] ms)
 	where
 		drawM (i,m) = case posicaoMinhoca m of
 			Nothing -> Blank
-			Just p -> Translate x y $ Pictures [Color (cor m) $ circleSolid (cellSize * 0.28), Color black $ Scale 0.12 0.12 $ Text (label i m)]
+			Just s -> Translate x y $ if vidaMinhoca m == Morta
+				then p !! 4
+				else p !! 3
 				where
-					(x,y) = converteMapa mapa p
-		cor m = case vidaMinhoca m of
-			Morta -> makeColor 0 0 0 1
-			Viva v -> if v <= 25 then makeColor 1 0.3 0 1 else makeColor 0 0.8 0 1
-		label i m = "" ++ case vidaMinhoca m of {Morta -> ""; Viva n -> show n}
+					(x,y) = converteMapa mapa s
+
 

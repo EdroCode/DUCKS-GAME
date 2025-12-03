@@ -13,7 +13,7 @@ type Segundos = Float
 -- | Intervalo entre passos automático.
 
 intervalo :: Segundos
-intervalo = 1
+intervalo = 0.2
 
 -- | Função que avança o tempo no estado do jogo no Gloss.
 reageTempo :: Segundos -> Worms -> Worms

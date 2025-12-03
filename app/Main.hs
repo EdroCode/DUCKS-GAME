@@ -28,8 +28,11 @@ main = do
   grass <- loadBMP "app/sprites/Grass_1_16x16.bmp"
   water <- loadBMP "app/sprites/Water_1_16x16.bmp"
   stone <- loadBMP "app/sprites/Stone_1_16x16.bmp"
-  minhoca <- loadBMP "app/sprites/Stone_3_16x16.bmp"
-  let tiles = [grass, water, stone, minhoca]
+  worm <- loadBMP "app/sprites/Worm.bmp"
+  morto <- loadBMP "app/sprites/Dead.bmp"
+  barril <- loadBMP "app/sprites/Barril.bmp"
+  bazuca <- loadBMP "app/sprites/Bazuca.bmp"
+  let tiles = [grass, water, stone, worm, morto, barril, bazuca]
 
   play janela fundo fr it (desenha tiles) reageEventos reageTempo
   where
