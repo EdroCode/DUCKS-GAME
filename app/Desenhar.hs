@@ -9,10 +9,10 @@ import Tarefa0_2025
 
 
 janelaLargura :: Float
-janelaLargura = 1080
+janelaLargura = 1000
 
 janelaAltura :: Float
-janelaAltura = 720
+janelaAltura = 1000
 
 
 
@@ -61,7 +61,7 @@ drawHelp = Pictures
 	]
 
 cellSize :: Float
-cellSize = 16
+cellSize = 32
 
 drawGame :: [Picture] -> Estado -> Picture
 -- Mostra uma linha de status e, ao centro, o mundo (mapa + objetos + minhocas)
@@ -79,7 +79,7 @@ drawGame p est = Pictures [Translate (-640) 240 $ Scale 0.12 0.12 $ Color black 
 
 		sx = janelaLargura  / largura
 		sy = janelaAltura / altura
-		scaleFactor = 0.9 * min sx sy   -- 0.9 para deixar margem
+		scaleFactor = 2 * min sx sy   -- 0.9 para deixar margem
 
 
 		world =

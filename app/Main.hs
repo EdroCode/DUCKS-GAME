@@ -7,6 +7,7 @@ import Eventos
 import Worms
 import Tempo
 
+import Graphics.Gloss.Juicy
 
 
 
@@ -25,10 +26,10 @@ main :: IO ()
 main = do
   putStrLn "Iniciando Worms - demo"
 
-  grass  <- loadBMP "app/sprites/Grass_1_16x16.bmp"
-  water  <- loadBMP "app/sprites/Water_1_16x16.bmp"
-  stone  <- loadBMP "app/sprites/Stone_1_16x16.bmp"
-  sky    <- loadBMP "app/sprites/Ice_18_16x16.bmp"
+  Just grass  <- loadJuicy "app/sprites/grass1.png"
+  Just water  <- loadJuicy "app/sprites/water.png"
+  Just stone  <- loadJuicy "app/sprites/stone1.png"
+  Just sky    <- loadJuicy "app/sprites/sky.png"
   worm   <- loadBMP "app/sprites/Worm.bmp"
   morto  <- loadBMP "app/sprites/Dead.bmp"
   barril <- loadBMP "app/sprites/Barril.bmp"

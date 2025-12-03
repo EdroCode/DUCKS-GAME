@@ -56,64 +56,108 @@ avancaObjetoJogada e objetos (i,objeto') = if elem objeto' objetos
 
 -- todo sem o sistema de mina ativo
 -- | Para um número de ticks desde o início da tática, dado um estado, determina a próxima jogada.
+-- | Para um número de ticks desde o início da tática, dado um estado, determina a próxima jogada.
+-- | Para um número de ticks desde o início da tática, dado um estado, determina a próxima jogada.
+-- | Para um número de ticks desde o início da tática, dado um estado, determina a próxima jogada.
+-- | Para um número de ticks desde o início da tática, dado um estado, determina a próxima jogada.
+-- | Para um número de ticks desde o início da tática, dado um estado, determina a próxima jogada.
 jogadaTatica :: Ticks -> Estado -> (NumMinhoca, Jogada)
 jogadaTatica ticks e =
   case minhocasEstado e of
     [] -> defaultBotMove
-    minhocas -> case getMinhocasValidas minhocas of
-      [] -> defaultBotMove
-      minhocasValidas ->
-
-        if jogadasRestantes > tickingBomb e
-
+    minhocas -> 
+      case getMinhocasValidasComIndices minhocas of
+        [] -> defaultBotMove
+        minhocasValidasIdx ->
+          if jogadasRestantes > tickingBomb e
           then -- * Jogadas Normais
             let
-              i = ticks `mod` length minhocasValidas
-              minhoca = minhocasValidas !! i
-
+              i = ticks `mod` length minhocasValidasIdx
+              (idxOriginal, minhoca) = minhocasValidasIdx !! i
               pos = case posicaoMinhoca minhoca of Just a -> a
-
-
               (onSight, posMira) = minhocaOnSight e pos
-
             in case (onSight, posMira) of
-              (True, Just alvo) -> if gotAmmo minhoca Bazuca then (i, Dispara Bazuca (getDir8 pos alvo)) else digFase e i minhoca
-              _ -> digFase e i minhoca
-
-
+              (True, Just alvo) -> if gotAmmo minhoca Bazuca 
+                                   then (idxOriginal, Dispara Bazuca (getDir8 pos alvo)) 
+                                   else digFase e idxOriginal minhoca
+              _ -> digFase e idxOriginal minhoca
           else -- * Trigger Suicidio
             let
-              suicideGroup = minhocasEstado e
-              suicideIndex = (jogadasRestantes `mod` length minhocasValidas)
-
-              suicider = minhocasValidas !! suicideIndex
-              pos = case posicaoMinhoca suicider of Just a -> a
-              -- todo sort por vida
-
-              posBloco = getPosicoesSquare mapa pos
-
-              blocoAgua = getPosTer mapa Agua posBloco
-              blocoTerra = getPosTer mapa Terra posBloco
-
-              (_, blocoMina) = temMinaPos pos mapa (objetosEstado e)
-
-            in
-              case blocoAgua of
-                Just a -> suicidioFase (Just (getDir8 pos a)) e suicideIndex suicider
-
-                Nothing -> case blocoTerra of
-                  Just b -> if lastBlockValid mapa b then suicidioFase Nothing e suicideIndex suicider else (suicideIndex,Dispara Escavadora (getDir8 pos b))
-                  Nothing -> case blocoMina of
-                    Just posM -> (suicideIndex, Move (getDir8 pos posM))
-                    Nothing -> suicidioFase Nothing e suicideIndex suicider
-                    
-                    
-                    
-                    
-
+              i = ticks `mod` length minhocasValidasIdx
+              (idxOriginal, minhoca) = minhocasValidasIdx !! i
+              -- Força suicídio com qualquer arma disponível
+              jogadaSuicidio = forcaSuicidio idxOriginal minhoca e
+            in jogadaSuicidio
   where
-        jogadasRestantes = 100 - ticks
-        mapa = mapaEstado e
+    jogadasRestantes = 100 - ticks
+    mapa = mapaEstado e
+
+-- NOVA: Retorna minhocas válidas COM seus índices originais
+getMinhocasValidasComIndices :: [Minhoca] -> [(Int, Minhoca)]
+getMinhocasValidasComIndices minhocas =
+  let validasMinhocas = getMinhocasValidas minhocas
+  in [(i, m) | (i, m) <- zip [0..] minhocas, m `elem` validasMinhocas]
+
+-- Nova função auxiliar para encontrar uma minhoca que pode executar suicídio
+encontraMinhocaSuicida :: Ticks -> [(Int, Minhoca)] -> Estado -> Maybe (NumMinhoca, Jogada)
+encontraMinhocaSuicida ticks minhocasValidasIdx e = 
+  let
+    mapa = mapaEstado e
+    numMinhocas = length minhocasValidasIdx
+    -- Tentar cada minhoca começando do índice atual
+    indices = take numMinhocas [(ticks `mod` numMinhocas + offset) `mod` numMinhocas | offset <- [0..]]
+  in
+    tentaMinhocas indices minhocasValidasIdx mapa
+  where
+    tentaMinhocas [] _ _ = Nothing
+    tentaMinhocas (idx:rest) minhocasIdx mapa =
+      let
+        (idxOriginal, minhoca) = minhocasIdx !! idx
+        pos = case posicaoMinhoca minhoca of Just a -> a
+        posBloco = getPosicoesSquare mapa pos
+        blocoAgua = getPosTer mapa Agua posBloco
+        blocoTerra = getPosTer mapa Terra posBloco
+        (_, blocoMina) = temMinaPos pos mapa (objetosEstado e)
+        
+        jogadaSuicidio = case blocoAgua of
+          Just a -> suicidioFase (Just (getDir8 pos a)) e idxOriginal minhoca
+          Nothing -> case blocoTerra of
+            Just b -> if lastBlockValid mapa b 
+                      then suicidioFase Nothing e idxOriginal minhoca 
+                      else (idxOriginal, Dispara Escavadora (getDir8 pos b))
+            Nothing -> case blocoMina of
+              Just posM -> (idxOriginal, Move (getDir8 pos posM))
+              Nothing -> suicidioFase Nothing e idxOriginal minhoca
+      in
+        -- Verificar se a jogada é válida (não é defaultBotMove)
+        if snd jogadaSuicidio /= snd defaultBotMove
+        then Just jogadaSuicidio
+        else tentaMinhocas rest minhocasIdx mapa
+
+-- NOVA: Força o suicídio com qualquer arma disponível (prioridade: Mina > Dinamite > Bazuca)
+-- Se não tiver armas, tenta mover-se para água ou cavar para morrer
+forcaSuicidio :: Int -> Minhoca -> Estado -> (NumMinhoca, Jogada)
+forcaSuicidio i minhoca e
+  | gotAmmo minhoca Mina = (i, Dispara Mina Norte)
+  | gotAmmo minhoca Dinamite = (i, Dispara Dinamite Norte)
+  | gotAmmo minhoca Bazuca = (i, Dispara Bazuca Sul)
+  | otherwise = suicidioSemArmas i minhoca e  -- Sem armas: tenta outras formas
+
+-- Quando não há armas, tenta suicídio alternativo
+suicidioSemArmas :: Int -> Minhoca -> Estado -> (NumMinhoca, Jogada)
+suicidioSemArmas i minhoca e =
+  let
+    mapa = mapaEstado e
+    pos = case posicaoMinhoca minhoca of Just a -> a
+    posBloco = getPosicoesSquare mapa pos
+    blocoAgua = getPosTer mapa Agua posBloco
+    blocoTerra = getPosTer mapa Terra posBloco
+  in
+    case blocoAgua of
+      Just a -> (i, Move (getDir8 pos a))  -- Move para água
+      Nothing -> case blocoTerra of
+        Just b -> (i, Dispara Escavadora (getDir8 pos b))  -- Cava até cair
+        Nothing -> (i, Move Sul)  -- Última tentativa: move para baixo
 
 -- nome temporario representa o processo de suicidio
 suicidioFase :: Maybe Direcao -> Estado -> Int -> Minhoca -> (NumMinhoca, Jogada)
@@ -124,33 +168,29 @@ suicidioFase dir _ i minhoca
   | dir /= Nothing = (i, Move (fromJust dir))
   | otherwise = defaultBotMove
 
-
--- todo fazer sistema que caso norte esteja ocupado usar outra direcao
-
 digFase :: Estado -> Int -> Minhoca -> (NumMinhoca, Jogada)
-digFase e i minhoca = let -- todo nao se suicida mas move se
-                      mapa = mapaEstado e
-                      pos = case posicaoMinhoca minhoca of Just a -> a
-                      posBloco = getPosicoesSquare mapa pos
-                      blocoTerra = getPosTer mapa Terra posBloco
-                      posInferior = movePosicao Sul pos
-
-                      blocoAr = getPosTerLivre e Ar pos posBloco
-
-
-                      in
-                        case blocoTerra of
-                          Just a -> if lastBlockValid mapa a then (i, Dispara Escavadora (getDir8 pos a)) else defaultBotMove
-
-                          Nothing -> case getMinhocasValidas (minhocasEstado e) of 
-                            [] -> defaultBotMove
-                            minhocasValidas ->  
-                              if existeMinhoca posInferior minhocasValidas
-                                then case blocoAr of
-                                  Just a -> (i, Move (getDir8 pos a))
-                                  Nothing -> defaultBotMove
-                                else defaultBotMove
-
+digFase e i minhoca = 
+  let
+    mapa = mapaEstado e
+    pos = case posicaoMinhoca minhoca of Just a -> a
+    posBloco = getPosicoesSquare mapa pos
+    blocoTerra = getPosTer mapa Terra posBloco
+    posInferior = movePosicao Sul pos
+    blocoAr = getPosTerLivre e Ar pos posBloco
+  in
+    case blocoTerra of
+      Just a -> if lastBlockValid mapa a 
+                then (i, Dispara Escavadora (getDir8 pos a)) 
+                else defaultBotMove
+      Nothing -> case getMinhocasValidasComIndices (minhocasEstado e) of 
+        [] -> defaultBotMove
+        minhocasValidasIdx ->  
+          let minhocasValidas = map snd minhocasValidasIdx
+          in if existeMinhoca posInferior minhocasValidas
+             then case blocoAr of
+               Just a -> (i, Move (getDir8 pos a))
+               Nothing -> defaultBotMove
+             else defaultBotMove
 
 
 -- Para criar este Bot decidi uma ordem de prioridade para qualquer minhoca que seja controlada
@@ -206,7 +246,7 @@ minhocaOnSight e pos =
         barrisInSight = filter (`existeBarril` barris) posicoesLV
 
 
-        maisPerto = escolheMaisPerto pos minhocasInSight
+        maisPerto = escolheMaisPerto pos (minhocasInSight ++ barrisInSight)
 
         -- devolve a posição da minhoca mais proxima
         escolheMaisPerto :: Posicao -> [Posicao] -> Maybe Posicao
@@ -223,7 +263,30 @@ minhocaOnSight e pos =
         getBarris [] = []
         getBarris (h:t) = if ehDisparo h then getBarris t else h : getBarris t
 
-    in (not (null minhocasInSight), maisPerto)
+
+    in (not (null minhocasInSight && null barrisInSight), maisPerto)
+
+
+
+assina = Estado
+    { mapaEstado =
+        [[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
+        ,[Terra,Terra,Terra,Terra,Pedra,Agua,Agua,Agua,Agua,Agua]
+        ,[Terra,Terra,Terra,Terra,Pedra,Pedra,Agua,Agua,Agua,Agua]
+        ,[Terra,Terra,Terra,Terra,Terra,Pedra,Pedra,Pedra,Agua,Agua]
+        ]
+    , objetosEstado =
+        []
+    , minhocasEstado =
+        [Minhoca {posicaoMinhoca = Just (2,4), vidaMinhoca = Viva 100, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 1}
+        ,Minhoca {posicaoMinhoca = Just (2,5), vidaMinhoca = Viva 100, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 1}
+        ]
+    }
+
+
+
 
 
 -- | Verifica se a posição inferior ao bloco na posição está fora da Matriz, ou seja se é valido ou nao
@@ -271,6 +334,8 @@ getPosicoesSquare mapa pos = sort (concatMap (posicoesDirecao mapa pos) direcoes
                 else [(y, x)]
 
 
+
+
 -- Verifica se existe terreno x numa posicao x e devolve a primeira ocorrencia deste elemento
 getPosTer :: Mapa -> Terreno -> [Posicao] -> Maybe Posicao
 getPosTer _ _ [] = Nothing
@@ -293,6 +358,7 @@ temMinaPos pos mapa objs = case minas of
     ehMina d@(Disparo _ _ arma _ _) = ehDisparo d && (case arma of
         Mina ->  True
         _ -> False)
+    ehMina d@(Barril _ _) = False
 
     checkMina :: Objeto -> [Posicao] -> (Bool, Maybe Posicao)
     checkMina _ [] = (False, Nothing)
@@ -327,7 +393,7 @@ tickingBomb e = let
 
   tempoArmas = getGunTimeCount (nub armas)
 
-  threshold = 5 + length minhocas -- Valor default para segurança
+  threshold = 10 + length minhocas -- Valor default para segurança
 
   getTerroristas :: [Minhoca] -> (Int, [Minhoca])
   getTerroristas [] = (0, [])
