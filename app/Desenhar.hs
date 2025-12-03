@@ -109,7 +109,7 @@ drawMapa p mapa = Pictures $ concatMap drawRow (zip [0..] mapa)
 		drawTile r (c, t) = Translate x y $ Pictures [colorTile t, Color (greyN 0.6) $ rectangleWire cellSize cellSize]
 			where
 				(x,y) = converteMapa mapa (r,c)
-				colorTile Ar = Color (greyN 0.95) $ rectangleSolid cellSize cellSize
+				colorTile Ar = p !! 7
 				colorTile Agua = p !! 1 
 				colorTile Terra = p !! 0
 				colorTile Pedra = p !! 2

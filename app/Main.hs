@@ -25,14 +25,15 @@ main :: IO ()
 main = do
   putStrLn "Iniciando Worms - demo"
 
-  grass <- loadBMP "app/sprites/Grass_1_16x16.bmp"
-  water <- loadBMP "app/sprites/Water_1_16x16.bmp"
-  stone <- loadBMP "app/sprites/Stone_1_16x16.bmp"
-  worm <- loadBMP "app/sprites/Worm.bmp"
-  morto <- loadBMP "app/sprites/Dead.bmp"
+  grass  <- loadBMP "app/sprites/Grass_1_16x16.bmp"
+  water  <- loadBMP "app/sprites/Water_1_16x16.bmp"
+  stone  <- loadBMP "app/sprites/Stone_1_16x16.bmp"
+  sky    <- loadBMP "app/sprites/Ice_18_16x16.bmp"
+  worm   <- loadBMP "app/sprites/Worm.bmp"
+  morto  <- loadBMP "app/sprites/Dead.bmp"
   barril <- loadBMP "app/sprites/Barril.bmp"
   bazuca <- loadBMP "app/sprites/Bazuca.bmp"
-  let tiles = [grass, water, stone, worm, morto, barril, bazuca]
+  let tiles = [grass, water, stone, worm, morto, barril, bazuca,sky]
 
   play janela fundo fr it (desenha tiles) reageEventos reageTempo
   where
