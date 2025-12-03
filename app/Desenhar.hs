@@ -6,7 +6,8 @@ import Worms
 import Labs2025
 import Tarefa0_geral
 import Tarefa0_2025
-
+import Tarefa2
+import Tarefa3
 
 janelaLargura :: Float
 janelaLargura = 1000
@@ -101,7 +102,7 @@ converteMapa mapa (r,c) = (x,y)
 		x = left + fromIntegral c * cellSize
 		y = top - fromIntegral r * cellSize
 
--- | Desenha todas as células do mapa (cada tile com uma cor simples)
+-- | Desenha todas as células do mapa
 drawMapa :: [Picture] -> Mapa -> Picture
 drawMapa p mapa = Pictures $ concatMap drawRow (zip [0..] mapa)
 	where
@@ -109,7 +110,7 @@ drawMapa p mapa = Pictures $ concatMap drawRow (zip [0..] mapa)
 		drawTile r (c, t) = Translate x y $ Pictures [colorTile t, Color (greyN 0.6) $ rectangleWire cellSize cellSize]
 			where
 				(x,y) = converteMapa mapa (r,c)
-				colorTile Ar = p !! 7
+				colorTile Ar = p !! 8
 				colorTile Agua = p !! 1 
 				colorTile Terra = p !! 0
 				colorTile Pedra = p !! 2
@@ -120,8 +121,8 @@ drawObjetos p objs mapa = Pictures $ map drawO objs
 	where
 		drawO o@(Disparo {}) = Translate x y $ case tipoDisparo o of
 			Bazuca -> bazucaDir p (direcaoDisparo o)
-			Mina -> Color (makeColor 0.9 0.7 0 1) $ circleSolid (cellSize * 0.18)
-			Dinamite -> Color (makeColor 0.9 0.2 0.2 1) $ rectangleSolid (cellSize * 0.3) (cellSize * 0.3)
+			Mina -> p !! 9
+			Dinamite -> p !! 7
 			_ -> Color black $ circleSolid (cellSize * 0.12)
 			where (x,y) = converteMapa mapa (posicaoObjeto o)
 
@@ -141,8 +142,8 @@ bazucaDir p dir = case dir of
 		Nordeste -> Rotate 315 (p !! 6)
 		Noroeste -> Rotate 225 (p !! 6)
 
--- | Desenha as minhocas. Cada minhoca aparece com um círculo colorido
--- e um rótulo que indica o índice e a vida restante.
+-- | Desenha as minhocas. Cada minhoca aparece com uma imagem diferente se estiver viva ou morta.
+
 drawMinhocas :: [Picture] -> [Minhoca] -> Mapa -> Picture
 drawMinhocas p ms mapa = Pictures $ map drawM (zip [0..] ms)
 	where
@@ -154,4 +155,5 @@ drawMinhocas p ms mapa = Pictures $ map drawM (zip [0..] ms)
 				where
 					(x,y) = converteMapa mapa s
 
+-- ! Fazer mudar imagem da minhoca quando utiliza escavadora ou jetpack
 

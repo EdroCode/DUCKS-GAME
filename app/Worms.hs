@@ -28,6 +28,8 @@ novoEstado = Estado
         ]
     , objetosEstado =
         [Barril {posicaoBarril = (1,16), explodeBarril = False}
+        ,Disparo {posicaoDisparo = (0,17), tipoDisparo = Dinamite, direcaoDisparo = Norte, donoDisparo = 2, tempoDisparo = Just 3}
+        ,Disparo {posicaoDisparo = (1,18), tipoDisparo = Mina, direcaoDisparo = Este, donoDisparo = 0, tempoDisparo = Nothing}
         ]
     , minhocasEstado =
         [Minhoca {posicaoMinhoca = Just (4,3), vidaMinhoca = Viva 70, jetpackMinhoca = 1, escavadoraMinhoca = 6, bazucaMinhoca = 0, minaMinhoca = 1, dinamiteMinhoca = 0}
