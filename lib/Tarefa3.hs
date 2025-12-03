@@ -220,30 +220,19 @@ avancaObjeto e i o = case o of
         case tempo of
           Just 0 -> Right (calculaExplosao pos 7)
           Just _ ->
-            let 
-              tempoNovo = case tempo of 
-                Just t -> Just (t - 1)
-              
-              posAbaixo = movePosicao Sul pos
-              noSolo = estaNoSolo pos mapa
-              posAbaixoLivre = ePosicaoMatrizValida posAbaixo mapa && ePosicaoMapaLivre posAbaixo mapa
-              
-              (novaPos, novaDir) = 
-                if noSolo
-                  then (pos, Norte)
-                  else
-                    -- Se não está no solo, cai para baixo
-                    if posAbaixoLivre
-                      then (posAbaixo, Norte)  -- Cai e mantém direção Norte
-                      else (pos, Norte)         -- Não pode cair, fica parada
+            let tempoNovo = case tempo of Just t  -> Just (t - 1)
+                (novaPos, novaDir) = case dir of
+                  Norte -> (movePosicao Sul pos, Norte)
+                  Sul   -> (movePosicao Sul pos, Norte)
+                  _     ->  rodaPosicaoDirecao (pos, dir)
 
-            in if ePosicaoMatrizValida novaPos mapa
-              then 
-                -- Verifica se a nova posição é válida antes de mover
-                if ePosicaoMapaLivre novaPos mapa || novaPos == pos
+            in if estaNoSolo pos mapa
+              then Left (Disparo { posicaoDisparo = novaPos, direcaoDisparo = novaDir, tipoDisparo = tipo, tempoDisparo = tempoNovo, donoDisparo = dono })
+              else if ePosicaoMatrizValida novaPos mapa
+                then if ePosicaoMapaLivre novaPos mapa
                   then Left (Disparo { posicaoDisparo = novaPos, direcaoDisparo = novaDir, tipoDisparo = tipo, tempoDisparo = tempoNovo, donoDisparo = dono })
-                  else Left (Disparo { posicaoDisparo = pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = tempoNovo, donoDisparo = dono })
-              else Right [] -- Objeto sai do mapa e desaparece
+                  else Left (Disparo { posicaoDisparo = movePosicao Sul pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = tempoNovo, donoDisparo = dono })
+                else Right [] --objeto desaparece
 
 
   where
