@@ -30,13 +30,16 @@ main = do
   Just water  <- loadJuicy "app/sprites/water.png"
   Just stone  <- loadJuicy "app/sprites/stone1.png"
   Just sky    <- loadJuicy "app/sprites/sky.png"
+
+
   worm   <- loadBMP "app/sprites/Worm.bmp"
   morto  <- loadBMP "app/sprites/Dead.bmp"
   barril <- loadBMP "app/sprites/Barril.bmp"
   bazuca <- loadBMP "app/sprites/Bazuca.bmp"
-
+  dinamite <- loadBMP "app/sprites/Dinamite.bmp"
+  mina <- loadBMP "app/sprites/Mina.bmp"
   
-  let tiles = [grass, water, stone, worm, morto, barril, bazuca,sky]
+  let tiles = [grass, water, stone, worm, morto, barril, bazuca, sky, dinamite, mina]
 
 
   play janela fundo fr it (desenha tiles) reageEventos reageTempo

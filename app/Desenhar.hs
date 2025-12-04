@@ -31,11 +31,6 @@ data Assets = Assets
 type EstadoGloss = (Estado, Assets)
 
 
-
-
-
-
-
 -- | Menu do jogo
 desenha :: [Picture] -> Worms -> Picture
 desenha p (Menu sel) = drawMenu sel
@@ -80,7 +75,7 @@ drawGame p est = Pictures [Translate (-640) 240 $ Scale 0.12 0.12 $ Color black 
 
 		sx = janelaLargura  / largura
 		sy = janelaAltura / altura
-		scaleFactor = 2 * min sx sy   -- 0.9 para deixar margem
+		scaleFactor = 1 * min sx sy   -- 0.9 para deixar margem
 
 
 		world =
@@ -110,7 +105,7 @@ drawMapa p mapa = Pictures $ concatMap drawRow (zip [0..] mapa)
 		drawTile r (c, t) = Translate x y $ Pictures [colorTile t, Color (greyN 0.6) $ rectangleWire cellSize cellSize]
 			where
 				(x,y) = converteMapa mapa (r,c)
-				colorTile Ar = p !! 8
+				colorTile Ar = p !! 7
 				colorTile Agua = p !! 1 
 				colorTile Terra = p !! 0
 				colorTile Pedra = p !! 2
@@ -122,7 +117,7 @@ drawObjetos p objs mapa = Pictures $ map drawO objs
 		drawO o@(Disparo {}) = Translate x y $ case tipoDisparo o of
 			Bazuca -> bazucaDir p (direcaoDisparo o)
 			Mina -> p !! 9
-			Dinamite -> p !! 7
+			Dinamite -> p !! 8
 			_ -> Color black $ circleSolid (cellSize * 0.12)
 			where (x,y) = converteMapa mapa (posicaoObjeto o)
 
