@@ -107,7 +107,9 @@ drawMapa p mapa = Pictures $ concatMap drawRow (zip [0..] mapa)
 				(x,y) = converteMapa mapa (r,c)
 				colorTile Ar = p !! 7
 				colorTile Agua = p !! 1 
-				colorTile Terra = p !! 0
+				-- Se em cima de terra estiver ar, desenha grama
+				colorTile Terra | r > 0 && (mapa !! (r-1) !! c) == Ar = p !! 0
+				                | otherwise = p !! 10
 				colorTile Pedra = p !! 2
 
 -- | Desenha objetos no mapa (disparos, minas, dinamites, barris, ...)

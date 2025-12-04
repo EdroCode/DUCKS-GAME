@@ -4,6 +4,7 @@ import Graphics.Gloss.Interface.Pure.Game
 import Worms
 import Labs2025
 import Tarefa2
+import System.Exit
 
 -- | Função principal que reage aos eventos do usuário e atualiza o estado do jogo
 reageEventos :: Event -> Worms -> IO Worms
@@ -31,8 +32,12 @@ reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) Help = return $ Menu 0
 -- Voltar do jogo para o menu
 reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (Playing _ _ _) = return $ Menu 0
 
--- fechar o jogo se estiver no estado Quit
-reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) Quit = return $ Quit
+-- Ir do menu para quit
+reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (Menu 0) = return $ Quit
+
+-- | Confirmar sair do jogo
+reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) Quit = exitSuccess
+
 
 -- Qualquer outro evento não altera o estado
 reageEventos _ s = return $ s
