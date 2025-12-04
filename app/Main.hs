@@ -25,7 +25,6 @@ fr = 60
 main :: IO ()
 main = do
   putStrLn "Iniciando Worms - demo"
-<<<<<<< HEAD
 
   Just grass  <- loadJuicy "app/sprites/grass1.png"
   Just water  <- loadJuicy "app/sprites/water.png"
@@ -35,6 +34,8 @@ main = do
   morto  <- loadBMP "app/sprites/Dead.bmp"
   barril <- loadBMP "app/sprites/Barril.bmp"
   bazuca <- loadBMP "app/sprites/Bazuca.bmp"
+
+  
   let tiles = [grass, water, stone, worm, morto, barril, bazuca,sky]
 
 
