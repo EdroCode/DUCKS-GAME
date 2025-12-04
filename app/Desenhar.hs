@@ -32,11 +32,11 @@ type EstadoGloss = (Estado, Assets)
 
 
 -- | Menu do jogo
-desenha :: [Picture] -> Worms -> Picture
-desenha p (Menu sel) = drawMenu sel
-desenha p (Playing est _ _) = drawGame p est
-desenha p Quit = Translate (-50) 0 $ Scale 0.5 0.5 $ Text "Aperte ESC para confirmar saída."
-desenha p Help = drawHelp
+desenha :: [Picture] -> Worms -> IO Picture
+desenha p (Menu sel) = return $ drawMenu sel
+desenha p (Playing est _ _) = return $ drawGame p est
+desenha p Quit = return $ Translate (-50) 0 $ Scale 0.5 0.5 $ Text "Aperte ESC para confirmar saída."
+desenha p Help = return $ drawHelp
 
 
 drawMenu :: Int -> Picture

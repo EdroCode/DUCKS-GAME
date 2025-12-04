@@ -13,14 +13,14 @@ type Segundos = Float
 -- | Intervalo entre passos automático.
 
 intervalo :: Segundos
-intervalo = 1.5
+intervalo = 1
 
 -- | Função que avança o tempo no estado do jogo no Gloss.
-reageTempo :: Segundos -> Worms -> Worms
-reageTempo _ m@Menu{} = m  -- sem mudança enquanto está no menu
-reageTempo _ Help = Help
-reageTempo _ Quit = Quit
-reageTempo dt (Playing est acc tick) = Playing estFinal acc' tick'
+reageTempo :: Segundos -> Worms -> IO Worms
+reageTempo _ m@Menu{} = return $ m  -- sem mudança enquanto está no menu
+reageTempo _ Help = return $ Help
+reageTempo _ Quit = return $ Quit
+reageTempo dt (Playing est acc tick) = return $ Playing estFinal acc' tick'
 	where
 		acc2 = acc + dt
 		steps = floor (acc2 / intervalo)

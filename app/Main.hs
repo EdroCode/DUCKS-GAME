@@ -8,7 +8,7 @@ import Worms
 import Tempo
 
 import Graphics.Gloss.Juicy
-
+import Graphics.Gloss.Interface.IO.Game
 
 
 janela :: Display
@@ -21,6 +21,8 @@ fundo = white
 fr :: Int
 fr = 60
 
+path :: String
+path = "app/sprites/"
 
 main :: IO ()
 main = do
@@ -32,17 +34,17 @@ main = do
   Just sky    <- loadJuicy "app/sprites/sky.png"
 
 
-  worm   <- loadBMP "app/sprites/Worm.bmp"
-  morto  <- loadBMP "app/sprites/Dead.bmp"
-  barril <- loadBMP "app/sprites/Barril.bmp"
-  bazuca <- loadBMP "app/sprites/Bazuca.bmp"
-  dinamite <- loadBMP "app/sprites/Dinamite.bmp"
-  mina <- loadBMP "app/sprites/Mina.bmp"
+  Just worm   <- loadJuicy "app/sprites/Worm.png"
+  Just  morto  <- loadJuicy "app/sprites/Dead.png"
+  Just  barril <- loadJuicy "app/sprites/Barril.png"
+  Just  bazuca <- loadJuicy "app/sprites/Bazuca.png"
+  Just  dinamite <- loadJuicy "app/sprites/Dinamite.png"
+  Just  mina <- loadJuicy "app/sprites/Mina.png"
   
   let tiles = [grass, water, stone, worm, morto, barril, bazuca, sky, dinamite, mina]
+  let temanatal = [grass, water, stone, worm, morto, barril, bazuca, sky, dinamite, mina]
 
-
-  play janela fundo fr it (desenha tiles) reageEventos reageTempo
+  playIO janela fundo fr it (desenha tiles) reageEventos reageTempo
   where
     
     it = Menu 0

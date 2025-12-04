@@ -6,30 +6,36 @@ import Labs2025
 import Tarefa2
 
 -- | Função principal que reage aos eventos do usuário e atualiza o estado do jogo
-reageEventos :: Event -> Worms -> Worms
+reageEventos :: Event -> Worms -> IO Worms
 
 
 -- Navegação no menu principal
-reageEventos (EventKey (SpecialKey KeyUp) Down _ _) (Menu sel) = Menu (max 0 (sel - 1)) -- Sobe opção
-reageEventos (EventKey (SpecialKey KeyDown) Down _ _) (Menu sel) = Menu (min 2 (sel + 1)) -- Desce opção
+reageEventos (EventKey (SpecialKey KeyUp) Down _ _) (Menu sel)
+	| sel > 0   = return $ Menu (sel - 1)
+	| otherwise = return $ Menu sel
+reageEventos (EventKey (SpecialKey KeyDown) Down _ _) (Menu sel)
+	| sel < 2   = return $ Menu (sel + 1)
+	| otherwise = return $ Menu sel
 
 -- Seleção de opção no menu
 reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (Menu sel)
-	| sel == 0 = Playing novoEstado 0.0 0 
-	| sel == 1 = Help 
-	| sel == 2 = Quit 
-	| otherwise = Menu sel 
+	| sel == 0  = return $ Playing novoEstado 0 0  -- Iniciar jogo
+	| sel == 1  = return $ Help                     -- Tela de ajuda
+	| sel == 2  = return $ Quit                     -- Sair do jogo
+	| otherwise = return $ Menu sel
 
 
 -- Voltar do Help para o menu
-reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) Help = Menu 0
-reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) Help = Menu 0
-
+reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) Help = return $ Menu 0
+reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) Help = return $ Menu 0
 -- Voltar do jogo para o menu
-reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (Playing _ _ _) = Menu 0
+reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (Playing _ _ _) = return $ Menu 0
+
+-- fechar o jogo se estiver no estado Quit
+reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) Quit = return $ Quit
 
 -- Qualquer outro evento não altera o estado
-reageEventos _ s = s
+reageEventos _ s = return $ s
 
 -- | Remove disparos pertencentes a minhocas que já morreram
 filtraDisparos :: [Objeto] -> [Minhoca] -> [Objeto]
