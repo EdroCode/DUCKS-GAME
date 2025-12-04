@@ -17,6 +17,7 @@ import Text.ParserCombinators.ReadP (look)
 import Data.Maybe (fromMaybe, fromJust)
 import Data.List
 import Foreign.Marshal (moveArray)
+import Data.Semigroup (Min(getMin))
 
 -- | Função principal da Tarefa 4. Dado um estado retorna uma lista de jogadas, com exatamente 100 jogadas.
 tatica :: Estado -> [(NumMinhoca,Jogada)]
@@ -52,6 +53,7 @@ avancaObjetoJogada e objetos (i,objeto') = if elem objeto' objetos
 -- todo sem o sistema de mina ativodefaultBotMove  :: (NumMinhoca, Jogada)
 
 -- | Para um número de ticks desde o início da tática, dado um estado, determina a próxima jogada.
+-- | Para um número de ticks desde o início da tática, dado um estado, determina a próxima jogada.
 jogadaTatica :: Ticks -> Estado -> (NumMinhoca, Jogada)
 jogadaTatica ticks e =
   case minhocasEstado e of
@@ -63,7 +65,8 @@ jogadaTatica ticks e =
           if jogadasRestantes > tickingBomb e
           then -- * Jogadas Normais
             let
-              i = ticks `mod` length minhocasValidasIdx
+              numMinhocasValidas = length minhocasValidasIdx
+              i = ticks `mod` numMinhocasValidas
               (idOriginal, minhoca) = minhocasValidasIdx !! i
               pos = case posicaoMinhoca minhoca of Just a -> a
               (onSight, posMira) = minhocaOnSight e pos
@@ -76,7 +79,8 @@ jogadaTatica ticks e =
                 _ -> digFase idOriginal minhoca
           else -- * Trigger Suicidio
             let
-              i = ticks `mod` length minhocasValidasIdx
+              numMinhocasValidas = length minhocasValidasIdx
+              i = ticks `mod` numMinhocasValidas
               (idOriginal, minhoca) = minhocasValidasIdx !! i
             in
               forcaSuicidio idOriginal minhoca
@@ -112,27 +116,25 @@ jogadaTatica ticks e =
         blocoNegro = getPosInv mapa posBlocoInv
 
         (podeSaltar, dirSalto) = canBungeJump mapa pos
-        
+
       in
         case blocoAgua of
           Just a -> (i, Move (getDir8 pos a))
           Nothing ->
             case blocoTerra of
-              Just b -> if not (ePosicaoMatrizValida (movePosicao Sul b) mapa)
-                then (i, Dispara Escavadora (getDir8 pos b))
-                else case blocoNegro of
+              Just b -> (if not (ePosicaoMatrizValida (movePosicao Sul b) mapa) && gotAmmo minhoca Escavadora then (i, Dispara Escavadora (getDir8 pos b)) else (case blocoNegro of
 
                   Just posInvalida -> (i, Move (getDir8 pos posInvalida))
                   Nothing -> case (podeSaltar, dirSalto) of
                     (True, Just d) -> (i, Move d)
-                    _ -> defaultBotMove
-                    
+                    _ -> complexBotMove e (i, minhoca)))
+
               Nothing -> case blocoNegro of
 
                 Just posInvalida -> (i, Move (getDir8 pos posInvalida))
                 Nothing -> case (podeSaltar, dirSalto) of
                   (True, Just d) -> (i, Move d)
-                  _ -> defaultBotMove
+                  _ -> complexBotMove e (i, minhoca)
 
 
 
@@ -158,7 +160,7 @@ jogadaTatica ticks e =
             Just a ->
               if lastBlockValid mapa a
               then (i, Dispara Escavadora (getDir8 pos a))
-              else defaultBotMove
+              else complexBotMove e (i, minhoca)
             Nothing ->
               case getMinhocasValidasComIndices (minhocasEstado e) of
                 [] -> defaultBotMove
@@ -170,7 +172,7 @@ jogadaTatica ticks e =
                       case blocoAr of -- Caso tenha uma minhoca em baixo dela ela sai 
                         Just a -> (i, Move (getDir8 pos a)) -- !
                         Nothing -> defaultBotMove
-                    else defaultBotMove
+                    else complexBotMove e (i, minhoca)
           else
               case getMinhocasValidasComIndices (minhocasEstado e) of
                 [] -> defaultBotMove
@@ -182,24 +184,44 @@ jogadaTatica ticks e =
                       case blocoAr of -- Caso tenha uma minhoca em baixo dela ela sai 
                         Just a -> (i, Move (getDir8 pos a)) -- !
                         Nothing -> defaultBotMove
-                    else defaultBotMove
+                    else complexBotMove e (i, minhoca)
 
-lala =  Estado
-    { mapaEstado =
-        [[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
-        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
-        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
-        ,[Ar,Terra,Ar,Ar,Pedra,Ar,Agua,Agua,Agua,Agua]
-        ,[Ar,Terra,Ar,Ar,Pedra,Ar,Agua,Agua,Agua,Agua]
-        ,[Agua,Terra,Agua,Ar,Terra,Agua,Pedra,Pedra,Agua,Agua]
-        ]
-    , objetosEstado =
-        []
-    , minhocasEstado =
-        [Minhoca {posicaoMinhoca = Just (2,1), vidaMinhoca = Viva 70, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 0, minaMinhoca = 1, dinamiteMinhoca = 0}
-        ,Minhoca {posicaoMinhoca = Just (1,4), vidaMinhoca = Viva 70, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 0, minaMinhoca = 1, dinamiteMinhoca = 0}
-        ]
-    }
+
+
+
+-- | Algoritmo alternativo ao defaultBotMove
+complexBotMove :: Estado -> (Int, Minhoca) -> (NumMinhoca, Jogada)
+complexBotMove e (i, minhoca) = case minhocaProx of
+                                  Just m -> let posM = case posicaoMinhoca m of Just a -> a
+                                                dirMinhoca = getDir8 pos posM
+                                            in (i, Move (getXWay dirMinhoca))
+
+                                  Nothing -> (i, Move Sul)
+
+
+
+  where
+    pos = case posicaoMinhoca minhoca of Just a -> a
+    minhocasValidas = getMinhocasValidas (minhocasEstado e)
+    minhocaProx = getMinhProx minhocasValidas pos
+    
+
+    getMinhProx :: [Minhoca] -> Posicao -> Maybe Minhoca
+    getMinhProx [] _ = Nothing
+    getMinhProx [m1] _ = Just m1
+    getMinhProx (m1:m2:t) p = 
+      let p1 = case posicaoMinhoca m1 of Just a -> a
+          p2 = case posicaoMinhoca m2 of Just a -> a
+
+      in if distAtoB p p1 > distAtoB p p2 
+        then getMinhProx (m2:t) p
+        else getMinhProx (m1:t) p
+
+
+-- todo usar imagens para compor texto
+
+
+
 
 -- Para criar este Bot decidi uma ordem de prioridade para qualquer minhoca que seja controlada
 -- O bot primeiro escolhera a minhoca com menos vida com uma posicao valida
@@ -447,7 +469,7 @@ tickingBomb e = tempoArmas + numTerr + threshold
 
 canBungeJump :: Mapa -> Posicao -> (Bool,Maybe Direcao)
 canBungeJump mapa pos
-  | isPathFree posDireita = (True, Just Este) 
+  | isPathFree posDireita = (True, Just Este)
   | isPathFree posEsquerda = (True, Just Oeste)
   | otherwise = (False, Nothing)
 
