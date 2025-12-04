@@ -42,7 +42,7 @@ desenha p Help = return $ drawHelp
 drawMenu :: Int -> Picture
 drawMenu sel = Pictures
 	[ Translate (-220) 120 $ Scale 0.6 0.6 $ Color black $ Text "WORMS"
-	, Translate (-220) 10 $ Scale 0.35 0.35 $ Color (if sel==0 then red else black) $ Text "Start Game"
+	, Translate (-220) 10 $ Scale 0.35 0.35 $ Color (if sel==0 then red else black) $ Text "Bot Simulation"
 	, Translate (-220) (-40) $ Scale 0.35 0.35 $ Color (if sel==1 then red else black) $ Text "Help"
 	, Translate (-220) (-90) $ Scale 0.35 0.35 $ Color (if sel==2 then red else black) $ Text "Quit"
 	]
