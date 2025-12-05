@@ -15,14 +15,16 @@ reageEventos (EventKey (SpecialKey KeyUp) Down _ _) (Menu sel)
 	| sel > 0   = return $ Menu (sel - 1)
 	| otherwise = return $ Menu sel
 reageEventos (EventKey (SpecialKey KeyDown) Down _ _) (Menu sel)
-	| sel < 2   = return $ Menu (sel + 1)
+	| sel < 3   = return $ Menu (sel + 1)
 	| otherwise = return $ Menu sel
 
 -- Seleção de opção no menu
 reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (Menu sel)
 	| sel == 0  = return $ Playing novoEstado 0 0  -- Iniciar jogo
-	| sel == 1  = return $ Help                     -- Tela de ajuda
-	| sel == 2  = return $ Quit                     -- Sair do jogo
+	-- | sel == 1  = return $ Help                     -- Tela de ajuda
+	| sel == 2  = return $ Help     
+	| sel == 3  = return $ Quit                     -- Sair do jogo
+	                -- Sair do jogo
 	| otherwise = return $ Menu sel
 
 
