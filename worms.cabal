@@ -29,6 +29,7 @@ library
     exposed-modules:
         Tarefa4
         Labs2025
+        Labs2025fase2
         Tarefa0_geral
         Tarefa0_2025
         Tarefa1
