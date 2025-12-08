@@ -8,7 +8,7 @@ Description : Validação de estados.
 
 Módulo para a realização da Tarefa 1 de LI1\/LP1 em 2025\/26.
 -}
-module Tarefa1 where
+module Tarefa1fase2 where
 
 import Labs2025
 import Tarefa0_2025

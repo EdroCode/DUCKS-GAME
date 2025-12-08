@@ -34,6 +34,10 @@ library
         Tarefa1
         Tarefa2
         Tarefa3
+        Tarefa1fase2
+        Tarefa2fase2
+        Tarefa3fase2
+        Tarefa4fase2
 
     -- Modules included in this library but not exported.
     -- other-modules:
