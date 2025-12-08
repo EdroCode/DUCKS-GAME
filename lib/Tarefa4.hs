@@ -116,6 +116,7 @@ jogadaTatica ticks e =
         blocoNegro = getPosInv mapa posBlocoInv
 
         (podeSaltar, dirSalto) = canBungeJump mapa pos
+        (voidDisponivel, dirVoid) = canFollowVoid mapa pos -- Void disponivel - tem uma posicao vazia perto
 
       in
         case blocoAgua of
@@ -466,7 +467,7 @@ tickingBomb e = tempoArmas + numTerr + threshold
       | bazucaMinhoca m > 0 = (Just Bazuca, True)
       | otherwise = (Nothing, False)
 
-
+-- | Função que determina se uma minhoca pode saltar para o suicidio
 canBungeJump :: Mapa -> Posicao -> (Bool,Maybe Direcao)
 canBungeJump mapa pos
   | isPathFree posDireita = (True, Just Este)
@@ -491,6 +492,37 @@ canBungeJump mapa pos
               then []
               else (linha, x) : anda (linha + 1)
       in anda (y + 1)
+
+-- | Funcao que determina se uma minhoca pode ir para o vazio
+-- Tem algumas limitacoes, mas a logica é parecida com a canBungeJump 
+canFollowVoid :: Mapa -> Posicao -> (Bool,Maybe Direcao)
+canFollowVoid mapa pos
+  | isPathFree posicoes = (True, Just (getCloser pos posicoes))
+  | otherwise = (False, Nothing)
+
+  where
+
+    posicoes = getPosicoesLaterais pos
+
+    getCloser :: Posicao -> [Posicao] -> Direcao
+    getCloser _ [] = Sul -- ! aviso
+    getCloser p (h:t) = if distAtoB p (last t) >= distAtoB p h then getDir8 p h else getDir8 p (last t)
+
+    isPathFree :: [Posicao] -> Bool
+    isPathFree [] = True
+    isPathFree (h:t) = ePosicaoMapaLivre h mapa && isPathFree t
+
+    -- | Devolve todas as posições laterais de uma posicao dentro do mapa
+    getPosicoesLaterais :: Posicao -> [Posicao]
+    getPosicoesLaterais (y, x) =
+        let (_, dX) = getDimensoesMatriz mapa
+            todasColunas = [0..dX-1]
+            semPosicaoAtual = filter (/= x) todasColunas
+            posicoes = map (\coluna -> (y, coluna)) semPosicaoAtual
+        in posicoes
+
+
+
 
 -- * FUNÇÕES AUXILIARES
 
