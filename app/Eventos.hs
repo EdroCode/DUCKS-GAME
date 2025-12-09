@@ -20,9 +20,9 @@ reageEventos (EventKey (SpecialKey KeyDown) Down _ _) (Menu sel)
 
 -- Seleção de opção no menu
 reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (Menu sel)
-	| sel == 0  = return $ Playing novoEstado 0 0  -- Iniciar jogo
-	-- | sel == 1  = return $ Help                     -- Tela de ajuda
-	| sel == 2  = return $ Help     
+	| sel == 0  = return $ BotSimulation novoEstado 0 0  -- Iniciar jogo
+	| sel == 1  = return $ FreeRoam flatWorld 0 0 (Move Sul) -- Iniciar jogo
+	| sel == 2  = return $ Help -- Tela de ajuda
 	| sel == 3  = return $ Quit                     -- Sair do jogo
 	                -- Sair do jogo
 	| otherwise = return $ Menu sel
@@ -32,7 +32,7 @@ reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (Menu sel)
 reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) Help = return $ Menu 0
 reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) Help = return $ Menu 0
 -- Voltar do jogo para o menu
-reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (Playing _ _ _) = return $ Menu 0
+reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (BotSimulation _ _ _) = return $ Menu 0
 
 -- Ir do menu para quit
 reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (Menu 0) = return $ Quit
@@ -41,8 +41,35 @@ reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (Menu 0) = return $ Quit
 reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) Quit = exitSuccess
 
 
+
+
+-- Controlo da minhoca em FreeRoam
+reageEventos (EventKey (SpecialKey KeyLeft) Down _ _) (FreeRoam est acc tick _) =
+    return $ FreeRoam est acc tick (Move Oeste)
+
+reageEventos (EventKey (SpecialKey KeyRight) Down _ _) (FreeRoam est acc tick _) =
+    return $ FreeRoam est acc tick (Move Este)
+
+reageEventos (EventKey (SpecialKey KeyUp) Down _ _) (FreeRoam est acc tick _) =
+    return $ FreeRoam est acc tick (Move Norte)
+
+reageEventos (EventKey (SpecialKey KeyDown) Down _ _) (FreeRoam est acc tick _) =
+    return $ FreeRoam est acc tick (Move Sul)
+
+-- Parar movimento quando larga as teclas
+reageEventos (EventKey (SpecialKey _) Up _ _) (FreeRoam est acc tick _) =
+    return $ FreeRoam est acc tick (Move Sul)
+
+
+
 -- Qualquer outro evento não altera o estado
 reageEventos _ s = return $ s
+
+
+
+
+
+
 
 -- | Remove disparos pertencentes a minhocas que já morreram
 filtraDisparos :: [Objeto] -> [Minhoca] -> [Objeto]
@@ -59,4 +86,3 @@ filtraDisparos objs ms = filter disparoValido objs
 	-- Verifica se o disparo pertence a uma minhoca viva
 	disparoValido o@(Disparo {}) = notElem (donoDisparo o) mortos
 	disparoValido _ = True
-

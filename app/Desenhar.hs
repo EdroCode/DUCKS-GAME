@@ -32,7 +32,8 @@ type EstadoGloss = (Estado, Assets)
 -- | Menu do jogo com múltiplas opções
 desenha :: [Picture] -> Worms -> IO Picture
 desenha p (Menu sel) = return $ drawMenu sel
-desenha p (Playing est _ _) = return $ drawGame p est
+desenha p (BotSimulation est _ _) = return $ drawGame p est
+desenha p (FreeRoam est _ _ _) = return $ drawGame p est
 desenha p Quit = return $ Translate (-50) 0 $ Scale 0.5 0.5 $ Text "Aperte ESC para confirmar saída."
 desenha p Help = return $ drawHelp
 
@@ -76,6 +77,12 @@ drawHelp = Pictures
 
 cellSize :: Float
 cellSize = 32
+
+
+
+
+
+
 drawGame :: [Picture] -> Estado -> Picture
 -- Mostra uma linha de status e, ao centro, o mundo (mapa + objetos + minhocas)
 drawGame p est = Pictures [sidebar, world]
@@ -121,6 +128,50 @@ drawGame p est = Pictures [sidebar, world]
             , drawMinhocas p ms mapa
             ]
 
+
+drawFreeRoamGame :: [Picture] -> Estado -> Picture
+drawFreeRoamGame p est = Pictures [sidebar, world]
+  where
+    mapa = mapaEstado est
+    infoMapa = "mapa: " ++ show (length mapa) ++ "x" ++ show (if null mapa then 0 else length (head mapa))
+    objs = objetosEstado est
+    ms = minhocasEstado est
+
+    minhocasVivas = length (getMinhocasValidas ms)
+    totalMinhocas = length ms
+    totalObjetos = length objs
+
+    sidebar = Pictures
+      [ Color (greyN 0.9) $ Translate (-450) 0 $ rectangleSolid 300 900
+      , Translate (-580) 300 $ Scale 0.18 0.18 $ Color black $ Text infoMapa
+      , Translate (-580) 260 $ Scale 0.18 0.18 $ Color (dark green) $ Text ("Minhocas vivas: " ++ show minhocasVivas)
+      , Translate (-580) 220 $ Scale 0.18 0.18 $ Color black $ Text ("Total minhocas: " ++ show totalMinhocas)
+      , Translate (-580) 180 $ Scale 0.18 0.18 $ Color (dark red) $ Text ("Objetos: " ++ show totalObjetos)
+      ]
+
+   
+
+    linha = length mapa
+    cols = if null mapa then 0 else length (head mapa)
+    largura = fromIntegral cols * cellSize
+    altura  = fromIntegral linha * cellSize
+    sidebarWidth = 300 
+
+    usableWidth  = janelaLargura - sidebarWidth
+    usableHeight = janelaAltura
+
+    sx = usableWidth  / largura
+    sy = usableHeight / altura
+    scaleFactor = min sx sy
+
+    world =
+      Translate (sidebarWidth / 2) 0 $
+        Scale scaleFactor scaleFactor $
+          Pictures
+            [ drawMapa p mapa
+            , drawObjetos p objs mapa
+            , drawMinhocas p ms mapa
+            ]
 
 -- | Converte coordenadas do mapa (linha, coluna) para coordenadas em pixels
 converteMapa :: Mapa -> Posicao -> (Float, Float)

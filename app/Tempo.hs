@@ -1,3 +1,4 @@
+{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 module Tempo where
 
 import Worms
@@ -8,37 +9,56 @@ import Tarefa2
 import Tarefa3
 import Tarefa4
 
+
+
 type Segundos = Float
 
 -- | Intervalo entre passos automático.
 
 intervalo :: Segundos
-intervalo = 1
+intervalo = 0.2
 
 -- | Função que avança o tempo no estado do jogo no Gloss.
 reageTempo :: Segundos -> Worms -> IO Worms
-reageTempo _ m@Menu{} = return $ m  -- sem mudança enquanto está no menu
-reageTempo _ Help = return $ Help
-reageTempo _ Quit = return $ Quit
-reageTempo dt (Playing est acc tick) = return $ Playing estFinal acc' tick'
-	where
-		acc2 = acc + dt
-		steps = floor (acc2 / intervalo)
-		acc' = acc2 - fromIntegral steps * intervalo
-		tick' = tick + steps
+reageTempo _ m@Menu{} = return m  -- sem mudança enquanto está no menu
+reageTempo _ Help = return Help
+reageTempo _ Quit = return Quit
+reageTempo dt (BotSimulation est acc tick) = return $ BotSimulation estFinal acc' tick'
+        where
+                acc2 = acc + dt
+                steps = floor (acc2 / intervalo)
+                acc' = acc2 - fromIntegral steps * intervalo
+                tick' = tick + steps
 
-		-- aplica os passos necessários (cada passo = jogada tática + atualização de objetos)
-		estFinal = aplicaPassos est tick steps
+                -- aplica os passos necessários (cada passo = jogada tática + atualização de objetos)
+                estFinal = aplicaPassos est tick steps
 
-		-- | Aplica n passos sequenciais ao estado. Cada passo tem um número de tick
-		-- usado pela jogada tática para decidir a ação.
-		aplicaPassos :: Estado -> Int -> Int -> Estado
-		aplicaPassos st _ 0 = st
-		aplicaPassos st t n = aplicaPassos (aplicaUm t st) (t + 1) (n - 1)
+                -- | Aplica n passos sequenciais ao estado. Cada passo tem um número de tick
+                -- usado pela jogada tática para decidir a ação.
+                aplicaPassos :: Estado -> Int -> Int -> Estado
+                aplicaPassos st _ 0 = st
+                aplicaPassos st t n = aplicaPassos (aplicaUm t st) (t + 1) (n - 1)
 
-		aplicaUm :: Int -> Estado -> Estado
-		-- Aplica um passo: primeiro a jogada tática (quem/jogada), depois avança o estado
-		aplicaUm t st = avancaEstado $ efetuaJogada jogador jogada st
-			where
-				(jogador, jogada) = jogadaTatica t st
-	
+                aplicaUm :: Int -> Estado -> Estado
+                -- Aplica um passo: primeiro a jogada tática (quem/jogada), depois avança o estado
+                aplicaUm t st = avancaEstado $ efetuaJogada jogador jogada st
+                        where
+                                (jogador, jogada) = jogadaTatica t st
+reageTempo dt (FreeRoam est acc tick jogadaUser) =
+    return $ FreeRoam estFinal acc' tick' jogadaUser
+  where
+    acc2  = acc + dt
+    steps = floor (acc2 / intervalo)
+    acc'  = acc2 - fromIntegral steps * intervalo
+    tick' = tick + steps
+
+    estFinal = aplicaPassos est tick steps
+
+    aplicaPassos :: Estado -> Int -> Int -> Estado
+    aplicaPassos st _ 0 = st
+    aplicaPassos st t n = aplicaPassos (aplicaUm st) (t+1) (n-1)
+
+    aplicaUm :: Estado -> Estado
+    aplicaUm st = avancaEstado (efetuaJogada jogador jogadaUser st)
+      where
+        jogador = 0   -- todo mudar depois para controlar + minhocas

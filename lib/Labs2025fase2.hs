@@ -6,12 +6,40 @@ Módulo com os tipos de dados que vão ser utilizados para modelar as tarefas do
 -}
 
 -- | 
-module Labs2025
-    ( module Labs2025
-    , module Tarefa0_geral
+module Labs2025fase2
+    ( module Labs2025fase2
     ) where
 
-import Tarefa0_geral
+
+-- * Registro de adicoes
+-- * Serve para registrar ideias para extras, sejam elas implantadas ou não, mas também para registrar os extras adicionais ao base game
+-- ? -> Added
+-- todo -> por adicionar
+-- todo healthpack
+-- todo bullets
+
+-- | Uma matriz é um conjunto de elementos a duas dimensões.
+--
+-- Em notação matemática, é geralmente representada por:
+--
+-- <<https://haslab.github.io/Teaching/LI1/2526/img/matriz.png>>
+type Matriz a = [[a]]
+
+-- | Uma posição numa matriz é dada como um par (/linha/,/colunha/).
+-- As coordenadas são dois números naturais e começam com (0,0) no canto superior esquerdo, com as linhas incrementando para baixo e as colunas incrementando para a direita.
+--
+-- <<https://haslab.github.io/Teaching/LI1/2526/img/posicaomatriz.png>>
+type Posicao = (Int,Int)
+
+-- | A dimensão de uma matrix dada como um par (/número de linhas/,/número de colunhas/).
+type Dimensao = (Int,Int)
+
+-- | Uma direção é dada pela rosa dos ventos. Ou seja, os 4 pontos cardeais e os 4 pontos colaterais.
+--
+-- <<https://haslab.github.io/Teaching/LI1/2526/img/rosadosventos.jpg>>
+data Direcao = Norte | Nordeste | Este | Sudeste | Sul | Sudoeste | Oeste | Noroeste
+    deriving (Eq,Ord,Show,Read,Enum)
+
 
 -- | Um tipo de terreno do mapa.
 data Terreno
@@ -91,6 +119,14 @@ data Objeto
         -- | Se o barril está prestes a explodir ou não.
         , explodeBarril :: Bool
         }
+    -- | Um medicKit ou healthPack (HP).
+    | HealthPack
+        {   
+        -- | A posição do HP no mapa.
+         posicaoHP :: Posicao
+        -- | A quantidade de cura que ele provem a minhoca.
+         , quantCura :: Int    
+        }
     deriving (Eq,Ord,Show,Read)
 
 -- | Estado do jogo.
@@ -111,6 +147,8 @@ data Jogada
     = Dispara TipoArma Direcao
     -- | Mover-se numa dada direção.
     | Move Direcao
+    -- | Fica no mesmo lugar
+    | Parado
     deriving (Eq,Ord,Show,Read)
 
 
