@@ -33,7 +33,7 @@ type EstadoGloss = (Estado, Assets)
 desenha :: [Picture] -> Worms -> IO Picture
 desenha p (Menu sel) = return $ drawMenu sel
 desenha p (BotSimulation est _ _) = return $ drawGame p est
-desenha p (FreeRoam est _ _ _) = return $ drawGame p est
+desenha p (FreeRoam est _ _ _) = return $ drawFreeRoamGame p est
 desenha p Quit = return $ Translate (-50) 0 $ Scale 0.5 0.5 $ Text "Aperte ESC para confirmar saída."
 desenha p Help = return $ drawHelp
 

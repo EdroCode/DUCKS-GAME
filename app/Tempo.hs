@@ -11,6 +11,9 @@ import Tarefa4
 
 
 
+
+
+
 type Segundos = Float
 
 -- | Intervalo entre passos automático.
@@ -52,13 +55,13 @@ reageTempo dt (FreeRoam est acc tick jogadaUser) =
     acc'  = acc2 - fromIntegral steps * intervalo
     tick' = tick + steps
 
-    estFinal = aplicaPassos est tick steps
+    estFinal = aplicaPassos est steps
 
-    aplicaPassos :: Estado -> Int -> Int -> Estado
-    aplicaPassos st _ 0 = st
-    aplicaPassos st t n = aplicaPassos (aplicaUm st) (t+1) (n-1)
+    -- Aplica n passos usando a jogada do utilizador
+    aplicaPassos :: Estado -> Int -> Estado
+    aplicaPassos st 0 = st
+    aplicaPassos st n = aplicaPassos (aplicaUm st jogadaUser) (n-1)
 
-    aplicaUm :: Estado -> Estado
-    aplicaUm st = avancaEstado (efetuaJogada jogador jogadaUser st)
-      where
-        jogador = 0   -- todo mudar depois para controlar + minhocas
+    -- Aplica um passo: efetua a jogada do jogador e avança o estado
+    aplicaUm :: Estado -> Jogada -> Estado
+    aplicaUm st jog = avancaEstado (efetuaJogada 0 jog st) -- ! indice ta 0, depois fazer para mudar

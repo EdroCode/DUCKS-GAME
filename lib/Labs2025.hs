@@ -111,6 +111,8 @@ data Jogada
     = Dispara TipoArma Direcao
     -- | Mover-se numa dada direção.
     | Move Direcao
+
+    | Parado
     deriving (Eq,Ord,Show,Read)
 
 

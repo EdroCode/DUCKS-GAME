@@ -61,7 +61,7 @@ estadoValido5 = Estado
 
 
 efetuaJogada :: NumMinhoca -> Jogada -> Estado -> Estado
-
+efetuaJogada _ Parado e = e
 -- DISPARO - Dispara TIpo Direcao
 efetuaJogada n (Dispara arma direcao) e = if indiceValido n e && vidaMinhoca minhoca /= Morta && temMunicao minhoca arma && not (elem (arma,n) (listaDonos objetos)) -- Verifica se existe um disparo da mesma arma da mesma minhoca no estado atual
                                                     then case arma of

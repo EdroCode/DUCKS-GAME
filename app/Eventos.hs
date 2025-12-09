@@ -21,7 +21,7 @@ reageEventos (EventKey (SpecialKey KeyDown) Down _ _) (Menu sel)
 -- Seleção de opção no menu
 reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (Menu sel)
 	| sel == 0  = return $ BotSimulation novoEstado 0 0  -- Iniciar jogo
-	| sel == 1  = return $ FreeRoam flatWorld 0 0 (Move Sul) -- Iniciar jogo
+	| sel == 1  = return $ FreeRoam flatWorld 0 0 Parado -- Iniciar jogo
 	| sel == 2  = return $ Help -- Tela de ajuda
 	| sel == 3  = return $ Quit                     -- Sair do jogo
 	                -- Sair do jogo
@@ -58,8 +58,7 @@ reageEventos (EventKey (SpecialKey KeyDown) Down _ _) (FreeRoam est acc tick _) 
 
 -- Parar movimento quando larga as teclas
 reageEventos (EventKey (SpecialKey _) Up _ _) (FreeRoam est acc tick _) =
-    return $ FreeRoam est acc tick (Move Sul)
-
+    return $ FreeRoam est acc tick Parado
 
 
 -- Qualquer outro evento não altera o estado
@@ -68,21 +67,3 @@ reageEventos _ s = return $ s
 
 
 
-
-
-
--- | Remove disparos pertencentes a minhocas que já morreram
-filtraDisparos :: [Objeto] -> [Minhoca] -> [Objeto]
-filtraDisparos objs ms = filter disparoValido objs
-  where
-	mortos = pegaIndicesMortos ms 0
-	-- Retorna os índices das minhocas mortas
-	pegaIndicesMortos [] _ = []
-	pegaIndicesMortos (m:rest) i =
-	  let r = pegaIndicesMortos rest (i+1)
-	  in case vidaMinhoca m of
-		   Morta -> i : r
-		   _     -> r
-	-- Verifica se o disparo pertence a uma minhoca viva
-	disparoValido o@(Disparo {}) = notElem (donoDisparo o) mortos
-	disparoValido _ = True
