@@ -6,9 +6,10 @@ import Labs2025
 import Tarefa2
 import System.Exit
 
+
+
 -- | Função principal que reage aos eventos do usuário e atualiza o estado do jogo
 reageEventos :: Event -> Worms -> IO Worms
-
 
 -- Navegação no menu principal
 reageEventos (EventKey (SpecialKey KeyUp) Down _ _) (Menu sel)
@@ -21,44 +22,45 @@ reageEventos (EventKey (SpecialKey KeyDown) Down _ _) (Menu sel)
 -- Seleção de opção no menu
 reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (Menu sel)
 	| sel == 0  = return $ BotSimulation novoEstado 0 0  -- Iniciar jogo
-	| sel == 1  = return $ FreeRoam flatWorld 0 0 Parado -- Iniciar jogo
+	| sel == 1  = return $ FreeRoam flatWorld 0 0 (Move Sul) -- Iniciar jogo
 	| sel == 2  = return $ Help -- Tela de ajuda
 	| sel == 3  = return $ Quit                     -- Sair do jogo
 	                -- Sair do jogo
 	| otherwise = return $ Menu sel
 
 
--- Voltar do Help para o menu
-reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) Help = return $ Menu 0
-reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) Help = return $ Menu 0
--- Voltar do jogo para o menu
-reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (BotSimulation _ _ _) = return $ Menu 0
-
--- Ir do menu para quit
-reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (Menu 0) = return $ Quit
-
--- | Confirmar sair do jogo
-reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) Quit = exitSuccess
+-- * ESC LOGIC
 
 
+reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) Help = return $ Menu 0 -- Voltar do Help para o menu
+reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) Help = return $ Menu 0 -- Voltar do jogo para o menu
+reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (BotSimulation _ _ _) = return $ Menu 0 -- Ir do menu para quit
+reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (Menu 0) = return $ Quit -- Confirmar sair do jogo
+reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) Quit = exitSuccess -- sai do jogo
 
 
--- Controlo da minhoca em FreeRoam
-reageEventos (EventKey (SpecialKey KeyLeft) Down _ _) (FreeRoam est acc tick _) =
-    return $ FreeRoam est acc tick (Move Oeste)
+ 
+-- * FREE ROAM MODE INPUTS
 
-reageEventos (EventKey (SpecialKey KeyRight) Down _ _) (FreeRoam est acc tick _) =
-    return $ FreeRoam est acc tick (Move Este)
 
-reageEventos (EventKey (SpecialKey KeyUp) Down _ _) (FreeRoam est acc tick _) =
-    return $ FreeRoam est acc tick (Move Norte)
+reageEventos (EventKey (SpecialKey KeyF1) Down _ _) (FreeRoam _ _ _ _) = exitSuccess
 
-reageEventos (EventKey (SpecialKey KeyDown) Down _ _) (FreeRoam est acc tick _) =
-    return $ FreeRoam est acc tick (Move Sul)
+
+-- ? Movimento
+reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (FreeRoam _ _ _ _) = return $ Menu 0
+
+reageEventos (EventKey (SpecialKey KeyLeft) Down _ _) (FreeRoam est acc tick _) = return $ FreeRoam est acc tick (Move Oeste)
+
+reageEventos (EventKey (SpecialKey KeyRight) Down _ _) (FreeRoam est acc tick _) = return $ FreeRoam est acc tick (Move Este)
+
+reageEventos (EventKey (SpecialKey KeyUp) Down _ _) (FreeRoam est acc tick _) = return $ FreeRoam est acc tick (Move Norte)
+
+reageEventos (EventKey (SpecialKey KeyDown) Down _ _) (FreeRoam est acc tick _) = return $ FreeRoam est acc tick (Move Sul)
+
 
 -- Parar movimento quando larga as teclas
 reageEventos (EventKey (SpecialKey _) Up _ _) (FreeRoam est acc tick _) =
-    return $ FreeRoam est acc tick Parado
+    return $ FreeRoam est acc tick (Move Sul) -- ! temporario
 
 
 -- Qualquer outro evento não altera o estado

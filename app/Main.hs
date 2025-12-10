@@ -19,17 +19,22 @@ fundo = white
 
 
 fr :: Int
-fr = 60
+fr = 30
 
 path :: String
 path = "app/sprites/"
+
+
 
 main :: IO ()
 main = do
   putStrLn "Iniciando Worms - demo"
 
 
+
  -- * Base game
+
+  
   Just grass  <- loadJuicy (path ++"grass1.png")
   Just water  <- loadJuicy (path ++"water.png")
   Just stone  <- loadJuicy (path ++"stone1.png")
@@ -49,7 +54,18 @@ main = do
   let tiles = [grass, water, stone, worm, morto, barril, bazuca, sky, dinamite, mina, dirt]
   let temanatal = [grass, water, stone, worm, morto, barril, bazuca, sky, dinamite, mina]
 
-  playIO janela fundo fr it (desenha tiles) reageEventos reageTempo
+  playIO 
+    janela -- janela onde irá correr o jogo
+    fundo -- côr do fundo da janela
+    fr  -- frame rate
+    it -- estado inicial
+    (desenha tiles)  -- desenha o estado do jogo
+    reageEventos  -- reage a um evento
+    reageTempo -- reage ao passar do tempo
+
+         
   where
     
     it = Menu 0
+
+

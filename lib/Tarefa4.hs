@@ -52,7 +52,7 @@ avancaObjetoJogada e objetos (i,objeto') = if elem objeto' objetos
 
 -- todo sem o sistema de mina ativodefaultBotMove  :: (NumMinhoca, Jogada)
 
--- | Para um número de ticks desde o início da tática, dado um estado, determina a próxima jogada.
+
 -- | Para um número de ticks desde o início da tática, dado um estado, determina a próxima jogada.
 jogadaTatica :: Ticks -> Estado -> (NumMinhoca, Jogada)
 jogadaTatica ticks e =
@@ -123,12 +123,9 @@ jogadaTatica ticks e =
           Just a -> (i, Move (getDir8 pos a))
           Nothing ->
             case blocoTerra of
-              Just b -> (if not (ePosicaoMatrizValida (movePosicao Sul b) mapa) && gotAmmo minhoca Escavadora then (i, Dispara Escavadora (getDir8 pos b)) else (case blocoNegro of
-
-                  Just posInvalida -> (i, Move (getDir8 pos posInvalida))
-                  Nothing -> case (podeSaltar, dirSalto) of
-                    (True, Just d) -> (i, Move d)
-                    _ -> complexBotMove e (i, minhoca)))
+              Just b -> (if not (ePosicaoMatrizValida (movePosicao Sul b) mapa) && gotAmmo minhoca Escavadora 
+                then (i, Dispara Escavadora (getDir8 pos b)) 
+                else complexBotMove e (i, minhoca))
 
               Nothing -> case blocoNegro of
 
@@ -190,20 +187,15 @@ jogadaTatica ticks e =
 
 
 
--- | Algoritmo alternativo ao defaultBotMove
 complexBotMove :: Estado -> (Int, Minhoca) -> (NumMinhoca, Jogada)
 complexBotMove e (i, minhoca) = case minhocaProx of
-                                  Just m -> let posM = case posicaoMinhoca m of Just a -> a
-                                                dirMinhoca = getDir8 pos posM
-                                            in (i, Move (getXWay dirMinhoca))
-
-                                  Nothing -> (i, Move Sul)
-
-
-
+  Just m -> let posM = case posicaoMinhoca m of Just a -> a
+                dirMinhoca = getDir8 pos posM
+            in (i, Move (getXWay dirMinhoca))
+  Nothing -> (i, Move Sul)
   where
     pos = case posicaoMinhoca minhoca of Just a -> a
-    minhocasValidas = getMinhocasValidas (minhocasEstado e)
+    minhocasValidas = filter (/= minhoca) (getMinhocasValidas (minhocasEstado e))  -- ← FILTRA A PRÓPRIA MINHOCA
     minhocaProx = getMinhProx minhocasValidas pos
     
 
@@ -424,6 +416,7 @@ temMinaPos pos mapa objs = case minas of
 -- - Tempo para dinamite explodir
 -- - Tempo para bazuca explodir 
 -- - Tempo para registrar explosão
+-- - Largura do mapa 
 -- - Margem de segurança + número de minhocas
 tickingBomb :: Estado -> Ticks
 tickingBomb e = tempoArmas + numTerr + threshold
@@ -433,8 +426,9 @@ tickingBomb e = tempoArmas + numTerr + threshold
     (numTerr, terroristas) = getTerroristas minhocas
     armas = getArmasSuicidio terroristas
     tempoArmas = getGunTimeCount (nub armas)
-    threshold = 10 + length minhocas -- Valor default para segurança
+    threshold = 10 + length minhocas  -- Valor defa ult para segurança
 
+   
     -- | Identifica as minhocas que podem suicidar-se
     -- | Devolve o número de terroristas e a lista de minhocas que podem suicidar-se
     getTerroristas :: [Minhoca] -> (Int, [Minhoca])

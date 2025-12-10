@@ -47,21 +47,4 @@ reageTempo dt (BotSimulation est acc tick) = return $ BotSimulation estFinal acc
                 aplicaUm t st = avancaEstado $ efetuaJogada jogador jogada st
                         where
                                 (jogador, jogada) = jogadaTatica t st
-reageTempo dt (FreeRoam est acc tick jogadaUser) =
-    return $ FreeRoam estFinal acc' tick' jogadaUser
-  where
-    acc2  = acc + dt
-    steps = floor (acc2 / intervalo)
-    acc'  = acc2 - fromIntegral steps * intervalo
-    tick' = tick + steps
-
-    estFinal = aplicaPassos est steps
-
-    -- Aplica n passos usando a jogada do utilizador
-    aplicaPassos :: Estado -> Int -> Estado
-    aplicaPassos st 0 = st
-    aplicaPassos st n = aplicaPassos (aplicaUm st jogadaUser) (n-1)
-
-    -- Aplica um passo: efetua a jogada do jogador e avança o estado
-    aplicaUm :: Estado -> Jogada -> Estado
-    aplicaUm st jog = avancaEstado (efetuaJogada 0 jog st) -- ! indice ta 0, depois fazer para mudar
+reageTempo dt (FreeRoam est acc tick jogadaUser) = undefined

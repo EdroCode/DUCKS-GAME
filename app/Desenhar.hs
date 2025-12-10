@@ -11,10 +11,9 @@ import Tarefa3
 import Tarefa4 (getMinhocasValidas)
 
 janelaLargura :: Float
-janelaLargura = 1000
-
+janelaLargura = 1500
 janelaAltura :: Float
-janelaAltura = 1000
+janelaAltura = 1500
 
 -- * Assets
 
@@ -40,15 +39,15 @@ desenha p Help = return $ drawHelp
 -- | Menu principal com seletor expandido
 drawMenu :: Int -> Picture
 drawMenu sel = Pictures
-  [ 
-	
+  [
+
     Translate (-220) 180 $ Scale 0.7 0.7 $ Color black $ Text "WORMS"
   , Translate (-220) 130 $ Scale 0.2 0.2 $ Color (greyN 0.5) $ Text "Escolha o modo de jogo"
   , Translate (-220) 60 $ Scale 0.35 0.35 $ Color (if sel==0 then red else black) $ Text "Bot Simulation"
   , Translate (-220) (-20) $ Scale 0.35 0.35 $ Color (if sel==1 then red else black) $ Text "Player vs Player"
   , Translate (-220) (-120) $ Scale 0.35 0.35 $ Color (if sel==2 then red else black) $ Text "Help"
   , Translate (-220) (-160) $ Scale 0.35 0.35 $ Color (if sel==3 then red else black) $ Text "Quit"
-  
+
 
   , Translate (-300) (-230) $ Scale 0.18 0.18 $ Color (greyN 0.4) $ Text (getDescription sel)
   ]
@@ -65,13 +64,13 @@ getDescription _ = ""
 drawHelp :: Picture
 drawHelp = Pictures
   [ Translate (-360) 280 $ Scale 0.5 0.5 $ Color black $ Text "Help / Instruções"
-  
+
 
   , Translate (-360) 180 $ Scale 0.3 0.3 $ Color (greyN 0.3) $ Text "NAVEGAÇÃO"
   , Translate (-360) 140 $ Scale 0.25 0.25 $ Color black $ Text "↑/↓ - navegar no menu"
-  , Translate (-360) 100 $ Scale 0.25 0.25 $ Color black $ Text "Enter - selecionar opção"
+  , Translate (-360) 900 $ Scale 0.25 0.25 $ Color black $ Text "Enter - selecionar opção"
   , Translate (-360) 60 $ Scale 0.25 0.25 $ Color black $ Text "ESC - voltar/sair"
-  
+
   , Translate (-360) (-220) $ Scale 0.18 0.18 $ Color (greyN 0.5) $ Text "Pressione ESC ou Enter para voltar ao menu"
   ]
 
@@ -96,21 +95,23 @@ drawGame p est = Pictures [sidebar, world]
     totalMinhocas = length ms
     totalObjetos = length objs
 
+
     sidebar = Pictures
-      [ Color (greyN 0.9) $ Translate (-450) 0 $ rectangleSolid 300 900
-      , Translate (-580) 300 $ Scale 0.18 0.18 $ Color black $ Text infoMapa
-      , Translate (-580) 260 $ Scale 0.18 0.18 $ Color (dark green) $ Text ("Minhocas vivas: " ++ show minhocasVivas)
-      , Translate (-580) 220 $ Scale 0.18 0.18 $ Color black $ Text ("Total minhocas: " ++ show totalMinhocas)
-      , Translate (-580) 180 $ Scale 0.18 0.18 $ Color (dark red) $ Text ("Objetos: " ++ show totalObjetos)
+      [ Color (greyN 0.9) $ Translate (-750) 0 $ rectangleSolid 300 900
+      , Translate (-900) 300 $ Scale 0.3 0.3 $ Color black $ Text infoMapa
+      , Translate (-900) 260 $ Scale 0.3 0.3 $ Color (dark green) $ Text ("Minhocas vivas: " ++ show minhocasVivas)
+      , Translate (-900) 220 $ Scale 0.3 0.3 $ Color (dark red) $ Text ("Minhocas mortas: " ++ show (totalMinhocas - minhocasVivas))
+      , Translate (-900) 180 $ Scale 0.3 0.3 $ Color black $ Text ("Total minhocas: " ++ show totalMinhocas)
+      , Translate (-900) 140 $ Scale 0.3 0.3 $ Color (dark red) $ Text ("Objetos: " ++ show totalObjetos)
       ]
 
-   
+
 
     linha = length mapa
     cols = if null mapa then 0 else length (head mapa)
     largura = fromIntegral cols * cellSize
     altura  = fromIntegral linha * cellSize
-    sidebarWidth = 300 
+    sidebarWidth = 300
 
     usableWidth  = janelaLargura - sidebarWidth
     usableHeight = janelaAltura
@@ -141,21 +142,43 @@ drawFreeRoamGame p est = Pictures [sidebar, world]
     totalMinhocas = length ms
     totalObjetos = length objs
 
+
     sidebar = Pictures
-      [ Color (greyN 0.9) $ Translate (-450) 0 $ rectangleSolid 300 900
-      , Translate (-580) 300 $ Scale 0.18 0.18 $ Color black $ Text infoMapa
-      , Translate (-580) 260 $ Scale 0.18 0.18 $ Color (dark green) $ Text ("Minhocas vivas: " ++ show minhocasVivas)
-      , Translate (-580) 220 $ Scale 0.18 0.18 $ Color black $ Text ("Total minhocas: " ++ show totalMinhocas)
-      , Translate (-580) 180 $ Scale 0.18 0.18 $ Color (dark red) $ Text ("Objetos: " ++ show totalObjetos)
+      [ Color (greyN 0.9) $ Translate (-750) 0 $ rectangleSolid 300 900
+      , Translate (-900) 300 $ Scale 0.3 0.3 $ Color black $ Text infoMapa
+      , Translate (-900) 260 $ Scale 0.3 0.3 $ Color (dark green) $ Text ("Minhocas vivas: " ++ show minhocasVivas)
+      , Translate (-900) 220 $ Scale 0.3 0.3 $ Color (dark red) $ Text ("Minhocas mortas: " ++ show (totalMinhocas - minhocasVivas))
+      , Translate (-900) 180 $ Scale 0.3 0.3 $ Color black $ Text ("Total minhocas: " ++ show totalMinhocas)
+      , Translate (-900) 140 $ Scale 0.3 0.3 $ Color (dark red) $ Text ("Objetos: " ++ show totalObjetos)
+
+      -- * minhoca selecionada
+      -- ! ainda nao esta funcional
+      , Translate (-900) 80 $ Scale 0.3 0.3 $ Color black $ Text "------- MINHOCA SELECIONADA: -------"
+      , (if eMinhocaViva (head ms) then ( Translate (-900) 40 $ Scale 0.3 0.3 $ Color green $ Text ("Vida: " ++ show (vidaMinhoca (head ms))) ) else ( Translate (-900) 40 $ Scale 0.3 0.3 $ Color red $ Text ("Vida: " ++ show (vidaMinhoca (head ms)))))
+      , Translate (-900) 0 $ Scale 0.3 0.3 $ Color blue $ Text ("Posicao: " ++ show (posicaoMinhoca (head ms)))
+      , Translate (-900) (-60) $ Scale 0.3 0.3 $ Color black $ Text "Armamento:"
+      , Translate (-900) (-100) $ Scale 0.3 0.3 $ Color blue $ Text ("Escavadora: " ++ show (escavadoraMinhoca (head ms)))
+      , Translate (-900) (-140) $ Scale 0.3 0.3 $ Color blue $ Text ("Jetpack: " ++ show (jetpackMinhoca (head ms)))
+      , Translate (-900) (-180) $ Scale 0.3 0.3 $ Color blue $ Text ("Bazuca: " ++ show (bazucaMinhoca (head ms)))
+      , Translate (-900) (-220) $ Scale 0.3 0.3 $ Color blue $ Text ("Mina: " ++ show (minaMinhoca (head ms)))
+      , Translate (-900) (-260) $ Scale 0.3 0.3 $ Color blue $ Text ("Dinamite: " ++ show (dinamiteMinhoca (head ms)))
+      
+      
+
+
+
+
+
       ]
 
-   
+
+
 
     linha = length mapa
     cols = if null mapa then 0 else length (head mapa)
     largura = fromIntegral cols * cellSize
     altura  = fromIntegral linha * cellSize
-    sidebarWidth = 300 
+    sidebarWidth = 300
 
     usableWidth  = janelaLargura - sidebarWidth
     usableHeight = janelaAltura
@@ -195,7 +218,7 @@ drawMapa p mapa = Pictures $ concatMap drawRow (zip [0..] mapa)
       where
         (x,y) = converteMapa mapa (r,c)
         colorTile Ar = p !! 7
-        colorTile Agua = p !! 1 
+        colorTile Agua = p !! 1
         colorTile Terra | r > 0 && (mapa !! (r-1) !! c) == Ar = p !! 0
                         | otherwise = p !! 10
         colorTile Pedra = p !! 2

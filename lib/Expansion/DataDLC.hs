@@ -1,20 +1,11 @@
-{-|
-Module      : Labs2025
-Description : Tipos de dados do jogo.
+module Expansion.DataDLC where
 
-Módulo com os tipos de dados que vão ser utilizados para modelar as tarefas do trabalho prático de LI1\/LP1 em 2025\/26.
--}
+import Labs2025 (Mapa, Posicao, Direcao, VidaMinhoca, TipoArma, Ticks, NumMinhoca)
+import Tarefa0_geral ()
 
--- | 
-module Labs2025
-    ( module Labs2025
-    , module Tarefa0_geral
-    ) where
-
-import Tarefa0_geral
-
+-- ? Ideias -> Areia | Lava | Lodo | Wind
 -- | Um tipo de terreno do mapa.
-data Terreno
+data TerrenosDLC 
     -- | Terreno vazio.
     = Ar
     -- | Terreno que afoga minhocas.
@@ -25,23 +16,12 @@ data Terreno
     | Pedra
     deriving (Eq,Ord,Show,Read,Enum)
 
--- | O mapa do jogo é uma matriz de terrenos.
-type Mapa = Matriz Terreno
-
--- | Os diversos tipos de arma disponíveis para uma minhoca.
-data TipoArma = Jetpack | Escavadora | Bazuca | Mina | Dinamite
+-- | Os diversos tipos de arma disponíveis para uma minhoca. --? Ideias -> Kamehameha , Air Strike
+data TipoArmaDLC = Jetpack | Escavadora | Bazuca | Mina | Dinamite
     deriving (Eq,Ord,Show,Read,Enum)
 
--- | O estado de saúde de uma minhoca.
-data VidaMinhoca
-    -- | Está viva com um número inteiros de pontos de vida.
-    = Viva Int
-    -- | Está morta.
-    | Morta
-    deriving (Eq,Ord,Show,Read)
-
 -- | O estado completo de uma minhoca.
-data Minhoca = Minhoca
+data MinhocaDLC = Minhoca
     -- | Uma posição no mapa. Opcional porque a minhoca pode ter saído do mapa.
     { posicaoMinhoca :: Maybe Posicao
 
@@ -57,20 +37,12 @@ data Minhoca = Minhoca
     -- | Munições de @Dinamite@.
     , dinamiteMinhoca :: Int
     
+    -- ? EQUIPA DA MINHOCA
     }
     deriving (Eq,Ord,Show,Read)
 
--- | Um tick é a unidade de tempo do jogo.
-type Ticks = Int
 
--- | O índice de uma minhoca na lista de minhocas.
-type NumMinhoca = Int
-
--- | O índice de um objeto na lista de objetos.
-type NumObjeto = Int
-
--- | Um objeto colocado no mapa.
-data Objeto
+data ObjetoDLC
     -- | Um disparo de uma arma.
     = Disparo
         -- | A posição do disparo no mapa.
@@ -91,39 +63,34 @@ data Objeto
         -- | Se o barril está prestes a explodir ou não.
         , explodeBarril :: Bool
         }
+    | HealthPack  -- todo add
+        
+        -- | A posicao do HP no mapa
+        { posicaoHP :: Posicao
+        -- | Cura que o HP da
+        , quantCura :: Int
+
+        }
     deriving (Eq,Ord,Show,Read)
 
 -- | Estado do jogo.
-data Estado = Estado
+data EstadoDLC = Estado
     -- | O mapa atual.
     { mapaEstado :: Mapa
     -- | Uma lista com os objetos presentes no mapa. Para as funções que vai desenvolver, deve considerar que a ordem dos elementos é irrelevante.
-    , objetosEstado :: [Objeto]
+    , objetosEstado :: [ObjetoDLC]
     -- | Uma lista com as minhocas no jogo. A ordem dos elementos é relevante, no sentido cada minhoca vai ser identificada pelo seu índice na lista.
-    , minhocasEstado :: [Minhoca]
+    , minhocasEstado :: [MinhocaDLC]
     
     }
     deriving (Eq,Ord,Show,Read)
 
 -- | Uma jogada que uma minhoca pode efetuar.
-data Jogada
+data JogadaDLC
     -- | Disparar uma arma numa dada direção.
     = Dispara TipoArma Direcao
     -- | Mover-se numa dada direção.
     | Move Direcao
-
+    -- | Ficar parado no local
+    | Parado
     deriving (Eq,Ord,Show,Read)
-
-
--- | Lista das oito direcções possíveis num tabuleiro ou grelha.
--- Inclui as quatro direcções cardeais e as quatro diagonais.
-axis8 :: [Direcao]
-axis8 = [Norte, Sul, Este, Oeste, Nordeste, Noroeste, Sudeste, Sudoeste]
-
--- | Lista das quatro direcções cardeais.
--- Representa movimentos apenas em linha recta, sem diagonais.
-axis4 :: [Direcao]
-axis4 = [Norte, Sul, Este, Oeste]
-
-defaultBotMove  :: (NumMinhoca, Jogada)
-defaultBotMove = (0, Move Sul)
