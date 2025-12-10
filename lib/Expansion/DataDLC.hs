@@ -81,7 +81,11 @@ data EstadoDLC = Estado
     , objetosEstado :: [ObjetoDLC]
     -- | Uma lista com as minhocas no jogo. A ordem dos elementos é relevante, no sentido cada minhoca vai ser identificada pelo seu índice na lista.
     , minhocasEstado :: [MinhocaDLC]
-    
+    -- | Guarda a tecla pressionada
+    , pressedKey :: Char
+    -- Jogador atual
+    , player :: NumMinhoca
+
     }
     deriving (Eq,Ord,Show,Read)
 

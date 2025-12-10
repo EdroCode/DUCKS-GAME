@@ -49,18 +49,38 @@ reageEventos (EventKey (SpecialKey KeyF1) Down _ _) (FreeRoam _ _ _ _) = exitSuc
 -- ? Movimento
 reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (FreeRoam _ _ _ _) = return $ Menu 0
 
-reageEventos (EventKey (SpecialKey KeyLeft) Down _ _) (FreeRoam est acc tick _) = return $ FreeRoam est acc tick (Move Oeste)
 
-reageEventos (EventKey (SpecialKey KeyRight) Down _ _) (FreeRoam est acc tick _) = return $ FreeRoam est acc tick (Move Este)
+reageEventos (EventKey (SpecialKey KeyLeft) Down _ _) (FreeRoam est acc tick _) = 
+    return $ FreeRoam (efetuaJogada 0 (Move Oeste) est) acc tick (Move Oeste)
 
-reageEventos (EventKey (SpecialKey KeyUp) Down _ _) (FreeRoam est acc tick _) = return $ FreeRoam est acc tick (Move Norte)
+reageEventos (EventKey (SpecialKey KeyRight) Down _ _) (FreeRoam est acc tick _) = 
+    return $ FreeRoam (efetuaJogada 0 (Move Este) est) acc tick (Move Este)
 
-reageEventos (EventKey (SpecialKey KeyDown) Down _ _) (FreeRoam est acc tick _) = return $ FreeRoam est acc tick (Move Sul)
+reageEventos (EventKey (SpecialKey KeyUp) Down _ _) (FreeRoam est acc tick _) = 
+    return $ FreeRoam (efetuaJogada 0 (Move Norte) est) acc tick (Move Norte)
+
+reageEventos (EventKey (SpecialKey KeyDown) Down _ _) (FreeRoam est acc tick _) = 
+    return $ FreeRoam (efetuaJogada 0 (Move Sul) est) acc tick (Move Sul)
+
+-- ! Temporario
+
+reageEventos (EventKey (Char 'q') Down _ _) (FreeRoam est acc tick _) = 
+    return $ FreeRoam (efetuaJogada 0 (Move Noroeste) est) acc tick (Move Noroeste)
+
+reageEventos (EventKey (Char 'e') Down _ _) (FreeRoam est acc tick _) = 
+    return $ FreeRoam (efetuaJogada 0 (Move Nordeste) est) acc tick (Move Nordeste)
+
+reageEventos (EventKey (Char 'z') Down _ _) (FreeRoam est acc tick _) = 
+    return $ FreeRoam (efetuaJogada 0 (Move Sudoeste) est) acc tick (Move Sudoeste)
+
+reageEventos (EventKey (Char 'c') Down _ _) (FreeRoam est acc tick _) = 
+    return $ FreeRoam (efetuaJogada 0 (Move Sudeste) est) acc tick (Move Sudeste)
+
+-- * Mudar minhoca
+reageEventos (EventKey (Char '2') Down _ _) (FreeRoam est acc tick _) = 
+    return $ FreeRoam (efetuaJogada 0 (Move Sudeste) est) acc tick (Move Sudeste)
 
 
--- Parar movimento quando larga as teclas
-reageEventos (EventKey (SpecialKey _) Up _ _) (FreeRoam est acc tick _) =
-    return $ FreeRoam est acc tick (Move Sul) -- ! temporario
 
 
 -- Qualquer outro evento não altera o estado

@@ -19,7 +19,7 @@ type Segundos = Float
 -- | Intervalo entre passos automático.
 
 intervalo :: Segundos
-intervalo = 0.2
+intervalo = 0.5
 
 -- | Função que avança o tempo no estado do jogo no Gloss.
 reageTempo :: Segundos -> Worms -> IO Worms
@@ -47,4 +47,6 @@ reageTempo dt (BotSimulation est acc tick) = return $ BotSimulation estFinal acc
                 aplicaUm t st = avancaEstado $ efetuaJogada jogador jogada st
                         where
                                 (jogador, jogada) = jogadaTatica t st
-reageTempo dt (FreeRoam est acc tick jogadaUser) = undefined
+reageTempo dt (FreeRoam est acc tick jogadaUser) = return $ FreeRoam (  avancaEstado est) acc tick jogadaUser
+        where
+                i = 0

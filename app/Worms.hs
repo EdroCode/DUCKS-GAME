@@ -52,6 +52,6 @@ flatWorld = Estado
     , objetosEstado =
         []
     , minhocasEstado =
-        [Minhoca {posicaoMinhoca = Just (2,4), vidaMinhoca = Viva 100, jetpackMinhoca = 100, escavadoraMinhoca = 100, bazucaMinhoca = 100, minaMinhoca = 100, dinamiteMinhoca = 100}
+        [Minhoca {posicaoMinhoca = Just (1,4), vidaMinhoca = Viva 100, jetpackMinhoca = 100, escavadoraMinhoca = 100, bazucaMinhoca = 100, minaMinhoca = 100, dinamiteMinhoca = 100}
         ]
     }
