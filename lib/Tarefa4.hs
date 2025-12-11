@@ -12,7 +12,7 @@ import Data.Either
 import Labs2025
 import Tarefa2
 import Tarefa3
-import Tarefa0_2025 (ePosicaoEstadoLivre, existeMinhoca, existeBarril, verificaVida, encontraQuantidadeArmaMinhoca, ehDisparo, existeBarril, eMinhocaViva, ePosicaoMapaLivre)
+import Tarefa0_2025 (ePosicaoEstadoLivre, existeMinhoca, existeBarril, verificaVida, encontraQuantidadeArmaMinhoca, ehDisparo, existeBarril, eMinhocaViva, ePosicaoMapaLivre, eTerrenoDestrutivel)
 import Text.ParserCombinators.ReadP (look)
 import Data.Maybe (fromMaybe, fromJust)
 import Data.List
@@ -76,7 +76,9 @@ jogadaTatica ticks e =
                   if gotAmmo minhoca Bazuca
                   then (idOriginal, Dispara Bazuca (getDir8 pos alvo))
                   else digFase idOriginal minhoca
-                _ -> digFase idOriginal minhoca
+                _ -> if gotAmmo minhoca Bazuca
+                  then shootPhase e idOriginal minhoca
+                  else digFase idOriginal minhoca
           else -- * Trigger Suicidio
             let
               numMinhocasValidas = length minhocasValidasIdx
@@ -185,18 +187,75 @@ jogadaTatica ticks e =
                     else complexBotMove e (i, minhoca)
 
 
+    shootPhase :: Estado -> Int -> Minhoca -> (NumMinhoca, Jogada)
+    shootPhase e i minhoca =  (i, Dispara Bazuca (getDir8 pos melhorPosicao))
+    
+      where
+        m = mapaEstado e
+        pos = case posicaoMinhoca minhoca of 
+                Just a -> a
+                
+        posPossiveis = getPosicoesBazuca m pos
+        -- Para cada posição possível, calcula o dano total
+        danosComPosicao = map (\p -> (p, calculaDanoTotal m p)) posPossiveis
+        -- Encontra a posição com maior dano
+        melhorPosicao = maximoPorDano danosComPosicao
+    
 
+        -- Calcula o dano total causado por uma explosão numa posição
+        calculaDanoTotal :: Mapa -> Posicao -> Int
+        calculaDanoTotal m pos = 
+            let danos = calculaExplosao pos 5
+                danosTerreno = filtraDanoTerreno danos m
+            in somaDanos danosTerreno
+
+        -- Filtra uma lista de danos e devolve apenas os danos a terrenos destrutíveis
+        filtraDanoTerreno :: Danos -> Mapa -> Danos
+        filtraDanoTerreno [] _ = []
+        filtraDanoTerreno ((posDano, dmg):t) mapa = 
+            case encontraPosicaoMatriz posDano mapa of
+                Just peca -> if eTerrenoDestrutivel peca 
+                            then (posDano, dmg) : filtraDanoTerreno t mapa 
+                            else filtraDanoTerreno t mapa
+                Nothing -> filtraDanoTerreno t mapa
+
+        -- Soma todos os danos de uma lista
+        somaDanos :: Danos -> Int
+        somaDanos = sum . map snd
+
+        -- Encontra a posição com maior dano (compara manualmente)
+        maximoPorDano :: [(Posicao, Int)] -> Posicao
+        maximoPorDano [(p, _)] = p
+        maximoPorDano ((p1, d1):(p2, d2):t) = 
+            if d1 >= d2 
+            then maximoPorDano ((p1, d1):t)
+            else maximoPorDano ((p2, d2):t)
 
 complexBotMove :: Estado -> (Int, Minhoca) -> (NumMinhoca, Jogada)
 complexBotMove e (i, minhoca) = case minhocaProx of
   Just m -> let posM = case posicaoMinhoca m of Just a -> a
                 dirMinhoca = getDir8 pos posM
-            in (i, Move (getXWay dirMinhoca))
+
+                posNova = movePosicao dirMinhoca pos
+                dirX = getXWay dirMinhoca
+
+
+                fAux :: Direcao -> Direcao
+                fAux d = case d of
+                  Este -> Nordeste
+                  Oeste -> Noroeste
+                  
+
+            in if ePosicaoEstadoLivre posNova e 
+              then (i, Move dirX)
+              else (i, Move (fAux dirX))
+
   Nothing -> (i, Move Sul)
   where
     pos = case posicaoMinhoca minhoca of Just a -> a
     minhocasValidas = filter (/= minhoca) (getMinhocasValidas (minhocasEstado e))  -- ← FILTRA A PRÓPRIA MINHOCA
     minhocaProx = getMinhProx minhocasValidas pos
+    
     
 
     getMinhProx :: [Minhoca] -> Posicao -> Maybe Minhoca
@@ -367,6 +426,15 @@ getPosTer _ _ [] = Nothing
 getPosTer mapa tipo (h:t) = case encontraPosicaoMatriz h mapa of
   Just a -> if tipo == a then Just h else getPosTer mapa tipo t
   Nothing -> Nothing
+
+-- | Verifica se existe terreno de um tipo numa lista de posições
+-- Devolve a lista dos terrenos
+getPosTerLista :: Mapa -> Terreno -> [Posicao] -> [Posicao]
+getPosTerLista _ _ [] = []
+getPosTerLista mapa tipo (h:t) = case encontraPosicaoMatriz h mapa of
+  Just a -> if tipo == a then h : getPosTerLista mapa tipo t else getPosTerLista mapa tipo t
+  Nothing -> getPosTerLista mapa tipo t
+
 
 -- | Verifica se existe uma posição inválida numa lista de posições
 -- Devolve a primeira ocorrência encontrada
@@ -549,7 +617,7 @@ getXWay d = case d of
   Sudoeste  -> Oeste
   Nordeste  -> Este
   Sudeste   -> Este
-  _         -> d
+  _         -> Este -- ! bandaid solution -> check later
 
 
 

@@ -270,24 +270,6 @@ avancaObjeto e i o = case o of
 
 
 
-    -- todo -> Isto definitivamente não é a forma mais otimizada de fazer isto, mas devido ao tempo é melhor usar assim por enquanto
-    -- todo -> Atualmente so se usa explosoes 3,5 e 7 logo isto serve, mas no futuro é importante transformar numa função generalizada
-    calculaExplosao :: Posicao -> Int -> Danos
-    calculaExplosao pos d = case d of
-      3 -> [
-              (pos, d*10),
-              (movePosicao Norte pos, (d-2)*10),(movePosicao Sul pos, (d-2)*10),(movePosicao Oeste pos, (d-2)*10),(movePosicao Este pos, (d-2)*10)
-          ]
-
-      5 -> [
-              (pos, d*10),
-              (movePosicao Norte pos, (d-2)*10),(movePosicao Sul pos, (d-2)*10),(movePosicao Oeste pos, (d-2)*10),(movePosicao Este pos, (d-2)*10),
-              (movePosicao Sudeste pos, (d-3)*10),(movePosicao Sudoeste pos, (d-3)*10),(movePosicao Nordeste pos, (d-3)*10),(movePosicao Noroeste pos, (d-3)*10),
-              (movePosicao Norte (movePosicao Norte pos), (d-4)*10),(movePosicao Sul (movePosicao Sul pos), (d-4)*10),(movePosicao Este (movePosicao Este pos), (d-4)*10),(movePosicao Oeste (movePosicao Oeste pos), (d-4)*10)
-          ]
-
-      7 -> [ (pos, 70), (movePosicao Norte pos, 50), (movePosicao Sul pos, 50), (movePosicao Este pos, 50), (movePosicao Oeste pos, 50), (movePosicao Nordeste pos, 40), (movePosicao Noroeste pos, 40), (movePosicao Sudeste pos, 40), (movePosicao Sudoeste pos, 40), (movePosicao Norte (movePosicao Nordeste pos), 40), (movePosicao Norte (movePosicao Noroeste pos), 40), (movePosicao Sul (movePosicao Sudeste pos), 40), (movePosicao Sul (movePosicao Sudoeste pos), 40), (movePosicao Este (movePosicao Nordeste pos), 40), (movePosicao Oeste (movePosicao Noroeste pos), 40), (movePosicao Este (movePosicao Sudeste pos), 40), (movePosicao Oeste (movePosicao Sudoeste pos), 40), (movePosicao Norte (movePosicao Norte pos), 30), (movePosicao Sul (movePosicao Sul pos), 30), (movePosicao Este (movePosicao Este pos), 30), (movePosicao Oeste (movePosicao Oeste pos), 30), (movePosicao Nordeste (movePosicao Nordeste pos), 20), (movePosicao Noroeste (movePosicao Noroeste pos), 20), (movePosicao Sudeste (movePosicao Sudeste pos), 20), (movePosicao Sudoeste (movePosicao Sudoeste pos), 20), (movePosicao Norte (movePosicao Norte (movePosicao Norte pos)), 50), (movePosicao Sul (movePosicao Sul (movePosicao Sul pos)), 50), (movePosicao Este (movePosicao Este (movePosicao Este pos)), 50), (movePosicao Oeste (movePosicao Oeste (movePosicao Oeste pos)), 50) ]
-
     estaEmAgua :: Posicao -> Mapa -> Bool
     estaEmAgua p [] = False
     estaEmAgua pos mapa = case encontraPosicaoMatriz (movePosicao Sul pos) mapa of
@@ -295,6 +277,24 @@ avancaObjeto e i o = case o of
         Just Agua -> True
         Just _ -> False
 
+
+-- todo -> Isto definitivamente não é a forma mais otimizada de fazer isto, mas devido ao tempo é melhor usar assim por enquanto
+-- todo -> Atualmente so se usa explosoes 3,5 e 7 logo isto serve, mas no futuro é importante transformar numa função generalizada
+calculaExplosao :: Posicao -> Int -> Danos
+calculaExplosao pos d = case d of
+  3 -> [
+          (pos, d*10),
+          (movePosicao Norte pos, (d-2)*10),(movePosicao Sul pos, (d-2)*10),(movePosicao Oeste pos, (d-2)*10),(movePosicao Este pos, (d-2)*10)
+      ]
+
+  5 -> [
+          (pos, d*10),
+          (movePosicao Norte pos, (d-2)*10),(movePosicao Sul pos, (d-2)*10),(movePosicao Oeste pos, (d-2)*10),(movePosicao Este pos, (d-2)*10),
+          (movePosicao Sudeste pos, (d-3)*10),(movePosicao Sudoeste pos, (d-3)*10),(movePosicao Nordeste pos, (d-3)*10),(movePosicao Noroeste pos, (d-3)*10),
+          (movePosicao Norte (movePosicao Norte pos), (d-4)*10),(movePosicao Sul (movePosicao Sul pos), (d-4)*10),(movePosicao Este (movePosicao Este pos), (d-4)*10),(movePosicao Oeste (movePosicao Oeste pos), (d-4)*10)
+      ]
+
+  7 -> [ (pos, 70), (movePosicao Norte pos, 50), (movePosicao Sul pos, 50), (movePosicao Este pos, 50), (movePosicao Oeste pos, 50), (movePosicao Nordeste pos, 40), (movePosicao Noroeste pos, 40), (movePosicao Sudeste pos, 40), (movePosicao Sudoeste pos, 40), (movePosicao Norte (movePosicao Nordeste pos), 40), (movePosicao Norte (movePosicao Noroeste pos), 40), (movePosicao Sul (movePosicao Sudeste pos), 40), (movePosicao Sul (movePosicao Sudoeste pos), 40), (movePosicao Este (movePosicao Nordeste pos), 40), (movePosicao Oeste (movePosicao Noroeste pos), 40), (movePosicao Este (movePosicao Sudeste pos), 40), (movePosicao Oeste (movePosicao Sudoeste pos), 40), (movePosicao Norte (movePosicao Norte pos), 30), (movePosicao Sul (movePosicao Sul pos), 30), (movePosicao Este (movePosicao Este pos), 30), (movePosicao Oeste (movePosicao Oeste pos), 30), (movePosicao Nordeste (movePosicao Nordeste pos), 20), (movePosicao Noroeste (movePosicao Noroeste pos), 20), (movePosicao Sudeste (movePosicao Sudeste pos), 20), (movePosicao Sudoeste (movePosicao Sudoeste pos), 20), (movePosicao Norte (movePosicao Norte (movePosicao Norte pos)), 50), (movePosicao Sul (movePosicao Sul (movePosicao Sul pos)), 50), (movePosicao Este (movePosicao Este (movePosicao Este pos)), 50), (movePosicao Oeste (movePosicao Oeste (movePosicao Oeste pos)), 50) ]
 
 
 
