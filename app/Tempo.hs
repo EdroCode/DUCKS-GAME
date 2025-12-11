@@ -1,4 +1,3 @@
-{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 module Tempo where
 
 import Worms
@@ -9,17 +8,12 @@ import Tarefa2
 import Tarefa3
 import Tarefa4
 
-
-
-
-
-
 type Segundos = Float
 
 -- | Intervalo entre passos automático.
 
 intervalo :: Segundos
-intervalo = 0.5
+intervalo = 1
 
 -- | Função que avança o tempo no estado do jogo no Gloss.
 reageTempo :: Segundos -> Worms -> IO Worms
@@ -33,14 +27,14 @@ reageTempo dt (BotSimulation est acc tick) = return $ BotSimulation estFinal acc
                 acc' = acc2 - fromIntegral steps * intervalo
                 tick' = tick + steps
 
-                -- aplica os passos necessários (cada passo = jogada tática + atualização de objetos)
-                estFinal = aplicaPassos est tick steps
+		-- aplica os passos necessários (cada passo = jogada tática + atualização de objetos)
+		estFinal = aplicaPassos est tick steps
 
-                -- | Aplica n passos sequenciais ao estado. Cada passo tem um número de tick
-                -- usado pela jogada tática para decidir a ação.
-                aplicaPassos :: Estado -> Int -> Int -> Estado
-                aplicaPassos st _ 0 = st
-                aplicaPassos st t n = aplicaPassos (aplicaUm t st) (t + 1) (n - 1)
+		-- | Aplica n passos sequenciais ao estado. Cada passo tem um número de tick
+		-- usado pela jogada tática para decidir a ação.
+		aplicaPassos :: Estado -> Int -> Int -> Estado
+		aplicaPassos st _ 0 = st
+		aplicaPassos st t n = aplicaPassos (aplicaUm t st) (t + 1) (n - 1)
 
                 aplicaUm :: Int -> Estado -> Estado
                 -- Aplica um passo: primeiro a jogada tática (quem/jogada), depois avança o estado
