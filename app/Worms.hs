@@ -5,7 +5,7 @@ import Labs2025
 -- | Estado usado pela interface Gloss: pode estar no menu, a jogar ou em estado de saída.
 data Worms
 	= Menu Int          -- ^ Menu com opção actualmente seleccionada (0..n)
-	| BotSimulation Estado Float Int    -- ^ Estado do jogo + accumulator (segundos) + tick counter
+	| BotSimulation Estado Float Int (NumMinhoca, Jogada)    -- ^ Estado do jogo + accumulator (segundos) + tick counter + última jogada
 	| FreeRoam Estado Float Int Jogada
     | Help              -- ^ Tela de ajuda (mostra instruções)
 	| Quit              -- ^ Estado de saída (mostrado apenas)

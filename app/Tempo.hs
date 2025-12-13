@@ -20,7 +20,7 @@ reageTempo :: Segundos -> Worms -> IO Worms
 reageTempo _ m@Menu{} = return m  -- sem mudança enquanto está no menu
 reageTempo _ Help = return Help
 reageTempo _ Quit = return Quit
-reageTempo dt (BotSimulation est acc tick) = return $ BotSimulation estFinal acc' tick'
+reageTempo dt (BotSimulation est acc tick ultimaJogada) = return $ BotSimulation estFinal acc' tick' novaJogada
         where
                 acc2 = acc + dt
                 steps = floor (acc2 / intervalo)
@@ -28,19 +28,24 @@ reageTempo dt (BotSimulation est acc tick) = return $ BotSimulation estFinal acc
                 tick' = tick + steps
 
 		-- aplica os passos necessários (cada passo = jogada tática + atualização de objetos)
-		estFinal = aplicaPassos est tick steps
+		(estFinal, novaJogada) = aplicaPassos est tick steps ultimaJogada
 
 		-- | Aplica n passos sequenciais ao estado. Cada passo tem um número de tick
 		-- usado pela jogada tática para decidir a ação.
-		aplicaPassos :: Estado -> Int -> Int -> Estado
-		aplicaPassos st _ 0 = st
-		aplicaPassos st t n = aplicaPassos (aplicaUm t st) (t + 1) (n - 1)
+		-- Retorna o estado final e a última jogada executada
+		aplicaPassos :: Estado -> Int -> Int -> (NumMinhoca, Jogada) -> (Estado, (NumMinhoca, Jogada))
+		aplicaPassos st _ 0 lastJogada = (st, lastJogada)
+		aplicaPassos st t n lastJogada = aplicaPassos estNovo (t + 1) (n - 1) jogadaAtual
+                        where
+                                (estNovo, jogadaAtual) = aplicaUm t st
 
-                aplicaUm :: Int -> Estado -> Estado
+                aplicaUm :: Int -> Estado -> (Estado, (NumMinhoca, Jogada))
                 -- Aplica um passo: primeiro a jogada tática (quem/jogada), depois avança o estado
-                aplicaUm t st = avancaEstado $ efetuaJogada jogador jogada st
+                -- Retorna o novo estado e a jogada executada
+                aplicaUm t st = (avancaEstado $ efetuaJogada jogador jogada st, (jogador, jogada))
                         where
                                 (jogador, jogada) = jogadaTatica t st
-reageTempo dt (FreeRoam est acc tick jogadaUser) = return $ FreeRoam (  avancaEstado est) acc tick jogadaUser
+                                
+reageTempo dt (FreeRoam est acc tick jogadaUser) = return $ FreeRoam (avancaEstado est) acc tick jogadaUser
         where
                 i = 0

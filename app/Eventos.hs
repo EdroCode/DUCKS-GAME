@@ -21,11 +21,10 @@ reageEventos (EventKey (SpecialKey KeyDown) Down _ _) (Menu sel)
 
 -- Seleção de opção no menu
 reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (Menu sel)
-	| sel == 0  = return $ BotSimulation novoEstado 0 0  -- Iniciar jogo
+	| sel == 0  = return $ BotSimulation novoEstado 0 0 (0, Move Sul)  -- Iniciar jogo com jogada default
 	| sel == 1  = return $ FreeRoam flatWorld 0 0 (Move Sul) -- Iniciar jogo
 	| sel == 2  = return $ Help -- Tela de ajuda
 	| sel == 3  = return $ Quit                     -- Sair do jogo
-	                -- Sair do jogo
 	| otherwise = return $ Menu sel
 
 
@@ -34,7 +33,7 @@ reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (Menu sel)
 
 reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) Help = return $ Menu 0 -- Voltar do Help para o menu
 reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) Help = return $ Menu 0 -- Voltar do jogo para o menu
-reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (BotSimulation _ _ _) = return $ Menu 0 -- Ir do menu para quit
+reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (BotSimulation _ _ _ _) = return $ Menu 0 -- Ir do menu para quit
 reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (Menu 0) = return $ Quit -- Confirmar sair do jogo
 reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) Quit = exitSuccess -- sai do jogo
 
@@ -85,7 +84,3 @@ reageEventos (EventKey (Char '2') Down _ _) (FreeRoam est acc tick _) =
 
 -- Qualquer outro evento não altera o estado
 reageEventos _ s = return $ s
-
-
-
-

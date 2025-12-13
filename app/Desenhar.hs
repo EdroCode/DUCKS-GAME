@@ -32,7 +32,7 @@ type EstadoGloss = (Estado, Assets)
 -- | Menu do jogo com múltiplas opções
 desenha :: [Picture] -> Worms -> IO Picture
 desenha p (Menu sel) = return $ drawMenu sel
-desenha p (BotSimulation est _ _) = return $ drawGame p est Nothing
+desenha p (BotSimulation est _ _ (numMinhoca, jogada)) = return $ drawGame p est (Just numMinhoca) (Just jogada)
 desenha p (FreeRoam est _ _ jogada) = return $ drawFreeRoamGame p est (Just jogada)
 desenha p Quit = return $ Translate (-50) 0 $ Scale 0.5 0.5 $ Text "Aperte ESC para confirmar saída."
 desenha p Help = return $ drawHelp
@@ -72,8 +72,8 @@ drawHelp = Pictures
 cellSize :: Float
 cellSize = 32
 
-drawGame :: [Picture] -> Estado -> Maybe Jogada -> Picture
-drawGame p est jogada = Pictures [sidebar, world]
+drawGame :: [Picture] -> Estado -> Maybe NumMinhoca -> Maybe Jogada -> Picture
+drawGame p est numMinhoca jogada = Pictures [sidebar, world]
   where
     mapa = mapaEstado est
     infoMapa = "mapa: " ++ show (length mapa) ++ "x" ++ show (if null mapa then 0 else length (head mapa))
@@ -112,7 +112,7 @@ drawGame p est jogada = Pictures [sidebar, world]
           Pictures
             [ drawMapa p mapa
             , drawObjetos p objs mapa
-            , drawMinhocas p ms mapa jogada
+            , drawMinhocas p ms mapa numMinhoca jogada
             ]
 
 drawFreeRoamGame :: [Picture] -> Estado -> Maybe Jogada -> Picture
@@ -164,7 +164,7 @@ drawFreeRoamGame p est jogada = Pictures [sidebar, world]
           Pictures
             [ drawMapa p mapa
             , drawObjetos p objs mapa
-            , drawMinhocas p ms mapa jogada
+            , drawMinhocas p ms mapa (Just 0) jogada
             ]
 
 converteMapa :: Mapa -> Posicao -> (Float, Float)
@@ -217,8 +217,8 @@ bazucaDir p dir = case dir of
     Noroeste -> Rotate 225 (p !! 6)
 
 -- | Desenha as minhocas com sprites diferentes baseado na última jogada
-drawMinhocas :: [Picture] -> [Minhoca] -> Mapa -> Maybe Jogada -> Picture
-drawMinhocas p ms mapa jogada = Pictures $ map drawM (zip [0..] ms)
+drawMinhocas :: [Picture] -> [Minhoca] -> Mapa -> Maybe NumMinhoca -> Maybe Jogada -> Picture
+drawMinhocas p ms mapa numMinhoca jogada = Pictures $ map drawM (zip [0..] ms)
   where
     drawM (i,m) = case posicaoMinhoca m of
       Nothing -> Blank
@@ -227,7 +227,7 @@ drawMinhocas p ms mapa jogada = Pictures $ map drawM (zip [0..] ms)
           (x,y) = converteMapa mapa s
           sprite = if vidaMinhoca m == Morta
             then p !! 4  -- Morto
-            else getSpriteParaAcao m jogada p (i == 0) mapa s
+            else getSpriteParaAcao m jogada p (Just i == numMinhoca) mapa s
 
 -- | Retorna o sprite correto baseado na ação
 -- Índices dos sprites na lista:
@@ -239,21 +239,20 @@ drawMinhocas p ms mapa jogada = Pictures $ map drawM (zip [0..] ms)
 getSpriteParaAcao :: Minhoca -> Maybe Jogada -> [Picture] -> Bool -> Mapa -> Posicao -> Picture
 getSpriteParaAcao m Nothing p _ _ _ = p !! 3  -- Idle
 
-getSpriteParaAcao m (Just (Move dir)) p isFirstWorm mapa pos
-  | isFirstWorm && not (estaNoSolo pos mapa) = 
+getSpriteParaAcao m (Just (Move dir)) p isActiveMinhoca mapa pos
+  | isActiveMinhoca && not (estaNoSolo pos mapa) = 
       if length p > 2 then p !! 2 else p !! 3  -- Caindo (índice 2)
-  | isFirstWorm && dir `elem` [Norte, Nordeste, Noroeste] = 
+  | isActiveMinhoca && dir `elem` [Norte, Nordeste, Noroeste] = 
       if length p > 3 then p !! 3 else p !! 3  -- Pulando (índice 3)
-  | isFirstWorm = 
+  | isActiveMinhoca = 
       if length p > 11 then p !! 11 else p !! 3  -- Andando (índice 11)
   | otherwise = p !! 3  -- Idle para outras minhocas
 
-getSpriteParaAcao m (Just (Dispara arma dir)) p isFirstWorm _ _
-  | not isFirstWorm = p !! 3  -- Idle para outras minhocas
+getSpriteParaAcao m (Just (Dispara arma dir)) p isActiveMinhoca _ _
+  | not isActiveMinhoca = p !! 3  -- Idle para outras minhocas
   | otherwise = case arma of
       Bazuca -> if length p > 2 then p !! 2 else p !! 3      -- Índice 2
       Jetpack -> if length p > 2 then p !! 2 else p !! 3     -- Índice 2
       Escavadora -> if length p > 2 then p !! 2 else p !! 3  -- Índice 2
       Dinamite -> if length p > 2 then p !! 2 else p !! 3    -- Índice 2
       Mina -> if length p > 2 then p !! 2 else p !! 3        -- Índice 2
-
