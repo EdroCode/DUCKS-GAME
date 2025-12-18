@@ -35,11 +35,11 @@ Funcionamento:
 
 -}
 avancaEstado :: Estado -> Estado
-avancaEstado e@(Estado mapa objetos minhocas) = foldr aplicaDanos e' danoss
+avancaEstado e@(Estado mapa objetos minhocas armSel mSel) = foldr aplicaDanos e' danoss
     where
     minhocas' = map (uncurry $ avancaMinhoca e) (zip [0..] minhocas)
     (objetos',danoss) = partitionEithers $ map (uncurry $ avancaObjeto $ e { minhocasEstado = minhocas' }) (zip [0..] objetos)
-    e' = Estado mapa objetos' minhocas'
+    e' = Estado mapa objetos' minhocas' armSel mSel
 
 -- * Funções Auxiliares
 

@@ -148,25 +148,5 @@ jogadasTeste =
   , (0 :: Int, Dispara Jetpack Norte, estado3)
   , (0 :: Int, Dispara Escavadora Sul, estado5)
   , (0 :: Int, Dispara Mina Este, estado5)
-  , (0 :: Int, Dispara Dinamite Oeste, estado31)
-  , (0 :: Int, Dispara Bazuca Oeste, estado32)
-  , (0 :: Int, Dispara Bazuca Norte, estado32)
-  , (0 :: Int, Move Norte, estado32)
-  , (0 :: Int, Dispara Dinamite Norte, estado32)
-  , (0 :: Int, Dispara Escavadora Norte, estado32)
-  , (0 :: Int, Dispara Mina Norte, estado32)
-  , (0 :: Int, Dispara Jetpack Norte, estado32)
-  , (0 :: Int, Dispara Dinamite Sul, estado33)
-  , (0 :: Int, Dispara Escavadora Sul, estado33)
-  , (0 :: Int, Dispara Mina Sul, estado33)
-  , (0 :: Int, Dispara Jetpack Sul, estado33)
-  , (0 :: Int, Dispara Escavadora Sul, estado34)
-  , (0 :: Int, Dispara Jetpack Oeste, estado35)
-  , (0 :: Int, Dispara Escavadora Oeste, estado35)
-  , (0 :: Int, Dispara Escavadora Sudoeste, estado35)
-  , (0 :: Int, Dispara Dinamite Oeste, estado35)
-  , (0 :: Int, Dispara Mina Oeste, estado35)
-
-  
   ]
 

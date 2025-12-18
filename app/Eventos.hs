@@ -5,6 +5,7 @@ import Worms
 import Labs2025
 import Tarefa2
 import System.Exit
+import Tarefa4 (minhocaOnSight)
 
 
 
@@ -45,42 +46,99 @@ reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) Quit = exitSuccess -- sai d
 reageEventos (EventKey (SpecialKey KeyF1) Down _ _) (FreeRoam _ _ _ _) = exitSuccess
 
 
--- ? Movimento
 reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (FreeRoam _ _ _ _) = return $ Menu 0
 
 
-reageEventos (EventKey (SpecialKey KeyLeft) Down _ _) (FreeRoam est acc tick _) = 
-    return $ FreeRoam (efetuaJogada 0 (Move Oeste) est) acc tick (Move Oeste)
+-- * Mudar de minhoca
+reageEventos (EventKey (Char '1') Down _ _) (FreeRoam est acc tick _) = 
 
-reageEventos (EventKey (SpecialKey KeyRight) Down _ _) (FreeRoam est acc tick _) = 
-    return $ FreeRoam (efetuaJogada 0 (Move Este) est) acc tick (Move Este)
+    let novaMinhoca = if (minhocaSelecionada est + 1) > (length (minhocasEstado est) - 1) then 0 else (minhocaSelecionada est + 1)
 
-reageEventos (EventKey (SpecialKey KeyUp) Down _ _) (FreeRoam est acc tick _) = 
-    return $ FreeRoam (efetuaJogada 0 (Move Norte) est) acc tick (Move Norte)
+        novoEstado = Estado {
+            mapaEstado = mapaEstado est
+            , minhocasEstado = minhocasEstado est
+            , objetosEstado = objetosEstado est
+            , armaSelecionada = armaSelecionada est
+            , minhocaSelecionada = novaMinhoca
+        }    
 
-reageEventos (EventKey (SpecialKey KeyDown) Down _ _) (FreeRoam est acc tick _) = 
-    return $ FreeRoam (efetuaJogada 0 (Move Sul) est) acc tick (Move Sul)
+    in
 
--- ! Temporario
+        return $ FreeRoam (efetuaJogada 0 (Move Sudeste) novoEstado) acc tick (Move Sul)
 
-reageEventos (EventKey (Char 'q') Down _ _) (FreeRoam est acc tick _) = 
-    return $ FreeRoam (efetuaJogada 0 (Move Noroeste) est) acc tick (Move Noroeste)
 
-reageEventos (EventKey (Char 'e') Down _ _) (FreeRoam est acc tick _) = 
-    return $ FreeRoam (efetuaJogada 0 (Move Nordeste) est) acc tick (Move Nordeste)
-
-reageEventos (EventKey (Char 'z') Down _ _) (FreeRoam est acc tick _) = 
-    return $ FreeRoam (efetuaJogada 0 (Move Sudoeste) est) acc tick (Move Sudoeste)
-
-reageEventos (EventKey (Char 'c') Down _ _) (FreeRoam est acc tick _) = 
-    return $ FreeRoam (efetuaJogada 0 (Move Sudeste) est) acc tick (Move Sudeste)
-
--- * Mudar minhoca
+-- * Mudar arma minhoca
 reageEventos (EventKey (Char '2') Down _ _) (FreeRoam est acc tick _) = 
-    return $ FreeRoam (efetuaJogada 0 (Move Sudeste) est) acc tick (Move Sudeste)
+
+    let novaArma = case armaSelecionada est of
+            Just Jetpack -> Just Escavadora
+            Just Escavadora -> Just Bazuca
+            Just Bazuca -> Just Mina
+            Just Mina -> Just Dinamite
+            Just Dinamite -> Nothing
+            Nothing -> Just Jetpack
+
+        novoEstado = Estado {
+            mapaEstado = mapaEstado est
+            , minhocasEstado = minhocasEstado est
+            , objetosEstado = objetosEstado est
+            , armaSelecionada = novaArma
+            , minhocaSelecionada = minhocaSelecionada est
+        }    
+
+    in
+
+        return $ FreeRoam (efetuaJogada 0 (Move Sudeste) novoEstado) acc tick (Move Sul)
+
+
+-- * RESTO DE DOWNS
+reageEventos (EventKey key Down _ _) (FreeRoam est acc tick _) = 
+    let (novoEst, jogada) = handleAction key est
+    in return $ FreeRoam novoEst acc tick jogada
+
+
 
 
 
 
 -- Qualquer outro evento não altera o estado
 reageEventos _ s = return $ s
+
+
+
+
+
+-- Função auxiliar para determinar direção baseada na tecla
+keyToDirection :: Key -> Direcao
+keyToDirection key = case key of
+    SpecialKey KeyUp    -> Norte
+    SpecialKey KeyDown  -> Sul
+    SpecialKey KeyLeft  -> Oeste
+    SpecialKey KeyRight -> Este
+    Char 'w'            -> Norte
+    Char 's'            -> Sul
+    Char 'a'            -> Oeste
+    Char 'd'            -> Este
+    Char 'q'            -> Noroeste
+    Char 'e'            -> Nordeste
+    Char 'z'            -> Sudoeste
+    Char 'c'            -> Sudeste
+    _                   -> Sul
+
+
+handleAction :: Key -> Estado -> (Estado, Jogada)
+handleAction key est = 
+    let
+        maybeArma = armaSelecionada est
+        i = minhocaSelecionada est
+    in case (keyToDirection key, maybeArma) of
+
+        (dir, Just arma) -> 
+            let novoEst = efetuaJogada i (Dispara arma dir) est
+            in (novoEst, Dispara arma dir)
+        
+       
+        (dir, Nothing) -> 
+            let novoEst = efetuaJogada i (Move dir) est
+            in (novoEst, Move dir)
+        

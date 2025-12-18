@@ -101,7 +101,10 @@ data Estado = Estado
     , objetosEstado :: [Objeto]
     -- | Uma lista com as minhocas no jogo. A ordem dos elementos é relevante, no sentido cada minhoca vai ser identificada pelo seu índice na lista.
     , minhocasEstado :: [Minhoca]
-    
+    -- | A arma selecionada pela minhoca
+    , armaSelecionada :: Maybe TipoArma
+    -- | O indice da minhoca selecionada
+    , minhocaSelecionada :: NumMinhoca
     }
     deriving (Eq,Ord,Show,Read)
 

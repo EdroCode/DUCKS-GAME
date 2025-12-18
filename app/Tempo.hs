@@ -47,5 +47,3 @@ reageTempo dt (BotSimulation est acc tick ultimaJogada) = return $ BotSimulation
                                 (jogador, jogada) = jogadaTatica t st
                                 
 reageTempo dt (FreeRoam est acc tick jogadaUser) = return $ FreeRoam (avancaEstado est) acc tick jogadaUser
-        where
-                i = 0

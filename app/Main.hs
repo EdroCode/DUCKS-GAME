@@ -19,7 +19,7 @@ fundo = white
 
 
 fr :: Int
-fr = 60
+fr = 1
 
 path :: String
 path = "app/sprites/"
