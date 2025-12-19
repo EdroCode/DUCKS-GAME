@@ -33,7 +33,7 @@ main = do
   Just stone  <- loadJuicy (path ++"stone1.png")
   Just sky    <- loadJuicy (path ++"sky.png")
   Just dirt  <- loadJuicy (path ++"Terra.png")
-
+  Just lava <- loadJuicy (path ++ "lava.png")
 
   Just worm   <- loadJuicy (path ++"Worm.png")
   Just  morto  <- loadJuicy (path ++"Dead.png")
@@ -42,8 +42,8 @@ main = do
   Just  dinamite <- loadJuicy (path ++"Dinamite.png")
   Just  mina <- loadJuicy (path ++"Mina.png")
   
-  let tiles = [grass, water, stone, worm, morto, barril, bazuca, sky, dinamite, mina, dirt]
-  let temanatal = [grass, water, stone, worm, morto, barril, bazuca, sky, dinamite, mina]
+  let tiles = [grass, water, stone, worm, morto, barril, bazuca, sky, dinamite, mina, dirt, lava]
+  let temanatal = [grass, water, stone, worm, morto, barril, bazuca, sky, dinamite, mina, dirt, lava]
 
   playIO janela fundo fr it (desenha tiles) reageEventos reageTempo
   where

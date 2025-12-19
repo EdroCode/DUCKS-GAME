@@ -13,6 +13,8 @@ import Tarefa4 (getMinhocasValidas)
 import Data.Semigroup (Min(Min))
 import Data.Data (ConstrRep(FloatConstr))
 
+
+
 janelaLargura :: Float
 janelaLargura = 1900
 janelaAltura :: Float
@@ -274,6 +276,7 @@ drawMapa p mapa = Pictures $ concatMap drawRow (zip [0..] mapa)
         colorTile Terra | r > 0 && (mapa !! (r-1) !! c) == Ar = p !! 0
                         | otherwise = p !! 10
         colorTile Pedra = p !! 2
+        colorTile Lava = p !! 11
 
 drawObjetos :: [Picture] -> [Objeto] -> Mapa -> Picture
 drawObjetos p objs mapa = Pictures $ map drawO objs

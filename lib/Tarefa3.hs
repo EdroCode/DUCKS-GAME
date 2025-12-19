@@ -75,10 +75,12 @@ avancaMinhoca e i minhoca =
               Morta -> minhoca { posicaoMinhoca = Just posicaoTentativa, vidaMinhoca = Morta }
               Viva 0 -> case terreno of
                 Just Agua -> minhoca { posicaoMinhoca = Just posicaoTentativa, vidaMinhoca = Morta }
+                Just Lava -> minhoca { posicaoMinhoca = Just posicaoTentativa, vidaMinhoca = Morta }
                 Just Ar   -> minhoca { posicaoMinhoca = Just posicaoTentativa, vidaMinhoca = Morta }
                 _         -> minhoca { posicaoMinhoca = Just posicaoTentativa, vidaMinhoca = Morta }
-              Viva _ -> case terreno of
+              Viva v -> case terreno of
                 Just Agua -> minhoca { posicaoMinhoca = Just posicaoTentativa, vidaMinhoca = Morta }
+                Just Lava -> minhoca { posicaoMinhoca = Just posicaoTentativa, vidaMinhoca = Viva (v-10) }
                 Just Ar   -> minhoca { posicaoMinhoca = Just posicaoTentativa }
                 _         -> minhoca { posicaoMinhoca = Just posicaoTentativa }
 
@@ -156,7 +158,7 @@ avancaObjeto e i o = case o of
   Barril posBarril explode ->
     if not explode
       then
-        if not (estaNoSolo posBarril mapa) || estaEmAgua posBarril mapa -- esta no ar ou em agua
+        if not (estaNoSolo posBarril mapa) || estaEmAgua posBarril mapa || estaEmLava posBarril mapa -- esta no ar ou em agua
           then Left (Barril { posicaoBarril = posBarril, explodeBarril = True })
           else Left o
       else Right (calculaExplosao posBarril 5)
@@ -191,7 +193,7 @@ avancaObjeto e i o = case o of
                       else Left (Disparo { posicaoDisparo = movePosicao Sul pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = tempoNovo, donoDisparo = dono })
                   else Left (Disparo { posicaoDisparo = pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = tempoNovo, donoDisparo = dono })
                 else Right [] -- o objeto é eliminado
-          Nothing -> let novaPos = if estaEmAgua pos mapa || not (estaNoSolo pos mapa)
+          Nothing -> let novaPos = if estaEmAgua pos mapa || not (estaNoSolo pos mapa) 
                             then movePosicao Sul pos
                             else pos
                             
@@ -276,6 +278,14 @@ avancaObjeto e i o = case o of
         Nothing -> False
         Just Agua -> True
         Just _ -> False
+    
+    estaEmLava :: Posicao -> Mapa -> Bool
+    estaEmLava p [] = False
+    estaEmLava pos mapa = case encontraPosicaoMatriz (movePosicao Sul pos) mapa of
+        Nothing -> False
+        Just Lava -> True
+        Just _ -> False
+        
 
 
 -- todo -> Isto definitivamente não é a forma mais otimizada de fazer isto, mas devido ao tempo é melhor usar assim por enquanto

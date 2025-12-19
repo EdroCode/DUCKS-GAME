@@ -160,6 +160,11 @@ efetuaJogada n (Dispara arma direcao) e = if indiceValido n e && vidaMinhoca min
                                                                     Jetpack    -> (Just pos, vidaMinhoca minhoca)
                                                                     Escavadora -> (Just novaPos, vidaMinhoca minhoca)
                                                                     _          -> (posicaoMinhoca minhoca, vidaMinhoca minhoca)
+                                                            Just Lava ->
+                                                                case arma of
+                                                                    Jetpack    -> if ePosicaoEstadoLivre novaPos e then (Just novaPos, Morta) else (Just pos, vidaMinhoca minhoca)
+                                                                    Escavadora -> if ePosicaoEstadoLivre novaPos e then (Just novaPos, Morta) else (Just pos, vidaMinhoca minhoca)
+                                                                    _          -> (posicaoMinhoca minhoca, vidaMinhoca minhoca)
 
                                                             _ ->
                                                                 case arma of
@@ -216,7 +221,7 @@ efetuaJogada n (Move direcao) e = if vidaMinhoca minhoca /= Morta && posicaoMinh
                             minhocaFinal = -- * NOva pos n é opaca
                                 if ePosicaoMatrizValida novaPos mapa
                                     then if ePosicaoEstadoLivre novaPos e
-                                        then if encontraPosicaoMatriz novaPos mapa /= Just Agua
+                                        then if encontraPosicaoMatriz novaPos mapa /= Just Agua || encontraPosicaoMatriz novaPos mapa /= Just Lava 
                                             then minhoca { posicaoMinhoca = Just novaPos }
                                             else minhoca { posicaoMinhoca = Just novaPos,  vidaMinhoca = Morta }
                                         else minhoca

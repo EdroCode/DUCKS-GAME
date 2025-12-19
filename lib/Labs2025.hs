@@ -23,6 +23,9 @@ data Terreno
     | Terra
     -- | Terreno opaco e indestrutivel.
     | Pedra
+    -- | Terreno que queima minhocas
+    | Lava
+
     deriving (Eq,Ord,Show,Read,Enum)
 
 -- | O mapa do jogo é uma matriz de terrenos.

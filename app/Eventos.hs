@@ -5,7 +5,7 @@ import Worms
 import Labs2025
 import Tarefa2
 import System.Exit
-import Tarefa4 (minhocaOnSight)
+import Tarefa4 (minhocaOnSight, getMinhocasValidas)
 
 
 
@@ -52,13 +52,15 @@ reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (FreeRoam _ _ _ _) = return
 -- * Mudar de minhoca
 reageEventos (EventKey (Char '1') Down _ _) (FreeRoam est acc tick _) = 
 
-    let novaMinhoca = if (minhocaSelecionada est + 1) > (length (minhocasEstado est) - 1) then 0 else (minhocaSelecionada est + 1)
+    let novaMinhoca = if (minhocaSelecionada est + 1) > (length minhocasValidas - 1) then 0 else (minhocaSelecionada est + 1)
 
+        minhocasValidas = getMinhocasValidas (minhocasEstado est)
+        
         novoEstado = Estado {
             mapaEstado = mapaEstado est
             , minhocasEstado = minhocasEstado est
             , objetosEstado = objetosEstado est
-            , armaSelecionada = armaSelecionada est
+            , armaSelecionada = Nothing
             , minhocaSelecionada = novaMinhoca
         }    
 
