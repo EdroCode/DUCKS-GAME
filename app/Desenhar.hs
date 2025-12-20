@@ -290,6 +290,9 @@ drawObjetos p objs mapa = Pictures $ map drawO objs
 
     drawO b@(Barril {}) = Translate x y $ p !! 5
       where (x,y) = converteMapa mapa (posicaoObjeto b)
+    
+    drawO hp@(HealthPack {}) = Translate x y $ p !! 12
+      where (x,y) = converteMapa mapa (posicaoObjeto hp)
 
 bazucaDir :: [Picture] -> Direcao -> Picture
 bazucaDir p dir = case dir of

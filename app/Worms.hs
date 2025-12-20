@@ -2,6 +2,7 @@ module Worms where
 
 import Labs2025
 import Control.Exception (tryJust)
+import Tarefa4 (canFollowVoid)
 
 -- | Estado usado pela interface Gloss: pode estar no menu, a jogar ou em estado de saída.
 data Worms
@@ -51,10 +52,11 @@ flatWorld = Estado
         ,[Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra]
         ]
     , objetosEstado =
-        [Barril {posicaoBarril = (3,2), explodeBarril = False}]
+        [Barril {posicaoBarril = (3,2), explodeBarril = False},
+        HealthPack {posicaoHP = (2,3), curaHP = 40}]
     , minhocasEstado =
-        [Minhoca {posicaoMinhoca = Just (1,4), vidaMinhoca = Viva 100, jetpackMinhoca = 100, escavadoraMinhoca = 100, bazucaMinhoca = 100, minaMinhoca = 100, dinamiteMinhoca = 100}
-        ,Minhoca {posicaoMinhoca = Just (2,4), vidaMinhoca = Viva 100, jetpackMinhoca = 100, escavadoraMinhoca = 100, bazucaMinhoca = 100, minaMinhoca = 100, dinamiteMinhoca = 100}
+        [Minhoca {posicaoMinhoca = Just (1,4), vidaMinhoca = Viva 100, jetpackMinhoca = 100, escavadoraMinhoca = 100, bazucaMinhoca = 100, minaMinhoca = 100, dinamiteMinhoca = 100, burningCounter = 0}
+        ,Minhoca {posicaoMinhoca = Just (2,4), vidaMinhoca = Viva 100, jetpackMinhoca = 100, escavadoraMinhoca = 100, bazucaMinhoca = 100, minaMinhoca = 100, dinamiteMinhoca = 100, burningCounter = 0}
         ]
     , armaSelecionada = Nothing
 

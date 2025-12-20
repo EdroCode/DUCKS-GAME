@@ -35,6 +35,10 @@ type Mapa = Matriz Terreno
 data TipoArma = Jetpack | Escavadora | Bazuca | Mina | Dinamite
     deriving (Eq,Ord,Show,Read,Enum)
 
+data Team = Red | Blue | Green 
+    deriving (Eq,Ord,Show,Read,Enum)
+
+
 -- | O estado de saúde de uma minhoca.
 data VidaMinhoca
     -- | Está viva com um número inteiros de pontos de vida.
@@ -59,7 +63,10 @@ data Minhoca = Minhoca
     , minaMinhoca :: Int
     -- | Munições de @Dinamite@.
     , dinamiteMinhoca :: Int
-    
+    -- | O estado de burning da minhoca
+    , burningCounter :: Int -- o Default dado por terrenos de lava é 5 mas pode variar
+    -- | Equipa da Minhoca (default é Nothing)
+    , equipaMinhoca :: Maybe Team
     }
     deriving (Eq,Ord,Show,Read)
 
@@ -94,6 +101,13 @@ data Objeto
         -- | Se o barril está prestes a explodir ou não.
         , explodeBarril :: Bool
         }
+    -- | Um pacote medico que cura a minhoca.
+    | HealthPack
+        -- | A posicao do HP no mapa
+        { posicaoHP :: Posicao
+        -- | A quantidade de cura do HP
+        , curaHP :: Int
+        }
     deriving (Eq,Ord,Show,Read)
 
 -- | Estado do jogo.
@@ -119,6 +133,9 @@ data Jogada
     | Move Direcao
 
     deriving (Eq,Ord,Show,Read)
+
+fireDamage :: Int
+fireDamage = 10
 
 
 -- | Lista das oito direcções possíveis num tabuleiro ou grelha.

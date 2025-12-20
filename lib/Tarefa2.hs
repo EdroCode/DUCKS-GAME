@@ -206,8 +206,9 @@ efetuaJogada n (Move direcao) e = if vidaMinhoca minhoca /= Morta && posicaoMinh
 
                         where
                             -- * minhoca estudada
-                            minhoca = case encontraIndiceLista n minhocas of Just m -> m -- ! atencao
+                            minhoca = case encontraIndiceLista n minhocas of Just m -> m 
                             pos = case posicaoMinhoca minhoca of Just a -> a
+                            hp = case vidaMinhoca minhoca of Viva a -> a
 
                             minhocas = minhocasEstado e
                             mapa = mapaEstado e
@@ -218,15 +219,17 @@ efetuaJogada n (Move direcao) e = if vidaMinhoca minhoca /= Morta && posicaoMinh
 
                             -- * Estado final
 
-                            minhocaFinal = -- * NOva pos n é opaca
+                            minhocaFinal = -- * Nova pos n é opaca
                                 if ePosicaoMatrizValida novaPos mapa
                                     then if ePosicaoEstadoLivre novaPos e
                                         then if encontraPosicaoMatriz novaPos mapa /= Just Agua || encontraPosicaoMatriz novaPos mapa /= Just Lava 
-                                            then minhoca { posicaoMinhoca = Just novaPos }
+                                            then case existeObjeto novaPos objetos of
+                                                Just (HealthPack p cura) -> minhoca { posicaoMinhoca = Just p, vidaMinhoca = Viva (hp + cura) }
+                                                _ -> minhoca { posicaoMinhoca = Just novaPos }
                                             else minhoca { posicaoMinhoca = Just novaPos,  vidaMinhoca = Morta }
                                         else minhoca
                                 else minhoca { posicaoMinhoca = Nothing, vidaMinhoca = Morta }
-
+                            
 
                             minhocasFinais = atualizaIndiceLista n minhocaFinal minhocas
 

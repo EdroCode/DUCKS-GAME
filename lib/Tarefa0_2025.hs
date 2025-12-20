@@ -98,10 +98,13 @@ existeMinhoca (x,y) (h:t) = let pos = posicaoMinhoca h
 existeBarril :: Posicao -> [Objeto] -> Bool
 existeBarril _ [] = False
 existeBarril pos (h:t) =
-  let p = posicaoObjeto h
-  in if ehDisparo h == False && p == pos
-              then True
-              else existeBarril pos t
+  case h of
+    Barril p _ -> if p == pos then True else existeBarril pos t
+    _ ->  existeBarril pos t
+
+existeObjeto :: Posicao -> [Objeto] -> Maybe Objeto
+existeObjeto _ [] = Nothing
+existeObjeto p (h:t) = if posicaoObjeto h == p then Just h else existeObjeto p t
 
 -- | Verifica se um 'Objeto' é um 'Disparo'.(Utilizado na função 'existeBarril')
 ehDisparo :: Objeto -> Bool
@@ -112,6 +115,8 @@ ehDisparo _ = False
 posicaoObjeto :: Objeto -> Posicao
 posicaoObjeto d@(Disparo {})  = posicaoDisparo d
 posicaoObjeto b@(Barril {}) = posicaoBarril b
+posicaoObjeto hp@(HealthPack {}) = posicaoHP hp
+
 
 
 

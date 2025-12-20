@@ -37,8 +37,8 @@ Funcionamento:
 avancaEstado :: Estado -> Estado
 avancaEstado e@(Estado mapa objetos minhocas armSel mSel) = foldr aplicaDanos e' danoss
     where
-    minhocas' = map (uncurry $ avancaMinhoca e) (zip [0..] minhocas)
-    (objetos',danoss) = partitionEithers $ map (uncurry $ avancaObjeto $ e { minhocasEstado = minhocas' }) (zip [0..] objetos)
+    minhocas' = zipWith (curry (uncurry $ avancaMinhoca e)) [0..] minhocas
+    (objetos',danoss) = partitionEithers $ zipWith (curry (uncurry $ avancaObjeto $ e { minhocasEstado = minhocas' })) [0..] objetos
     e' = Estado mapa objetos' minhocas' armSel mSel
 
 -- * Funções Auxiliares
@@ -57,7 +57,7 @@ Funcionamento:
 
 -}
 avancaMinhoca :: Estado -> NumMinhoca -> Minhoca -> Minhoca
-avancaMinhoca e i minhoca =
+avancaMinhoca e i minhoca=
   case posicaoMinhoca minhoca of
     Nothing -> minhoca
     Just pos ->
@@ -69,20 +69,22 @@ avancaMinhoca e i minhoca =
         -- Se a posição tentativa for inválida, a minhoca morre e desaparece
         posicaoFinalValida = ePosicaoMatrizValida posicaoTentativa mapa
         terreno = encontraPosicaoMatriz posicaoTentativa mapa
+
+
       in if not posicaoFinalValida
             then minhoca { posicaoMinhoca = Nothing, vidaMinhoca = Morta }
             else case vidaMinhoca minhoca of
-              Morta -> minhoca { posicaoMinhoca = Just posicaoTentativa, vidaMinhoca = Morta }
+              Morta -> minhoca { posicaoMinhoca = Just posicaoTentativa, vidaMinhoca = Morta, burningCounter = 0 }
               Viva 0 -> case terreno of
-                Just Agua -> minhoca { posicaoMinhoca = Just posicaoTentativa, vidaMinhoca = Morta }
-                Just Lava -> minhoca { posicaoMinhoca = Just posicaoTentativa, vidaMinhoca = Morta }
-                Just Ar   -> minhoca { posicaoMinhoca = Just posicaoTentativa, vidaMinhoca = Morta }
-                _         -> minhoca { posicaoMinhoca = Just posicaoTentativa, vidaMinhoca = Morta }
+                Just Agua -> minhoca { posicaoMinhoca = Just posicaoTentativa, vidaMinhoca = Morta, burningCounter = 0 }
+                Just Lava -> minhoca { posicaoMinhoca = Just posicaoTentativa, vidaMinhoca = Morta, burningCounter = 0 }
+                Just Ar   -> minhoca { posicaoMinhoca = Just posicaoTentativa, vidaMinhoca = Morta, burningCounter = 0 }
+                _         -> minhoca { posicaoMinhoca = Just posicaoTentativa, vidaMinhoca = Morta, burningCounter = 0 }
               Viva v -> case terreno of
-                Just Agua -> minhoca { posicaoMinhoca = Just posicaoTentativa, vidaMinhoca = Morta }
-                Just Lava -> minhoca { posicaoMinhoca = Just posicaoTentativa, vidaMinhoca = Viva (v-10) }
-                Just Ar   -> minhoca { posicaoMinhoca = Just posicaoTentativa }
-                _         -> minhoca { posicaoMinhoca = Just posicaoTentativa }
+                Just Agua -> minhoca { posicaoMinhoca = Just posicaoTentativa, vidaMinhoca =  Morta, burningCounter = 0}
+                Just Lava -> minhoca { posicaoMinhoca = Just posicaoTentativa, vidaMinhoca = Viva (v-fireDamage), burningCounter = 5}
+                Just Ar   -> minhoca { posicaoMinhoca = Just posicaoTentativa, vidaMinhoca = if burningCounter minhoca > 0 then Viva (v-fireDamage) else Viva v, burningCounter = if burningCounter minhoca > 0 then burningCounter minhoca - 1 else 0 }
+                _         -> minhoca { posicaoMinhoca = Just posicaoTentativa, vidaMinhoca = Viva v, burningCounter = if burningCounter minhoca > 0 then burningCounter minhoca - 1 else 0 }
 
   where
     mapa = mapaEstado e
@@ -163,6 +165,9 @@ avancaObjeto e i o = case o of
           else Left o
       else Right (calculaExplosao posBarril 5)
 
+  HealthPack pos _ -> if ePosicaoEstadoLivre pos e then Left o else Right []
+
+
   Disparo pos dir tipo tempo dono -> case tipo of
 
       Bazuca ->
@@ -170,11 +175,7 @@ avancaObjeto e i o = case o of
             tempoNovo = case tempo of
               Just t  -> Just (t - 1)
               Nothing -> Nothing
-        in if ePosicaoEstadoLivre pos e
-          then if ePosicaoMatrizValida posNova mapa
-            then Left (Disparo{posicaoDisparo = posNova, direcaoDisparo = dir, tipoDisparo = tipo, tempoDisparo = tempoNovo, donoDisparo = dono})
-            else Right (calculaExplosao pos 5)
-          else Right (calculaExplosao pos 5)
+        in (if ePosicaoEstadoLivre pos e && ePosicaoMatrizValida posNova mapa then Left (Disparo{posicaoDisparo = posNova, direcaoDisparo = dir, tipoDisparo = tipo, tempoDisparo = tempoNovo, donoDisparo = dono}) else Right (calculaExplosao pos 5))
 
       Mina ->
         case tempo of
@@ -193,19 +194,19 @@ avancaObjeto e i o = case o of
                       else Left (Disparo { posicaoDisparo = movePosicao Sul pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = tempoNovo, donoDisparo = dono })
                   else Left (Disparo { posicaoDisparo = pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = tempoNovo, donoDisparo = dono })
                 else Right [] -- o objeto é eliminado
-          Nothing -> let novaPos = if estaEmAgua pos mapa || not (estaNoSolo pos mapa) 
+          Nothing -> let novaPos = if estaEmAgua pos mapa || not (estaNoSolo pos mapa)
                             then movePosicao Sul pos
                             else pos
-                            
+
 
                      in if ePosicaoMatrizValida novaPos mapa
                       then if existeDonoMinhoca pos dono minhocas
                         then Left (Disparo { posicaoDisparo = novaPos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = Just 2, donoDisparo = dono })
                         else Left (Disparo { posicaoDisparo = novaPos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = Nothing, donoDisparo = dono })
                       else Right []
-                    
 
-                    
+
+
                     {- if ePosicaoMatrizValida pos mapa
                       then if existeDonoMinhoca pos dono minhocas
                         then if not (estaNoSolo pos mapa) || estaEmAgua pos mapa
@@ -264,9 +265,7 @@ avancaObjeto e i o = case o of
         verificaTodasPosicoes :: [Posicao] -> [(Int, Minhoca)] -> Bool
         verificaTodasPosicoes [] _ = False
         verificaTodasPosicoes (p:ps) ms =
-          if existeMinhocaInimiga p ms
-            then True
-            else verificaTodasPosicoes ps ms
+          (existeMinhocaInimiga p ms || verificaTodasPosicoes ps ms)
 
       in verificaTodasPosicoes posicoes minhocasComIndice
 
@@ -278,14 +277,14 @@ avancaObjeto e i o = case o of
         Nothing -> False
         Just Agua -> True
         Just _ -> False
-    
+
     estaEmLava :: Posicao -> Mapa -> Bool
     estaEmLava p [] = False
     estaEmLava pos mapa = case encontraPosicaoMatriz (movePosicao Sul pos) mapa of
         Nothing -> False
         Just Lava -> True
         Just _ -> False
-        
+
 
 
 -- todo -> Isto definitivamente não é a forma mais otimizada de fazer isto, mas devido ao tempo é melhor usar assim por enquanto
@@ -409,7 +408,7 @@ aplicaDanos danos estado = estado {
         posAfetado :: Posicao -> Danos -> Bool
         posAfetado _ [] = False
         posAfetado p ((posDano, _):t) =
-          if p == posDano then True else posAfetado p t
+          (p == posDano) || posAfetado p t
 
 
 
