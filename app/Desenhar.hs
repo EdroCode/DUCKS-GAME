@@ -331,9 +331,9 @@ getSpriteParaAcao m Nothing p _ _ _ = p !! 3  -- Idle
 
 getSpriteParaAcao m (Just (Move dir)) p isActiveMinhoca mapa pos
   | isActiveMinhoca && not (estaNoSolo pos mapa) = 
-      if length p > 12 then p !! 12 else p !! 3  -- Caindo 
+      if length p > 14 then p !! 14 else p !! 3  -- Caindo 
   | isActiveMinhoca && dir `elem` [Norte, Nordeste, Noroeste] = 
-      if length p > 11 then p !! 11 else p !! 3  -- Pulando 
+      if length p > 13 then p !! 13 else p !! 3  -- Pulando 
   | isActiveMinhoca = 
       if length p > 3 then p !! 3 else p !! 3  -- Andando 
   | otherwise = p !! 3  -- Idle 

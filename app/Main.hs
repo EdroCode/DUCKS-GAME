@@ -19,7 +19,7 @@ fundo = white
 
 
 fr :: Int
-fr = 60
+fr = 2
 
 path :: String
 path = "app/sprites/"
@@ -33,6 +33,7 @@ main = do
   Just stone  <- loadJuicy (path ++"Pedra.png")
   Just sky    <- loadJuicy (path ++"sky.png")
   Just dirt  <- loadJuicy (path ++"Terra.png")
+  Just lava <- loadJuicy (path ++ "lava.png")
 
 
   Just worm   <- loadJuicy (path ++"PatoParado.png")
@@ -43,8 +44,9 @@ main = do
   Just  mina <- loadJuicy (path ++"Mina.png")
   Just patoPulando <- loadJuicy (path ++ "PatoPulando.png")
   Just patoCaindo <- loadJuicy (path ++ "PatoCaindo.png")
+  Just healthPack <- loadJuicy (path ++ "health_pack.png")
   
-  let tiles = [grass, water, stone, worm, morto, barril, bazuca, sky, dinamite, mina, dirt, patoPulando, patoCaindo]
+  let tiles = [grass, water, stone, worm, morto, barril, bazuca, sky, dinamite, mina, dirt, lava, healthPack, patoPulando, patoCaindo]
   let temanatal = [grass, water, stone, worm, morto, barril, bazuca, sky, dinamite, mina]
 
   playIO janela fundo fr it (desenha tiles) reageEventos reageTempo
