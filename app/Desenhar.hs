@@ -37,7 +37,7 @@ type EstadoGloss = (Estado, Assets)
 desenha :: [Picture] -> Worms -> IO Picture
 desenha p (Menu sel) = return $ drawMenu sel
 desenha p (BotSimulation est _ _ (numMinhoca, jogada)) = return $ drawGame p est (Just numMinhoca) (Just jogada)
-desenha p (FreeRoam est _ _ jogada) = return $ drawFreeRoamGame p est (Just jogada)
+desenha p (PVP est _ _ jogada) = return $ drawPvPGame p est (Just jogada)
 desenha p Quit = return $ Translate (-50) 0 $ Scale 0.5 0.5 $ Text "Aperte ESC para confirmar saída."
 desenha p Help = return $ drawHelp
 
@@ -119,8 +119,8 @@ drawGame p est numMinhoca jogada = Pictures [sidebar, world]
             , drawMinhocas p ms mapa numMinhoca jogada
             ]
 
-drawFreeRoamGame :: [Picture] -> Estado -> Maybe Jogada -> Picture
-drawFreeRoamGame p est jogada =
+drawPvPGame :: [Picture] -> Estado -> Maybe Jogada -> Picture
+drawPvPGame p est jogada =
   Pictures [sidebar, world]
   where
     mapa = mapaEstado est

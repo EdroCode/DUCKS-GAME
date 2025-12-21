@@ -23,7 +23,7 @@ reageEventos (EventKey (SpecialKey KeyDown) Down _ _) (Menu sel)
 -- Seleção de opção no menu
 reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (Menu sel)
 	| sel == 0  = return $ BotSimulation novoEstado 0 0 (0, Move Sul)  -- Iniciar jogo com jogada default
-	| sel == 1  = return $ FreeRoam flatWorld 0 0 (Move Sul) -- Iniciar jogo
+	| sel == 1  = return $ PVP flatWorld 0 0 (Move Sul) -- Iniciar jogo
 	| sel == 2  = return $ Help -- Tela de ajuda
 	| sel == 3  = return $ Quit                     -- Sair do jogo
 	| otherwise = return $ Menu sel
@@ -43,14 +43,14 @@ reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) Quit = exitSuccess -- sai d
 -- * FREE ROAM MODE INPUTS
 
 
-reageEventos (EventKey (SpecialKey KeyF1) Down _ _) (FreeRoam _ _ _ _) = exitSuccess
+reageEventos (EventKey (SpecialKey KeyF1) Down _ _) (PVP _ _ _ _) = exitSuccess
 
 
-reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (FreeRoam _ _ _ _) = return $ Menu 0
+reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (PVP _ _ _ _) = return $ Menu 0
 
 
 -- * Mudar de minhoca
-reageEventos (EventKey (Char '1') Down _ _) (FreeRoam est acc tick _) = 
+reageEventos (EventKey (Char '1') Down _ _) (PVP est acc tick _) = 
 
     let novaMinhoca = if (minhocaSelecionada est + 1) > (length minhocasValidas - 1) then 0 else (minhocaSelecionada est + 1)
 
@@ -66,11 +66,11 @@ reageEventos (EventKey (Char '1') Down _ _) (FreeRoam est acc tick _) =
 
     in
 
-        return $ FreeRoam (efetuaJogada 0 (Move Sudeste) novoEstado) acc tick (Move Sul)
+        return $ PVP (efetuaJogada 0 (Move Sudeste) novoEstado) acc tick (Move Sul)
 
 
 -- * Mudar arma minhoca
-reageEventos (EventKey (Char '2') Down _ _) (FreeRoam est acc tick _) = 
+reageEventos (EventKey (Char '2') Down _ _) (PVP est acc tick _) = 
 
     let novaArma = case armaSelecionada est of
             Just Jetpack -> Just Escavadora
@@ -90,13 +90,13 @@ reageEventos (EventKey (Char '2') Down _ _) (FreeRoam est acc tick _) =
 
     in
 
-        return $ FreeRoam (efetuaJogada 0 (Move Sudeste) novoEstado) acc tick (Move Sul)
+        return $ PVP (efetuaJogada 0 (Move Sudeste) novoEstado) acc tick (Move Sul)
 
 
 -- * RESTO DE DOWNS
-reageEventos (EventKey key Down _ _) (FreeRoam est acc tick _) = 
+reageEventos (EventKey key Down _ _) (PVP est acc tick _) = 
     let (novoEst, jogada) = handleAction key est
-    in return $ FreeRoam novoEst acc tick jogada
+    in return $ PVP novoEst acc tick jogada
 
 
 

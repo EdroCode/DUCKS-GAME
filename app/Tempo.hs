@@ -39,7 +39,7 @@ reageTempo dt (BotSimulation est acc tick ultimaJogada) = return $ BotSimulation
                         where
                                 (jogador, jogada) = jogadaTatica t st
                                 
-reageTempo dt (FreeRoam est acc tick jogadaUser) = return $ FreeRoam estFinal acc tick jogadaUser
+reageTempo dt (PVP est acc tick jogadaUser) = return $ PVP estFinal acc tick jogadaUser
   where
     -- Primeiro avança o estado normalmente
     estAvancado = avancaEstado est

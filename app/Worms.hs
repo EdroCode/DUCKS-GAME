@@ -8,7 +8,8 @@ import Tarefa4 (canFollowVoid)
 data Worms
 	= Menu Int          -- ^ Menu com opção actualmente seleccionada (0..n)
 	| BotSimulation Estado Float Int (NumMinhoca, Jogada)    -- ^ Estado do jogo + accumulator (segundos) + tick counter + última jogada
-	| FreeRoam Estado Float Int Jogada
+	| PVP Estado Float Int Jogada
+    | MapCreatorTool Estado Float Int Jogada
     | Help              -- ^ Tela de ajuda (mostra instruções)
 	| Quit              -- ^ Estado de saída (mostrado apenas)
 	deriving (Eq, Show)
