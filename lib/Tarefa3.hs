@@ -206,36 +206,27 @@ avancaObjeto e i o = case o of
                       else Right []
 
 
-
-                    {- if ePosicaoMatrizValida pos mapa
-                      then if existeDonoMinhoca pos dono minhocas
-                        then if not (estaNoSolo pos mapa) || estaEmAgua pos mapa
-                          then Left (Disparo { posicaoDisparo = movePosicao Sul pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = Nothing, donoDisparo = dono })
-                          else Left (Disparo { posicaoDisparo = pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = Just 2, donoDisparo = dono })
-
-                        else if not (estaNoSolo pos mapa) || estaEmAgua pos mapa
-                          then Left (Disparo { posicaoDisparo = movePosicao Sul pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = Nothing, donoDisparo = dono })
-                          else Left (Disparo { posicaoDisparo = pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = Nothing, donoDisparo = dono })
-                      else Right [] -}
-
-
       Dinamite ->
         case tempo of
           Just 0 -> Right (calculaExplosao pos 7)
           Just _ ->
             let tempoNovo = case tempo of Just t  -> Just (t - 1)
-                (novaPos, novaDir) = case dir of
-                  Norte -> (movePosicao Sul pos, Norte)
-                  Sul   -> (movePosicao Sul pos, Norte)
-                  _     ->  rodaPosicaoDirecao (pos, dir)
-
+            
             in if estaNoSolo pos mapa
-              then Left (Disparo { posicaoDisparo = novaPos, direcaoDisparo = novaDir, tipoDisparo = tipo, tempoDisparo = tempoNovo, donoDisparo = dono })
-              else if ePosicaoMatrizValida novaPos mapa
-                then if ePosicaoMapaLivre novaPos mapa
-                  then Left (Disparo { posicaoDisparo = novaPos, direcaoDisparo = novaDir, tipoDisparo = tipo, tempoDisparo = tempoNovo, donoDisparo = dono })
-                  else Left (Disparo { posicaoDisparo = movePosicao Sul pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = tempoNovo, donoDisparo = dono })
-                else Right [] --objeto desaparece
+              then 
+                -- Se está no solo, mantém a posição
+                Left (Disparo { posicaoDisparo = pos, direcaoDisparo = dir, tipoDisparo = tipo, tempoDisparo = tempoNovo, donoDisparo = dono })
+              else
+                -- Se não está no solo, aplica movimento
+                let (novaPos, novaDir) = case dir of
+                      Norte -> (movePosicao Sul pos, Norte)
+                      Sul   -> (movePosicao Sul pos, Norte)
+                      _     -> rodaPosicaoDirecao (pos, dir)
+                in if ePosicaoMatrizValida novaPos mapa
+                  then if ePosicaoMapaLivre novaPos mapa
+                    then Left (Disparo { posicaoDisparo = novaPos, direcaoDisparo = novaDir, tipoDisparo = tipo, tempoDisparo = tempoNovo, donoDisparo = dono })
+                    else Left (Disparo { posicaoDisparo = movePosicao Sul pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = tempoNovo, donoDisparo = dono })
+                  else Right [] --objeto desaparece
 
 
   where
@@ -409,12 +400,3 @@ aplicaDanos danos estado = estado {
         posAfetado _ [] = False
         posAfetado p ((posDano, _):t) =
           (p == posDano) || posAfetado p t
-
-
-
-
-
-
-
-
-

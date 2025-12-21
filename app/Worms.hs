@@ -31,15 +31,17 @@ novoEstado = Estado
         ]
     , objetosEstado =
         [Barril {posicaoBarril = (1,16), explodeBarril = False}
-        ,Disparo {posicaoDisparo = (0,17), tipoDisparo = Dinamite, direcaoDisparo = Norte, donoDisparo = 2, tempoDisparo = Just 3}
+        ,Disparo {posicaoDisparo = (0,10), tipoDisparo = Dinamite, direcaoDisparo = Norte, donoDisparo = 2, tempoDisparo = Just 3}
         ,Disparo {posicaoDisparo = (1,18), tipoDisparo = Mina, direcaoDisparo = Este, donoDisparo = 0, tempoDisparo = Nothing}
         ]
     , minhocasEstado =
-        [Minhoca {posicaoMinhoca = Just (4,3), vidaMinhoca = Viva 70, jetpackMinhoca = 1, escavadoraMinhoca = 6, bazucaMinhoca = 0, minaMinhoca = 1, dinamiteMinhoca = 0}
-        ,Minhoca {posicaoMinhoca = Just (4,0), vidaMinhoca = Viva 60, jetpackMinhoca = 1, escavadoraMinhoca = 9, bazucaMinhoca = 0, minaMinhoca = 1, dinamiteMinhoca = 0}
-        ,Minhoca {posicaoMinhoca = Just (7,6), vidaMinhoca = Viva 100, jetpackMinhoca = 1, escavadoraMinhoca = 6, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 2}
-        ,Minhoca {posicaoMinhoca = Just (1,11), vidaMinhoca = Viva 100, jetpackMinhoca = 1, escavadoraMinhoca = 6, bazucaMinhoca = 4, minaMinhoca = 1, dinamiteMinhoca = 3}
+        [Minhoca {posicaoMinhoca = Just (4,3), vidaMinhoca = Viva 70, jetpackMinhoca = 1, escavadoraMinhoca = 6, bazucaMinhoca = 0, minaMinhoca = 1, dinamiteMinhoca = 0, burningCounter = 0, equipaMinhoca = Nothing}
+        ,Minhoca {posicaoMinhoca = Just (4,0), vidaMinhoca = Viva 60, jetpackMinhoca = 1, escavadoraMinhoca = 9, bazucaMinhoca = 0, minaMinhoca = 1, dinamiteMinhoca = 0, burningCounter = 0, equipaMinhoca = Nothing}
+        ,Minhoca {posicaoMinhoca = Just (7,6), vidaMinhoca = Viva 100, jetpackMinhoca = 1, escavadoraMinhoca = 6, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 2, burningCounter = 0, equipaMinhoca = Nothing}
+        ,Minhoca {posicaoMinhoca = Just (1,11), vidaMinhoca = Viva 100, jetpackMinhoca = 1, escavadoraMinhoca = 6, bazucaMinhoca = 4, minaMinhoca = 1, dinamiteMinhoca = 3, burningCounter = 0, equipaMinhoca = Nothing}
         ]
+    , armaSelecionada = Nothing
+    , minhocaSelecionada = 0
     }
 
 flatWorld :: Estado
@@ -55,10 +57,9 @@ flatWorld = Estado
         [Barril {posicaoBarril = (3,2), explodeBarril = False},
         HealthPack {posicaoHP = (2,3), curaHP = 40}]
     , minhocasEstado =
-        [Minhoca {posicaoMinhoca = Just (1,4), vidaMinhoca = Viva 100, jetpackMinhoca = 100, escavadoraMinhoca = 100, bazucaMinhoca = 100, minaMinhoca = 100, dinamiteMinhoca = 100, burningCounter = 0}
-        ,Minhoca {posicaoMinhoca = Just (2,4), vidaMinhoca = Viva 100, jetpackMinhoca = 100, escavadoraMinhoca = 100, bazucaMinhoca = 100, minaMinhoca = 100, dinamiteMinhoca = 100, burningCounter = 0}
+        [Minhoca {posicaoMinhoca = Just (1,4), vidaMinhoca = Viva 100, jetpackMinhoca = 100, escavadoraMinhoca = 100, bazucaMinhoca = 100, minaMinhoca = 100, dinamiteMinhoca = 100, burningCounter = 0, equipaMinhoca = Nothing}
+        ,Minhoca {posicaoMinhoca = Just (2,4), vidaMinhoca = Viva 100, jetpackMinhoca = 100, escavadoraMinhoca = 100, bazucaMinhoca = 100, minaMinhoca = 100, dinamiteMinhoca = 100, burningCounter = 0, equipaMinhoca = Nothing}
         ]
     , armaSelecionada = Nothing
-
-    ,minhocaSelecionada = 0
+    , minhocaSelecionada = 0
     }

@@ -273,8 +273,8 @@ drawMapa p mapa = Pictures $ concatMap drawRow (zip [0..] mapa)
         (x,y) = converteMapa mapa (r,c)
         colorTile Ar = p !! 7
         colorTile Agua = p !! 1
-        colorTile Terra | r > 0 && (mapa !! (r-1) !! c) == Ar = p !! 0
-                        | otherwise = p !! 10
+        colorTile Terra | r > 0 && (mapa !! (r-1) !! c) == Ar = Scale 0.66 0.66 $ p !! 0
+                        | otherwise = Scale 0.66 0.66 $ p !! 10
         colorTile Pedra = p !! 2
         colorTile Lava = p !! 11
 
@@ -318,30 +318,31 @@ drawMinhocas p ms mapa numMinhoca jogada = Pictures $ map drawM (zip [0..] ms)
             then p !! 4  -- Morto
             else getSpriteParaAcao m jogada p (Just i == numMinhoca) mapa s
 
--- | Retorna o sprite correto baseado na ação
--- Índices dos sprites na lista:
--- 0: grass, 1: water, 2: stone, 3: worm (idle), 4: morto, 5: barril,
--- 6: bazuca, 7: sky, 8: dinamite, 9: mina, 10: dirt,
--- 11: worm andando, 3: worm pulando, 2: worm caindo,
--- 2: worm bazuca, 2: worm jetpack, 2: worm escavadora,
--- 2: worm dinamite, 2: worm mina
+{- Retorna o sprite correto baseado na ação
+ Índices dos sprites na lista:
+ 0: grass, 1: water, 2: stone, 3: worm (idle), 4: morto, 5: barril,
+ 6: bazuca, 7: sky, 8: dinamite, 9: mina, 10: dirt,
+ 11: worm andando, 12: worm pulando, 13: worm caindo,
+ 14: worm bazuca, 15: worm jetpack, 16: worm escavadora,
+ 17: worm dinamite, 18: worm mina
+-}
 getSpriteParaAcao :: Minhoca -> Maybe Jogada -> [Picture] -> Bool -> Mapa -> Posicao -> Picture
 getSpriteParaAcao m Nothing p _ _ _ = p !! 3  -- Idle
 
 getSpriteParaAcao m (Just (Move dir)) p isActiveMinhoca mapa pos
   | isActiveMinhoca && not (estaNoSolo pos mapa) = 
-      if length p > 2 then p !! 2 else p !! 3  -- Caindo (índice 2)
+      if length p > 12 then p !! 12 else p !! 3  -- Caindo 
   | isActiveMinhoca && dir `elem` [Norte, Nordeste, Noroeste] = 
-      if length p > 3 then p !! 3 else p !! 3  -- Pulando (índice 3)
+      if length p > 11 then p !! 11 else p !! 3  -- Pulando 
   | isActiveMinhoca = 
-      if length p > 11 then p !! 11 else p !! 3  -- Andando (índice 11)
-  | otherwise = p !! 3  -- Idle para outras minhocas
+      if length p > 3 then p !! 3 else p !! 3  -- Andando 
+  | otherwise = p !! 3  -- Idle 
 
 getSpriteParaAcao m (Just (Dispara arma dir)) p isActiveMinhoca _ _
-  | not isActiveMinhoca = p !! 3  -- Idle para outras minhocas
+  | not isActiveMinhoca = p !! 3  -- Idle 
   | otherwise = case arma of
-      Bazuca -> if length p > 2 then p !! 2 else p !! 3      -- Índice 2
-      Jetpack -> if length p > 2 then p !! 2 else p !! 3     -- Índice 2
-      Escavadora -> if length p > 2 then p !! 2 else p !! 3  -- Índice 2
-      Dinamite -> if length p > 2 then p !! 2 else p !! 3    -- Índice 2
-      Mina -> if length p > 2 then p !! 2 else p !! 3        -- Índice 2
+      Bazuca -> if length p > 2 then p !! 3 else p !! 3      
+      Jetpack -> if length p > 2 then p !! 3 else p !! 3     
+      Escavadora -> if length p > 2 then p !! 3 else p !! 3  
+      Dinamite -> if length p > 2 then p !! 3 else p !! 3    
+      Mina -> if length p > 2 then p !! 3 else p !! 3        

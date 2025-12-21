@@ -19,7 +19,7 @@ fundo = white
 
 
 fr :: Int
-fr = 1
+fr = 60
 
 path :: String
 path = "app/sprites/"
@@ -28,26 +28,27 @@ main :: IO ()
 main = do
   putStrLn "Iniciando Worms - demo"
 
-  Just grass  <- loadJuicy (path ++"grass1.png")
+  Just grass  <- loadJuicy (path ++"Grama.png")
   Just water  <- loadJuicy (path ++"water.png")
-  Just stone  <- loadJuicy (path ++"stone1.png")
+  Just stone  <- loadJuicy (path ++"Pedra.png")
   Just sky    <- loadJuicy (path ++"sky.png")
   Just dirt  <- loadJuicy (path ++"Terra.png")
-  Just lava <- loadJuicy (path ++ "lava.png")
 
-  Just worm   <- loadJuicy (path ++"Worm.png")
+
+  Just worm   <- loadJuicy (path ++"PatoParado.png")
   Just  morto  <- loadJuicy (path ++"Dead.png")
   Just  barril <- loadJuicy (path ++"Barril.png")
   Just  bazuca <- loadJuicy (path ++"Bazuca.png")
   Just  dinamite <- loadJuicy (path ++"Dinamite.png")
   Just  mina <- loadJuicy (path ++"Mina.png")
-  Just  hpack <- loadJuicy (path ++"health_pack.png")
-
+  Just patoPulando <- loadJuicy (path ++ "PatoPulando.png")
+  Just patoCaindo <- loadJuicy (path ++ "PatoCaindo.png")
   
-  let tiles = [grass, water, stone, worm, morto, barril, bazuca, sky, dinamite, mina, dirt, lava, hpack]
-  let temanatal = [grass, water, stone, worm, morto, barril, bazuca, sky, dinamite, mina, dirt, lava, hpack]
+  let tiles = [grass, water, stone, worm, morto, barril, bazuca, sky, dinamite, mina, dirt, patoPulando, patoCaindo]
+  let temanatal = [grass, water, stone, worm, morto, barril, bazuca, sky, dinamite, mina]
 
   playIO janela fundo fr it (desenha tiles) reageEventos reageTempo
   where
     
     it = Menu 0
+
