@@ -23,8 +23,6 @@ data Terreno
     | Terra
     -- | Terreno opaco e indestrutivel.
     | Pedra
-    -- | Terreno que queima minhocas
-    | Lava
 
     deriving (Eq,Ord,Show,Read,Enum)
 
@@ -33,9 +31,6 @@ type Mapa = Matriz Terreno
 
 -- | Os diversos tipos de arma disponíveis para uma minhoca.
 data TipoArma = Jetpack | Escavadora | Bazuca | Mina | Dinamite
-    deriving (Eq,Ord,Show,Read,Enum)
-
-data Team = Red | Blue | Green 
     deriving (Eq,Ord,Show,Read,Enum)
 
 
@@ -63,12 +58,9 @@ data Minhoca = Minhoca
     , minaMinhoca :: Int
     -- | Munições de @Dinamite@.
     , dinamiteMinhoca :: Int
-    -- | O estado de burning da minhoca
-    , burningCounter :: Int -- o Default dado por terrenos de lava é 5 mas pode variar
-    -- | Equipa da Minhoca (default é Nothing)
-    , equipaMinhoca :: Maybe Team
     }
     deriving (Eq,Ord,Show,Read)
+
 
 -- | Um tick é a unidade de tempo do jogo.
 type Ticks = Int
@@ -101,13 +93,6 @@ data Objeto
         -- | Se o barril está prestes a explodir ou não.
         , explodeBarril :: Bool
         }
-    -- | Um pacote medico que cura a minhoca.
-    | HealthPack
-        -- | A posicao do HP no mapa
-        { posicaoHP :: Posicao
-        -- | A quantidade de cura do HP
-        , curaHP :: Int
-        }
     deriving (Eq,Ord,Show,Read)
 
 -- | Estado do jogo.
@@ -119,9 +104,6 @@ data Estado = Estado
     -- | Uma lista com as minhocas no jogo. A ordem dos elementos é relevante, no sentido cada minhoca vai ser identificada pelo seu índice na lista.
     , minhocasEstado :: [Minhoca]
     -- | A arma selecionada pela minhoca
-    , armaSelecionada :: Maybe TipoArma
-    -- | O indice da minhoca selecionada
-    , minhocaSelecionada :: NumMinhoca
     }
     deriving (Eq,Ord,Show,Read)
 
@@ -134,8 +116,6 @@ data Jogada
 
     deriving (Eq,Ord,Show,Read)
 
-fireDamage :: Int
-fireDamage = 10
 
 
 -- | Lista das oito direcções possíveis num tabuleiro ou grelha.

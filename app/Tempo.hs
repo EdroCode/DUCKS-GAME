@@ -7,6 +7,10 @@ import Tarefa0_2025
 import Tarefa2
 import Tarefa3
 import Tarefa4
+import DataDLC
+import AvancaEstado
+import EfetuaJogada
+
 
 type Segundos = Float
 
@@ -35,32 +39,32 @@ reageTempo dt (BotSimulation est acc tick ultimaJogada) = return $ BotSimulation
                                 (estNovo, jogadaAtual) = aplicaUm t st
 
                 aplicaUm :: Int -> Estado -> (Estado, (NumMinhoca, Jogada))
-                aplicaUm t st = (avancaEstado $ efetuaJogada jogador jogada st, (jogador, jogada))
+                aplicaUm t st = (Tarefa3.avancaEstado $ Tarefa2.efetuaJogada jogador jogada st, (jogador, jogada))
                         where
                                 (jogador, jogada) = jogadaTatica t st
                                 
 reageTempo dt (PVP est acc tick jogadaUser) = return $ PVP estFinal acc tick jogadaUser
   where
     -- Primeiro avança o estado normalmente
-    estAvancado = avancaEstado est
+    estAvancado = AvancaEstado.avancaEstado est
     
     -- Depois corrige as dinamites que deveriam estar paradas
     estFinal = corrigeDinamites estAvancado
     
     -- Corrige a posição das dinamites que deveriam estar paradas
-    corrigeDinamites :: Estado -> Estado
-    corrigeDinamites e = e { objetosEstado = map corrigeDinamite (objetosEstado e) }
+    corrigeDinamites :: EstadoDLC -> EstadoDLC
+    corrigeDinamites e = e { objetosEstadoDLC = map corrigeDinamite (objetosEstadoDLC e) }
       where
-        mapa = mapaEstado e
+        mapa = mapaEstadoDLC e
         
-        corrigeDinamite :: Objeto -> Objeto
-        corrigeDinamite obj@(Disparo pos dir Dinamite tempo dono) =
+        corrigeDinamite :: ObjetoDLC -> ObjetoDLC
+        corrigeDinamite obj@(DisparoDLC pos dir DinamiteDLC tempo dono) =
           -- Verifica se há terreno sólido abaixo
           let posAbaixo = movePosicao Sul pos
               terrenoAbaixo = encontraPosicaoMatriz posAbaixo mapa
               deveParar = case terrenoAbaixo of
-                Just Terra -> True
-                Just Pedra -> True
+                Just TerraDLC -> True
+                Just PedraDLC -> True
                 _ -> False
           in if deveParar
              then obj  -- Mantém a posição atual

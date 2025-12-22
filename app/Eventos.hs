@@ -8,7 +8,10 @@ import System.Exit
 import Tarefa4 (minhocaOnSight, getMinhocasValidas)
 import Desenhar(cellSize, janelaLargura, janelaAltura)
 import Tarefa0_2025 (posicaoObjeto)
-
+import DataDLC
+import EfetuaJogada
+import AvancaEstado
+import Auxiliar (getMinhocasValidasDLC)
 
 -- | Função principal que reage aos eventos do usuário e atualiza o estado do jogo
 reageEventos :: Event -> Worms -> IO Worms
@@ -23,9 +26,9 @@ reageEventos (EventKey (SpecialKey KeyDown) Down _ _) (Menu sel)
 
 -- Seleção de opção no menu
 reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (Menu sel)
-	| sel == 0  = return $ BotSimulation novoEstado 0 0 (0, Move Sul)  -- Iniciar jogo com jogada default
-	| sel == 1  = return $ PVP flatWorld 0 0 (Move Sul) -- Iniciar jogo
-    | sel == 2  = return $ MapCreatorTool novoEstado 0 0 -- MCT
+	| sel == 0  = return $ BotSimulation novoEstado 0 0 (0, Labs2025.Move Sul)  -- Iniciar jogo com jogada default
+	| sel == 1  = return $ PVP flatWorld 0 0 (DataDLC.Move Sul) -- Iniciar jogo
+    | sel == 2  = return $ MapCreatorTool flatWorld 0 0 -- MCT
 	| sel == 3  = return $ Help -- Tela de ajuda
 	| sel == 4  = return $ Quit                     -- Sair do jogo
 	| otherwise = return $ Menu sel
@@ -57,43 +60,43 @@ reageEventos (EventKey (Char '1') Down _ _) (PVP est acc tick _) =
 
     let novaMinhoca = if (minhocaSelecionada est + 1) > (length minhocasValidas - 1) then 0 else (minhocaSelecionada est + 1)
 
-        minhocasValidas = getMinhocasValidas (minhocasEstado est)
+        minhocasValidas = getMinhocasValidasDLC (minhocasEstadoDLC est)
         
-        novoEstado = Estado {
-            mapaEstado = mapaEstado est
-            , minhocasEstado = minhocasEstado est
-            , objetosEstado = objetosEstado est
+        novoEstado = EstadoDLC {
+            mapaEstadoDLC = mapaEstadoDLC est
+            , minhocasEstadoDLC = minhocasEstadoDLC est
+            , objetosEstadoDLC = objetosEstadoDLC est
             , armaSelecionada = Nothing
             , minhocaSelecionada = novaMinhoca
         }    
 
     in
 
-        return $ PVP novoEstado acc tick (Move Sul)
+        return $ PVP novoEstado acc tick (DataDLC.Move Sul)
 
 
 -- * Mudar arma minhoca
 reageEventos (EventKey (Char '2') Down _ _) (PVP est acc tick _) = 
 
     let novaArma = case armaSelecionada est of
-            Just Jetpack -> Just Escavadora
-            Just Escavadora -> Just Bazuca
-            Just Bazuca -> Just Mina
-            Just Mina -> Just Dinamite
-            Just Dinamite -> Nothing
-            Nothing -> Just Jetpack
+            Just JetpackDLC -> Just EscavadoraDLC
+            Just EscavadoraDLC -> Just BazucaDLC
+            Just BazucaDLC -> Just MinaDLC
+            Just MinaDLC -> Just DinamiteDLC
+            Just DinamiteDLC -> Nothing
+            Nothing -> Just JetpackDLC
 
-        novoEstado = Estado {
-            mapaEstado = mapaEstado est
-            , minhocasEstado = minhocasEstado est
-            , objetosEstado = objetosEstado est
+        novoEstado = EstadoDLC {
+            mapaEstadoDLC = mapaEstadoDLC est
+            , minhocasEstadoDLC = minhocasEstadoDLC est
+            , objetosEstadoDLC = objetosEstadoDLC est
             , armaSelecionada = novaArma
             , minhocaSelecionada = minhocaSelecionada est
         }    
 
     in
 
-        return $ PVP novoEstado acc tick (Move Sul)
+        return $ PVP novoEstado acc tick (DataDLC.Move Sul)
 
 -- * RESTO DE DOWNS pvp
 reageEventos (EventKey key Down _ _) (PVP est acc tick _) = 
@@ -112,37 +115,37 @@ reageEventos (EventKey key Down _ _) (PVP est acc tick _) =
 -- AUmentar Linhas -> 
 reageEventos (EventKey (Char 'k') Down _ _) (MapCreatorTool e b a) = 
     let 
-        mapa = mapaEstado e
+        mapa = mapaEstadoDLC e
         linhas = length mapa
         colunas = if null mapa then 0 else length (head mapa)
-        novaLinha = replicate colunas Ar
+        novaLinha = replicate colunas ArDLC
         novoMapa = mapa ++ [novaLinha]
-    in return $ MapCreatorTool e{mapaEstado = novoMapa} b a
+    in return $ MapCreatorTool e{mapaEstadoDLC = novoMapa} b a
 
 reageEventos (EventKey (Char 'l') Down _ _) (MapCreatorTool e b a) = 
     let 
-        mapa = mapaEstado e
-        novoMapa = map (++ [Ar]) mapa
-    in return $ MapCreatorTool e{mapaEstado = novoMapa} b a
+        mapa = mapaEstadoDLC e
+        novoMapa = map (++ [ArDLC]) mapa
+    in return $ MapCreatorTool e{mapaEstadoDLC = novoMapa} b a
 
 reageEventos (EventKey (Char 'n') Down _ _) (MapCreatorTool e b a) = 
     let 
-        mapa = mapaEstado e
+        mapa = mapaEstadoDLC e
         linhas = length mapa
         colunas = if null mapa then 0 else length (head mapa)
-        novaLinha = replicate colunas Ar
+        novaLinha = replicate colunas ArDLC
         novoMapa = init mapa
-    in return $ MapCreatorTool e{mapaEstado = novoMapa} b a
+    in return $ MapCreatorTool e{mapaEstadoDLC = novoMapa} b a
 
 reageEventos (EventKey (Char 'm') Down _ _) (MapCreatorTool e b a) = 
     let 
-        mapa = mapaEstado e
+        mapa = mapaEstadoDLC e
         novoMapa = map init  mapa
-    in return $ MapCreatorTool e{mapaEstado = novoMapa} b a
+    in return $ MapCreatorTool e{mapaEstadoDLC = novoMapa} b a
 
 reageEventos (EventKey (Char '1') Down _ _) (MapCreatorTool e b a) = 
     let 
-        mapa = mapaEstado e
+        mapa = mapaEstadoDLC e
         x = case a of
             0 -> 4
             1 -> 1
@@ -153,13 +156,13 @@ reageEventos (EventKey (Char '1') Down _ _) (MapCreatorTool e b a) =
 
 reageEventos (EventKey (Char '2') Down _ _) (MapCreatorTool e b a) = 
     let 
-        mapa = mapaEstado e
+        mapa = mapaEstadoDLC e
         novoa = if a > 1 then 0 else a + 1
     in return $ MapCreatorTool e 0 novoa
 
 reageEventos (EventKey (MouseButton LeftButton) Down _ mousePos) (MapCreatorTool e blocoSelecionado modo) =
     let 
-        mapa = mapaEstado e
+        mapa = mapaEstadoDLC e
         (mx, my) = mousePos
         sidebarWidth = 300
         linha = length mapa
@@ -183,9 +186,9 @@ reageEventos (EventKey (MouseButton LeftButton) Down _ mousePos) (MapCreatorTool
         
         novoEstado = if posValida
             then case modo of
-                0 -> e { mapaEstado = atualizaMapa mapa linhaIdx colIdx (getBlocoFromIndex blocoSelecionado) }
-                1 -> adicionaObjeto e blocoSelecionado posicao
-                2 -> adicionaMinhoca e posicao
+                0 -> e { mapaEstadoDLC = atualizaMapa mapa linhaIdx colIdx (getBlocoFromIndex blocoSelecionado) }
+                1 -> adicionaObjetoDLC e blocoSelecionado posicao
+                2 -> adicionaMinhocaDLC e posicao
                 _ -> e
             else e
     in return $ MapCreatorTool novoEstado blocoSelecionado modo
@@ -199,11 +202,10 @@ adicionaObjeto :: Estado -> Int -> Posicao -> Estado
 adicionaObjeto e idx pos = 
     let novoObjeto = case idx of
             0 -> Barril pos False
-            1 -> HealthPack pos 50
             _ -> Barril pos False
         objetosAtuais = objetosEstado e
         -- Remove objeto existente na mesma posição (se houver)
-        objetosFiltrados = filter (\obj -> posicaoObjeto obj /= pos) objetosAtuais
+        objetosFiltrados = filter (\obj -> Tarefa0_2025.posicaoObjeto obj /= pos) objetosAtuais
     in e { objetosEstado = objetosFiltrados ++ [novoObjeto] }
 
 adicionaMinhoca :: Estado -> Posicao -> Estado
@@ -212,8 +214,11 @@ adicionaMinhoca e pos =
         -- Remove minhoca existente na mesma posição (se houver)
         minhocasFiltradas = filter (\m -> posicaoMinhoca m /= Just pos) minhocasAtuais
         -- Cria nova minhoca
-        novaMinhoca = Minhoca {posicaoMinhoca = Just pos, vidaMinhoca = Viva 100, jetpackMinhoca = 100, bazucaMinhoca=100, minaMinhoca = 100, dinamiteMinhoca=100, burningCounter=0, equipaMinhoca=Nothing}
+        novaMinhoca = Minhoca {posicaoMinhoca = Just pos, vidaMinhoca = Viva 100, jetpackMinhoca = 100, bazucaMinhoca=100, minaMinhoca = 100, dinamiteMinhoca=100}
     in e { minhocasEstado = minhocasFiltradas ++ [novaMinhoca] }
+
+
+
 
 -- Função auxiliar para determinar direção baseada na tecla
 keyToDirection :: Key -> Direcao
@@ -232,21 +237,24 @@ keyToDirection key = case key of
     Char 'c'            -> Sudeste
     _                   -> Sul
 
-getBlocoFromIndex :: Int -> Terreno
-getBlocoFromIndex 0 = Terra
-getBlocoFromIndex 1 = Agua
-getBlocoFromIndex 2 = Pedra
-getBlocoFromIndex 3 = Ar
+getBlocoFromIndex :: Int -> TerrenoDLC
+getBlocoFromIndex 0 = TerraDLC
+getBlocoFromIndex 1 = AguaDLC
+getBlocoFromIndex 2 = PedraDLC
+getBlocoFromIndex 3 = ArDLC
 getBlocoFromIndex 4 = Lava
-getBlocoFromIndex _ = Ar
+getBlocoFromIndex _ = ArDLC
 
-atualizaMapa :: Mapa -> Int -> Int -> Terreno -> Mapa
+
+
+
+atualizaMapa :: MapaDLC -> Int -> Int -> TerrenoDLC -> MapaDLC
 atualizaMapa mapa linha col novoBloco =
     let (antes, linhaAtual:depois) = splitAt linha mapa
         novaLinha = atualizaLinha linhaAtual col novoBloco
     in antes ++ [novaLinha] ++ depois
 
-atualizaLinha :: [Terreno] -> Int -> Terreno -> [Terreno]
+atualizaLinha :: [TerrenoDLC] -> Int -> TerrenoDLC -> [TerrenoDLC]
 atualizaLinha linha col novoBloco =
     let (antes, _:depois) = splitAt col linha
     in antes ++ [novoBloco] ++ depois
@@ -260,10 +268,20 @@ podeMover est i =
         Just minhoca -> 
             case posicaoMinhoca minhoca of
                 Nothing -> False
-                Just pos -> estaNoSolo pos (mapaEstado est)
+                Just pos -> Tarefa2.estaNoSolo pos (mapaEstado est)
+
+-- | Verifica se a minhoca pode se mover (está no solo)
+podeMoverDLC :: EstadoDLC -> NumMinhoca -> Bool
+podeMoverDLC est i = 
+    case encontraIndiceLista i (minhocasEstadoDLC est) of
+        Nothing -> False
+        Just minhoca -> 
+            case posicaoMinhocaDLC minhoca of
+                Nothing -> False
+                Just pos -> EfetuaJogada.estaNoSolo pos (mapaEstadoDLC est)
 
 
-handleAction :: Key -> Estado -> (Estado, Jogada)
+handleAction :: Key -> EstadoDLC -> (EstadoDLC, JogadaDLC)
 handleAction key est = 
     let
         maybeArma = armaSelecionada est
@@ -272,12 +290,34 @@ handleAction key est =
     in case maybeArma of
         -- Se tem arma selecionada, sempre dispara
         Just arma -> 
-            let novoEst = efetuaJogada i (Dispara arma dir) est
-            in (novoEst, Dispara arma dir)
+            let novoEst = EfetuaJogada.efetuaJogada i (DataDLC.Dispara arma dir) est
+            in (novoEst, DataDLC.Dispara arma dir)
         
         -- Se não tem arma, só move se estiver no solo
         Nothing -> 
-            if podeMover est i
-            then let novoEst = efetuaJogada i (Move dir) est
-                 in (novoEst, Move dir)
-            else (est, Move dir)
+            if podeMoverDLC est i
+            then let novoEst = EfetuaJogada.efetuaJogada i (DataDLC.Move dir) est
+                 in (novoEst, DataDLC.Move dir)
+            else (est, DataDLC.Move dir)
+
+
+-- * DLC
+
+adicionaObjetoDLC :: EstadoDLC -> Int -> Posicao -> EstadoDLC
+adicionaObjetoDLC e idx pos = 
+    let novoObjeto = case idx of
+            0 -> BarrilDLC pos False
+            _ -> BarrilDLC pos False
+        objetosAtuais = objetosEstadoDLC e
+        -- Remove objeto existente na mesma posição (se houver)
+        objetosFiltrados = filter (\obj -> DataDLC.posicaoObjeto obj /= pos) objetosAtuais
+    in e { objetosEstadoDLC = objetosFiltrados ++ [novoObjeto] }
+
+adicionaMinhocaDLC :: EstadoDLC -> Posicao -> EstadoDLC
+adicionaMinhocaDLC e pos = 
+    let minhocasAtuais = minhocasEstadoDLC e
+        -- Remove minhoca existente na mesma posição (se houver)
+        minhocasFiltradas = filter (\m -> posicaoMinhocaDLC m /= Just pos) minhocasAtuais
+        -- Cria nova minhoca
+        novaMinhoca = MinhocaDLC {posicaoMinhocaDLC = Just pos, vidaMinhocaDLC = VivaDLC 100, jetpackMinhocaDLC = 100, bazucaMinhocaDLC=100, minaMinhocaDLC = 100, dinamiteMinhocaDLC=100, burningCounter = 0, equipaMinhoca = Nothing}
+    in e { minhocasEstadoDLC = minhocasFiltradas ++ [novaMinhoca] }

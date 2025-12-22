@@ -170,7 +170,7 @@ instance Coded Objeto where
     
 instance Coded Minhoca where
     encode :: MonadPut m => Minhoca -> Coding m ()
-    encode (Minhoca pos vida jet esc baz min din burn eq) = encode pos <> encode vida <> encode jet <> encode esc <> encode baz <> encode min <> encode din
+    encode (Minhoca pos vida jet esc baz min din) = encode pos <> encode vida <> encode jet <> encode esc <> encode baz <> encode min <> encode din
     decode = decode >>= \pos -> decode >>= \vida -> decode >>= \jet -> decode >>= \esc -> decode >>= \baz -> decode >>= \min -> decode >>= \din -> return (Minhoca pos vida jet esc baz min din)
 
 instance Coded VidaMinhoca where

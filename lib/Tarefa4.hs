@@ -30,12 +30,12 @@ avancaTatica (e,js) tick = (avancaJogada j e,j:js)
 
 -- | Aplica uma jogada de uma minhoca a um estado, e avança o tempo.
 avancaJogada :: (NumMinhoca,Jogada) -> Estado -> Estado
-avancaJogada (i,j) e@(Estado _ objetos minhocas armSel mSel) = foldr aplicaDanos e'' danoss''
+avancaJogada (i,j) e@(Estado _ objetos minhocas) = foldr aplicaDanos e'' danoss''
     where
-    e'@(Estado mapa' objetos' minhocas' armSel' mSel) = efetuaJogada i j e
+    e'@(Estado mapa' objetos' minhocas') = efetuaJogada i j e
     minhocas'' = map (avancaMinhocaJogada e') (zip3 [0..] minhocas minhocas')
     (objetos'',danoss'') = partitionEithers $ map (avancaObjetoJogada (e' { minhocasEstado = minhocas''}) objetos) (zip [0..] objetos')
-    e'' = Estado mapa' objetos'' minhocas'' armSel' mSel
+    e'' = Estado mapa' objetos'' minhocas''
 
 -- | Avança o tempo para o estado de uma minhoca, se não efetuou a última jogada.
 avancaMinhocaJogada :: Estado -> (NumMinhoca,Minhoca,Minhoca) -> Minhoca

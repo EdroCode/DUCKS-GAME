@@ -115,8 +115,6 @@ ehDisparo _ = False
 posicaoObjeto :: Objeto -> Posicao
 posicaoObjeto d@(Disparo {})  = posicaoDisparo d
 posicaoObjeto b@(Barril {}) = posicaoBarril b
-posicaoObjeto hp@(HealthPack {}) = posicaoHP hp
-
 
 
 

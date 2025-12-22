@@ -1,15 +1,17 @@
 module Worms where
 
-import Labs2025
+import Labs2025(VidaMinhoca(Viva, Morta), TipoArma(Dinamite, Mina, Jetpack, Escavadora, Bazuca), Direcao(Norte,Este,Oeste,Sul,Nordeste,Noroeste,Sudoeste,Sudeste),tempoDisparo,donoDisparo,direcaoDisparo, posicaoBarril, tipoDisparo, explodeBarril, posicaoDisparo,Mapa, Objeto(Barril, Disparo),Estado,Posicao, Terreno(Agua, Ar, Terra, Pedra),Estado(Estado), Minhoca (Minhoca), Jogada, NumMinhoca, NumObjeto, minhocasEstado, objetosEstado, mapaEstado, posicaoMinhoca, vidaMinhoca, jetpackMinhoca, escavadoraMinhoca, bazucaMinhoca, minaMinhoca, dinamiteMinhoca)
 import Control.Exception (tryJust)
 import Tarefa4 (canFollowVoid)
+import DataDLC( JogadaDLC,TerrenoDLC(ArDLC, TerraDLC, PedraDLC, AguaDLC), EstadoDLC, jetpackMinhocaDLC, escavadoraMinhocaDLC, bazucaMinhocaDLC, minaMinhocaDLC, dinamiteMinhocaDLC,mapaEstadoDLC, objetosEstadoDLC, minhocasEstadoDLC,posicaoHP,armaSelecionada,minhocaSelecionada,curaHP, equipaMinhoca, burningCounter, Matriz, fireDamage, VidaMinhocaDLC(MortaDLC, VivaDLC), MapaDLC,EstadoDLC(EstadoDLC), MinhocaDLC (MinhocaDLC), ObjetoDLC, TerrenoDLC(Lava, AguaDLC, ArDLC, TerraDLC, PedraDLC), posicaoMinhocaDLC, vidaMinhocaDLC, burningCounter, posicaoDisparoDLC, direcaoDisparoDLC, tempoDisparoDLC, tipoDisparoDLC, donoDisparoDLC, posicaoBarrilDLC, explodeBarrilDLC, ObjetoDLC, ObjetoDLC(DisparoDLC, BarrilDLC, HealthPack), TipoArmaDLC(MinaDLC, BazucaDLC, DinamiteDLC))
+
 
 -- | Estado usado pela interface Gloss: pode estar no menu, a jogar ou em estado de saída.
 data Worms
 	= Menu Int          -- ^ Menu com opção actualmente seleccionada (0..n)
 	| BotSimulation Estado Float Int (NumMinhoca, Jogada)    -- ^ Estado do jogo + accumulator (segundos) + tick counter + última jogada
-	| PVP Estado Float Int Jogada
-    | MapCreatorTool Estado Int Int -- estado blocoselected modo
+	| PVP EstadoDLC Float Int JogadaDLC
+    | MapCreatorTool EstadoDLC Int Int -- estado blocoselected modo
     | MapSelector
     | Help              -- ^ Tela de ajuda (mostra instruções)
 	| Quit              -- ^ Estado de saída (mostrado apenas)
@@ -37,30 +39,28 @@ novoEstado = Estado
         ,Disparo {posicaoDisparo = (1,18), tipoDisparo = Mina, direcaoDisparo = Este, donoDisparo = 0, tempoDisparo = Nothing}
         ]
     , minhocasEstado =
-        [Minhoca {posicaoMinhoca = Just (4,3), vidaMinhoca = Viva 70, jetpackMinhoca = 1, escavadoraMinhoca = 6, bazucaMinhoca = 0, minaMinhoca = 1, dinamiteMinhoca = 0, burningCounter = 0, equipaMinhoca = Nothing}
-        ,Minhoca {posicaoMinhoca = Just (4,0), vidaMinhoca = Viva 60, jetpackMinhoca = 1, escavadoraMinhoca = 9, bazucaMinhoca = 0, minaMinhoca = 1, dinamiteMinhoca = 0, burningCounter = 0, equipaMinhoca = Nothing}
-        ,Minhoca {posicaoMinhoca = Just (7,6), vidaMinhoca = Viva 100, jetpackMinhoca = 1, escavadoraMinhoca = 6, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 2, burningCounter = 0, equipaMinhoca = Nothing}
-        ,Minhoca {posicaoMinhoca = Just (1,11), vidaMinhoca = Viva 100, jetpackMinhoca = 1, escavadoraMinhoca = 6, bazucaMinhoca = 4, minaMinhoca = 1, dinamiteMinhoca = 3, burningCounter = 0, equipaMinhoca = Nothing}
+        [Minhoca {posicaoMinhoca = Just (4,3), vidaMinhoca = Viva 70, jetpackMinhoca = 1, escavadoraMinhoca = 6, bazucaMinhoca = 0, minaMinhoca = 1, dinamiteMinhoca = 0}
+        ,Minhoca {posicaoMinhoca = Just (4,0), vidaMinhoca = Viva 60, jetpackMinhoca = 1, escavadoraMinhoca = 9, bazucaMinhoca = 0, minaMinhoca = 1, dinamiteMinhoca = 0}
+        ,Minhoca {posicaoMinhoca = Just (7,6), vidaMinhoca = Viva 100, jetpackMinhoca = 1, escavadoraMinhoca = 6, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 2}
+        ,Minhoca {posicaoMinhoca = Just (1,11), vidaMinhoca = Viva 100, jetpackMinhoca = 1, escavadoraMinhoca = 6, bazucaMinhoca = 4, minaMinhoca = 1, dinamiteMinhoca = 3}
         ]
-    , armaSelecionada = Nothing
-    , minhocaSelecionada = 0
-    }
+        }
 
-flatWorld :: Estado
-flatWorld = Estado
-    { mapaEstado =
-        [[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
-        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
-        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
-        ,[Terra,Agua,Agua,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Lava,Ar,Ar,Ar]
-        ,[Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra]
+flatWorld :: EstadoDLC
+flatWorld = EstadoDLC
+    { mapaEstadoDLC =
+        [[ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC]
+        ,[ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC]
+        ,[ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC]
+        ,[TerraDLC,AguaDLC,AguaDLC,TerraDLC,TerraDLC,TerraDLC,TerraDLC,TerraDLC,TerraDLC,TerraDLC,Lava,ArDLC,ArDLC,ArDLC]
+        ,[TerraDLC,TerraDLC,TerraDLC,TerraDLC,TerraDLC,TerraDLC,TerraDLC,TerraDLC,TerraDLC,TerraDLC,TerraDLC,TerraDLC,TerraDLC,TerraDLC]
         ]
-    , objetosEstado =
-        [Barril {posicaoBarril = (3,2), explodeBarril = False},
+    , objetosEstadoDLC =
+        [BarrilDLC{posicaoBarrilDLC = (3,2), explodeBarrilDLC = False},
         HealthPack {posicaoHP = (2,3), curaHP = 40}]
-    , minhocasEstado =
-        [Minhoca {posicaoMinhoca = Just (1,4), vidaMinhoca = Viva 100, jetpackMinhoca = 100, escavadoraMinhoca = 100, bazucaMinhoca = 100, minaMinhoca = 100, dinamiteMinhoca = 100, burningCounter = 0, equipaMinhoca = Nothing}
-        ,Minhoca {posicaoMinhoca = Just (2,4), vidaMinhoca = Viva 100, jetpackMinhoca = 100, escavadoraMinhoca = 100, bazucaMinhoca = 100, minaMinhoca = 100, dinamiteMinhoca = 100, burningCounter = 0, equipaMinhoca = Nothing}
+    , minhocasEstadoDLC =
+        [MinhocaDLC {posicaoMinhocaDLC = Just (1,4), vidaMinhocaDLC = VivaDLC 100, jetpackMinhocaDLC = 100, escavadoraMinhocaDLC = 100, bazucaMinhocaDLC = 100, minaMinhocaDLC = 100, dinamiteMinhocaDLC = 100, burningCounter = 0, equipaMinhoca = Nothing}
+        ,MinhocaDLC {posicaoMinhocaDLC = Just (2,4), vidaMinhocaDLC = VivaDLC 100, jetpackMinhocaDLC = 100, escavadoraMinhocaDLC = 100, bazucaMinhocaDLC = 100, minaMinhocaDLC = 100, dinamiteMinhocaDLC = 100, burningCounter = 0, equipaMinhoca = Nothing}
         ]
     , armaSelecionada = Nothing
     , minhocaSelecionada = 0

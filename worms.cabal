@@ -34,7 +34,6 @@ library
         Tarefa2
         Tarefa3
         Tarefa4
-        
 
 
     -- Modules included in this library but not exported.
@@ -104,7 +103,10 @@ executable worms-game
         Desenhar
         Eventos
         Tempo
-
+        AvancaEstado
+        DataDLC
+        EfetuaJogada
+        Auxiliar
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
 

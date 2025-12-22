@@ -1,21 +1,20 @@
-{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
-{-# HLINT ignore "Redundant if" #-}
 {-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 {-|
-Module      : Tarefa3
+Module      : AvancaEstado
 Description : Avançar tempo do jogo.
 
-Módulo para a realização da Tarefa 3 de LI1\/LP1 em 2025\/26.
+Variante da Tarefa4 para a DLC
 -}
+module AvancaEstado where
 
-module Tarefa3 where
 
 import Data.Either
-import Tarefa0_geral
-import Tarefa0_2025
-import Tarefa2
-import Labs2025
+import EfetuaJogada
 import GHC.Generics ((:+:)(R1))
+import DataDLC( TerrenoDLC(ArDLC, TerraDLC, PedraDLC, AguaDLC, Lava),  Matriz, fireDamage, VidaMinhocaDLC(MortaDLC, VivaDLC), MapaDLC,EstadoDLC(EstadoDLC), MinhocaDLC, ObjetoDLC, minhocasEstadoDLC, posicaoMinhocaDLC, vidaMinhocaDLC, burningCounter, posicaoDisparoDLC, direcaoDisparoDLC, tempoDisparoDLC, tipoDisparoDLC, donoDisparoDLC, posicaoBarrilDLC, explodeBarrilDLC, ObjetoDLC, ObjetoDLC(DisparoDLC, BarrilDLC, HealthPack), minhocasEstadoDLC, objetosEstadoDLC, mapaEstadoDLC, TipoArmaDLC(MinaDLC, BazucaDLC,JetpackDLC, EscavadoraDLC, DinamiteDLC))
+import Labs2025(NumMinhoca,Posicao, NumObjeto, Direcao(Norte,Este,Oeste,Sul,Nordeste,Noroeste,Sudoeste,Sudeste))
+import Auxiliar
+
 
 -- * Tipos Auxiliares
 type Dano = Int
@@ -34,12 +33,12 @@ Funcionamento:
 
 
 -}
-avancaEstado :: Estado -> Estado
-avancaEstado e@(Estado mapa objetos minhocas) = foldr aplicaDanos e' danoss
+avancaEstado :: EstadoDLC -> EstadoDLC
+avancaEstado e@(EstadoDLC mapa objetos minhocas armSel mSel) = foldr aplicaDanos e' danoss
     where
-    minhocas' = map (uncurry $ avancaMinhoca e) (zip [0..] minhocas)
-    (objetos',danoss) = partitionEithers $ map (uncurry $ avancaObjeto $ e { minhocasEstado = minhocas' }) (zip [0..] objetos)
-    e' = Estado mapa objetos' minhocas'
+    minhocas' = zipWith (curry (uncurry $ avancaMinhoca e)) [0..] minhocas
+    (objetos',danoss) = partitionEithers $ zipWith (curry (uncurry $ avancaObjeto $ e { minhocasEstadoDLC = minhocas' })) [0..] objetos
+    e' = EstadoDLC mapa objetos' minhocas' armSel mSel
 
 -- * Funções Auxiliares
 
@@ -56,9 +55,9 @@ Funcionamento:
 * Verifica o 'Terreno' na nova 'Posicao' e atualiza a 'Minhoca' conforme o novo 'Terreno'
 
 -}
-avancaMinhoca :: Estado -> NumMinhoca -> Minhoca -> Minhoca
-avancaMinhoca e i minhoca =
-  case posicaoMinhoca minhoca of
+avancaMinhoca :: EstadoDLC -> NumMinhoca -> MinhocaDLC -> MinhocaDLC
+avancaMinhoca e i minhoca=
+  case posicaoMinhocaDLC minhoca of
     Nothing -> minhoca
     Just pos ->
       let
@@ -69,23 +68,27 @@ avancaMinhoca e i minhoca =
         -- Se a posição tentativa for inválida, a minhoca morre e desaparece
         posicaoFinalValida = ePosicaoMatrizValida posicaoTentativa mapa
         terreno = encontraPosicaoMatriz posicaoTentativa mapa
+
+
       in if not posicaoFinalValida
-            then minhoca { posicaoMinhoca = Nothing, vidaMinhoca = Morta }
-            else case vidaMinhoca minhoca of
-              Morta -> minhoca { posicaoMinhoca = Just posicaoTentativa, vidaMinhoca = Morta }
-              Viva 0 -> case terreno of
-                Just Agua -> minhoca { posicaoMinhoca = Just posicaoTentativa, vidaMinhoca = Morta }
-                Just Ar   -> minhoca { posicaoMinhoca = Just posicaoTentativa, vidaMinhoca = Morta }
-                _         -> minhoca { posicaoMinhoca = Just posicaoTentativa, vidaMinhoca = Morta }
-              Viva _ -> case terreno of
-                Just Agua -> minhoca { posicaoMinhoca = Just posicaoTentativa, vidaMinhoca = Morta }
-                Just Ar   -> minhoca { posicaoMinhoca = Just posicaoTentativa }
-                _         -> minhoca { posicaoMinhoca = Just posicaoTentativa }
+            then minhoca { posicaoMinhocaDLC = Nothing, vidaMinhocaDLC = MortaDLC }
+            else case vidaMinhocaDLC minhoca of
+              MortaDLC -> minhoca { posicaoMinhocaDLC = Just posicaoTentativa, vidaMinhocaDLC = MortaDLC, burningCounter = 0 }
+              VivaDLC 0 -> case terreno of
+                Just AguaDLC -> minhoca { posicaoMinhocaDLC = Just posicaoTentativa, vidaMinhocaDLC = MortaDLC, burningCounter = 0 }
+                Just Lava -> minhoca { posicaoMinhocaDLC = Just posicaoTentativa, vidaMinhocaDLC = MortaDLC, burningCounter = 0 }
+                Just ArDLC   -> minhoca { posicaoMinhocaDLC = Just posicaoTentativa, vidaMinhocaDLC = MortaDLC, burningCounter = 0 }
+                _         -> minhoca { posicaoMinhocaDLC = Just posicaoTentativa, vidaMinhocaDLC = MortaDLC, burningCounter = 0 }
+              VivaDLC v -> case terreno of
+                Just AguaDLC -> minhoca { posicaoMinhocaDLC = Just posicaoTentativa, vidaMinhocaDLC =  MortaDLC, burningCounter = 0}
+                Just Lava -> minhoca { posicaoMinhocaDLC = Just posicaoTentativa, vidaMinhocaDLC = VivaDLC (v-fireDamage), burningCounter = 5}
+                Just ArDLC   -> minhoca { posicaoMinhocaDLC = Just posicaoTentativa, vidaMinhocaDLC = if burningCounter minhoca > 0 then VivaDLC (v-fireDamage) else VivaDLC v, burningCounter = if burningCounter minhoca > 0 then burningCounter minhoca - 1 else 0 }
+                _         -> minhoca { posicaoMinhocaDLC = Just posicaoTentativa, vidaMinhocaDLC = VivaDLC v, burningCounter = if burningCounter minhoca > 0 then burningCounter minhoca - 1 else 0 }
 
   where
-    mapa = mapaEstado e
+    mapa = mapaEstadoDLC e
 
-    estaMinhocaBaixoViva :: Posicao -> Estado -> Bool
+    estaMinhocaBaixoViva :: Posicao -> EstadoDLC -> Bool
     estaMinhocaBaixoViva pos e =
       let
         posAbaixo = movePosicao Sul pos
@@ -104,17 +107,17 @@ Funcinamento Geral:
 
 * Para cada tipo de 'Objeto', aplica a lógica específica:
 
-==__'Barril':__
+==__'BarrilDLC':__
 
-* Se o 'Barril' não está a explodir:
+* Se o 'BarrilDLC' não está a explodir:
   * Verifica se está no solo ou em água
-    * Se não estiver, marca o 'Barril' para explodir
-    * Caso contrário, mantém o 'Barril' inalterado
+    * Se não estiver, marca o 'BarrilDLC' para explodir
+    * Caso contrário, mantém o 'BarrilDLC' inalterado
 
-==__'Bazuca':__
-* Move o 'Disparo' na direção especificada
+==__'BazucaDLC':__
+* Move o 'DisparoDLC' na direção especificada
 * Verifica se a nova posição é válida e livre
-  * Se for, atualiza a posição do 'Disparo'
+  * Se for, atualiza a posição do 'DisparoDLC'
   * Caso contrário, calcula a explosão na posição atual
 
 ==__'Mina':__
@@ -151,30 +154,29 @@ Funcinamento Geral:
 
 -}
 
-avancaObjeto :: Estado -> NumObjeto -> Objeto -> Either Objeto Danos
+avancaObjeto :: EstadoDLC -> NumObjeto -> ObjetoDLC -> Either ObjetoDLC Danos
 avancaObjeto e i o = case o of
-  Barril posBarril explode ->
+  BarrilDLC posBarril explode ->
     if not explode
       then
-        if not (estaNoSolo posBarril mapa) || estaEmAgua posBarril mapa -- esta no ar ou em agua
-          then Left (Barril { posicaoBarril = posBarril, explodeBarril = True })
+        if not (estaNoSolo posBarril mapa) || estaEmAgua posBarril mapa || estaEmLava posBarril mapa -- esta no ar ou em agua
+          then Left (BarrilDLC { posicaoBarrilDLC = posBarril, explodeBarrilDLC = True })
           else Left o
       else Right (calculaExplosao posBarril 5)
 
-  Disparo pos dir tipo tempo dono -> case tipo of
+  HealthPack pos _ -> if ePosicaoEstadoLivre pos e then Left o else Right []
 
-      Bazuca ->
+
+  DisparoDLC pos dir tipo tempo dono -> case tipo of
+
+      BazucaDLC ->
         let posNova = movePosicao dir pos
             tempoNovo = case tempo of
               Just t  -> Just (t - 1)
               Nothing -> Nothing
-        in if ePosicaoEstadoLivre pos e
-          then if ePosicaoMatrizValida posNova mapa
-            then Left (Disparo{posicaoDisparo = posNova, direcaoDisparo = dir, tipoDisparo = tipo, tempoDisparo = tempoNovo, donoDisparo = dono})
-            else Right (calculaExplosao pos 5)
-          else Right (calculaExplosao pos 5)
+        in (if ePosicaoEstadoLivre pos e && ePosicaoMatrizValida posNova mapa then Left (DisparoDLC{posicaoDisparoDLC = posNova, direcaoDisparoDLC = dir, tipoDisparoDLC = tipo, tempoDisparoDLC = tempoNovo, donoDisparoDLC = dono}) else Right (calculaExplosao pos 5))
 
-      Mina ->
+      MinaDLC ->
         case tempo of
           Just 0 -> Right (calculaExplosao pos 3)
           Just _ ->
@@ -187,63 +189,54 @@ avancaObjeto e i o = case o of
                 then if not (estaNoSolo pos mapa) || estaEmAgua pos mapa
                   then
                     if dir == Sul
-                      then Left (Disparo { posicaoDisparo = movePosicao dir pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = tempoNovo, donoDisparo = dono })
-                      else Left (Disparo { posicaoDisparo = movePosicao Sul pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = tempoNovo, donoDisparo = dono })
-                  else Left (Disparo { posicaoDisparo = pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = tempoNovo, donoDisparo = dono })
+                      then Left (DisparoDLC { posicaoDisparoDLC = movePosicao dir pos, direcaoDisparoDLC = Norte, tipoDisparoDLC = tipo, tempoDisparoDLC = tempoNovo, donoDisparoDLC = dono })
+                      else Left (DisparoDLC { posicaoDisparoDLC = movePosicao Sul pos, direcaoDisparoDLC = Norte, tipoDisparoDLC = tipo, tempoDisparoDLC = tempoNovo, donoDisparoDLC = dono })
+                  else Left (DisparoDLC { posicaoDisparoDLC = pos, direcaoDisparoDLC = Norte, tipoDisparoDLC = tipo, tempoDisparoDLC = tempoNovo, donoDisparoDLC = dono })
                 else Right [] -- o objeto é eliminado
           Nothing -> let novaPos = if estaEmAgua pos mapa || not (estaNoSolo pos mapa)
                             then movePosicao Sul pos
                             else pos
-                            
+
 
                      in if ePosicaoMatrizValida novaPos mapa
                       then if existeDonoMinhoca pos dono minhocas
-                        then Left (Disparo { posicaoDisparo = novaPos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = Just 2, donoDisparo = dono })
-                        else Left (Disparo { posicaoDisparo = novaPos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = Nothing, donoDisparo = dono })
+                        then Left (DisparoDLC { posicaoDisparoDLC = novaPos, direcaoDisparoDLC = Norte, tipoDisparoDLC = tipo, tempoDisparoDLC = Just 2, donoDisparoDLC = dono })
+                        else Left (DisparoDLC { posicaoDisparoDLC = novaPos, direcaoDisparoDLC = Norte, tipoDisparoDLC = tipo, tempoDisparoDLC = Nothing, donoDisparoDLC = dono })
                       else Right []
-                    
-
-                    
-                    {- if ePosicaoMatrizValida pos mapa
-                      then if existeDonoMinhoca pos dono minhocas
-                        then if not (estaNoSolo pos mapa) || estaEmAgua pos mapa
-                          then Left (Disparo { posicaoDisparo = movePosicao Sul pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = Nothing, donoDisparo = dono })
-                          else Left (Disparo { posicaoDisparo = pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = Just 2, donoDisparo = dono })
-
-                        else if not (estaNoSolo pos mapa) || estaEmAgua pos mapa
-                          then Left (Disparo { posicaoDisparo = movePosicao Sul pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = Nothing, donoDisparo = dono })
-                          else Left (Disparo { posicaoDisparo = pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = Nothing, donoDisparo = dono })
-                      else Right [] -}
 
 
-      Dinamite ->
+      DinamiteDLC ->
         case tempo of
           Just 0 -> Right (calculaExplosao pos 7)
           Just _ ->
             let tempoNovo = case tempo of Just t  -> Just (t - 1)
-                (novaPos, novaDir) = case dir of
-                  Norte -> (movePosicao Sul pos, Norte)
-                  Sul   -> (movePosicao Sul pos, Norte)
-                  _     ->  rodaPosicaoDirecao (pos, dir)
-
+            
             in if estaNoSolo pos mapa
-              then Left (Disparo { posicaoDisparo = novaPos, direcaoDisparo = novaDir, tipoDisparo = tipo, tempoDisparo = tempoNovo, donoDisparo = dono })
-              else if ePosicaoMatrizValida novaPos mapa
-                then if ePosicaoMapaLivre novaPos mapa
-                  then Left (Disparo { posicaoDisparo = novaPos, direcaoDisparo = novaDir, tipoDisparo = tipo, tempoDisparo = tempoNovo, donoDisparo = dono })
-                  else Left (Disparo { posicaoDisparo = movePosicao Sul pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = tempoNovo, donoDisparo = dono })
-                else Right [] --objeto desaparece
+              then 
+                -- Se está no solo, mantém a posição
+                Left (DisparoDLC { posicaoDisparoDLC = pos, direcaoDisparoDLC = dir, tipoDisparoDLC = tipo, tempoDisparoDLC = tempoNovo, donoDisparoDLC = dono })
+              else
+                -- Se não está no solo, aplica movimento
+                let (novaPos, novaDir) = case dir of
+                      Norte -> (movePosicao Sul pos, Norte)
+                      Sul   -> (movePosicao Sul pos, Norte)
+                      _     -> rodaPosicaoDirecao (pos, dir)
+                in if ePosicaoMatrizValida novaPos mapa
+                  then if ePosicaoMapaLivre novaPos mapa
+                    then Left (DisparoDLC { posicaoDisparoDLC = novaPos, direcaoDisparoDLC = novaDir, tipoDisparoDLC = tipo, tempoDisparoDLC = tempoNovo, donoDisparoDLC = dono })
+                    else Left (DisparoDLC { posicaoDisparoDLC = movePosicao Sul pos, direcaoDisparoDLC = Norte, tipoDisparoDLC = tipo, tempoDisparoDLC = tempoNovo, donoDisparoDLC = dono })
+                  else Right [] --objeto desaparece
 
 
   where
-    mapa = mapaEstado e
-    minhocas = minhocasEstado e
+    mapa = mapaEstadoDLC e
+    minhocas = minhocasEstadoDLC e
 
 
       -- todo podera ser otimizado com a funcao auxiliar da tarefa0
 
     -- A função verifica se há alguma minhoca inimiga à volta de uma posição (sem ser a que lançou a mina)
-    existeDonoMinhoca :: Posicao -> Int -> [Minhoca] -> Bool
+    existeDonoMinhoca :: Posicao -> Int -> [MinhocaDLC] -> Bool
     existeDonoMinhoca pos dono minhs =
       let
 
@@ -251,31 +244,37 @@ avancaObjeto e i o = case o of
         minhocasComIndice = zip [0..] minhs
 
 
-        existeMinhocaInimiga :: Posicao -> [(Int, Minhoca)] -> Bool
+        existeMinhocaInimiga :: Posicao -> [(Int, MinhocaDLC)] -> Bool
         existeMinhocaInimiga _ [] = False
         existeMinhocaInimiga p ((indice, m):ms) =
-          case posicaoMinhoca m of
+          case posicaoMinhocaDLC m of
             Just p' | p == p' && indice /= dono -> True
             _ -> existeMinhocaInimiga p ms
 
 
-        verificaTodasPosicoes :: [Posicao] -> [(Int, Minhoca)] -> Bool
+        verificaTodasPosicoes :: [Posicao] -> [(Int, MinhocaDLC)] -> Bool
         verificaTodasPosicoes [] _ = False
         verificaTodasPosicoes (p:ps) ms =
-          if existeMinhocaInimiga p ms
-            then True
-            else verificaTodasPosicoes ps ms
+          (existeMinhocaInimiga p ms || verificaTodasPosicoes ps ms)
 
       in verificaTodasPosicoes posicoes minhocasComIndice
 
 
 
-    estaEmAgua :: Posicao -> Mapa -> Bool
+    estaEmAgua :: Posicao -> MapaDLC -> Bool
     estaEmAgua p [] = False
     estaEmAgua pos mapa = case encontraPosicaoMatriz (movePosicao Sul pos) mapa of
         Nothing -> False
-        Just Agua -> True
+        Just AguaDLC -> True
         Just _ -> False
+
+    estaEmLava :: Posicao -> MapaDLC -> Bool
+    estaEmLava p [] = False
+    estaEmLava pos mapa = case encontraPosicaoMatriz (movePosicao Sul pos) mapa of
+        Nothing -> False
+        Just Lava -> True
+        Just _ -> False
+
 
 
 -- todo -> Isto definitivamente não é a forma mais otimizada de fazer isto, mas devido ao tempo é melhor usar assim por enquanto
@@ -318,29 +317,29 @@ Funcionamento Geral:
 
 * Atualiza cada 'Minhoca' na lista de 'Minhocas' do 'Estado', aplicando o dano correspondente se a 'Minhoca' estiver na posição afetada
 * Se a 'Minhoca' estiver na posição afetada, reduz a sua 'Vida' pelo valor do dano
-* Se a 'Vida' da 'Minhoca' for menor ou igual a zero, define a 'Vida' como 'Morta'
+* Se a 'Vida' da 'Minhoca' for menor ou igual a zero, define a 'Vida' como 'MortaDLC'
 
 
 ==__'Objeto':__
 
 * Atualiza cada 'Objeto' na lista de objetos do 'Estado'
-* Se o 'Objeto' for um 'Barril' não explodido e estiver na posição afetada, marca-o como explodido
+* Se o 'Objeto' for um 'BarrilDLC' não explodido e estiver na posição afetada, marca-o como explodido
 * Caso contrário, mantém o 'Objeto' como está
-* Se o 'Objeto' for um 'Disparo', mantém-no como está
+* Se o 'Objeto' for um 'DisparoDLC', mantém-no como está
 
 -}
-aplicaDanos :: Danos -> Estado -> Estado
+aplicaDanos :: Danos -> EstadoDLC -> EstadoDLC
 aplicaDanos danos estado = estado {
-    minhocasEstado = atualizaMinhocas (minhocasEstado estado),
-    objetosEstado = atualizaObjetos danos (objetosEstado estado),
-    mapaEstado = atualizaMapa (mapaEstado estado) danos
+    minhocasEstadoDLC = atualizaMinhocas (minhocasEstadoDLC estado),
+    objetosEstadoDLC = atualizaObjetos danos (objetosEstadoDLC estado),
+    mapaEstadoDLC = atualizaMapa (mapaEstadoDLC estado) danos
   }
   where
 
 
     -- * Terrenos
 
-    atualizaMapa :: Mapa -> Danos -> Mapa
+    atualizaMapa :: MapaDLC -> Danos -> MapaDLC
     atualizaMapa mapa [] = mapa
     atualizaMapa mapa ((pos, _):ds) =
       let
@@ -355,24 +354,24 @@ aplicaDanos danos estado = estado {
 
     -- * Minhocas
 
-    atualizaMinhocas :: [Minhoca] -> [Minhoca]
+    atualizaMinhocas :: [MinhocaDLC] -> [MinhocaDLC]
     atualizaMinhocas [] = []
     atualizaMinhocas (h:t) = atualizaMinhoca h : atualizaMinhocas t
 
 
-    atualizaMinhoca :: Minhoca -> Minhoca
+    atualizaMinhoca :: MinhocaDLC -> MinhocaDLC
     atualizaMinhoca minhoca =
-      case posicaoMinhoca minhoca of
+      case posicaoMinhocaDLC minhoca of
         Nothing -> minhoca
         Just pos ->
-          case vidaMinhoca minhoca of
-            Morta -> minhoca
-            Viva v ->
+          case vidaMinhocaDLC minhoca of
+            MortaDLC -> minhoca
+            VivaDLC v ->
               let dano = somaDanos pos danos
                   novaVida = v - dano
               in if novaVida <= 0
-                 then minhoca { vidaMinhoca = Morta }
-                 else minhoca { vidaMinhoca = Viva novaVida }
+                 then minhoca { vidaMinhocaDLC = MortaDLC }
+                 else minhoca { vidaMinhocaDLC = VivaDLC novaVida }
 
     somaDanos :: Posicao -> Danos -> Int
     somaDanos _ [] = 0
@@ -383,14 +382,14 @@ aplicaDanos danos estado = estado {
 
 -- * Objetos
 
-    atualizaObjetos :: Danos -> [Objeto] -> [Objeto]
+    atualizaObjetos :: Danos -> [ObjetoDLC] -> [ObjetoDLC]
     atualizaObjetos _ [] = []
     atualizaObjetos danos (obj:resto) =
       let pos = posicaoObjeto obj
           objAtualizado = case obj of
-            Barril _ False ->
+            BarrilDLC _ False ->
               if posAfetado pos danos
-                then Barril pos True
+                then BarrilDLC pos True
                 else obj
             _ -> obj
       in objAtualizado : atualizaObjetos danos resto
@@ -399,13 +398,4 @@ aplicaDanos danos estado = estado {
         posAfetado :: Posicao -> Danos -> Bool
         posAfetado _ [] = False
         posAfetado p ((posDano, _):t) =
-          if p == posDano then True else posAfetado p t
-
-
-
-
-
-
-
-
-
+          (p == posDano) || posAfetado p t
