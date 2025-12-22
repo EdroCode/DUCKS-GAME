@@ -6,7 +6,8 @@ import Labs2025
 import Tarefa2
 import System.Exit
 import Tarefa4 (minhocaOnSight, getMinhocasValidas)
-
+import Desenhar(cellSize, janelaLargura, janelaAltura)
+import Tarefa0_2025 (posicaoObjeto)
 
 
 -- | Função principal que reage aos eventos do usuário e atualiza o estado do jogo
@@ -17,15 +18,16 @@ reageEventos (EventKey (SpecialKey KeyUp) Down _ _) (Menu sel)
 	| sel > 0   = return $ Menu (sel - 1)
 	| otherwise = return $ Menu sel
 reageEventos (EventKey (SpecialKey KeyDown) Down _ _) (Menu sel)
-	| sel < 3   = return $ Menu (sel + 1)
+	| sel < 4   = return $ Menu (sel + 1)
 	| otherwise = return $ Menu sel
 
 -- Seleção de opção no menu
 reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (Menu sel)
 	| sel == 0  = return $ BotSimulation novoEstado 0 0 (0, Move Sul)  -- Iniciar jogo com jogada default
 	| sel == 1  = return $ PVP flatWorld 0 0 (Move Sul) -- Iniciar jogo
-	| sel == 2  = return $ Help -- Tela de ajuda
-	| sel == 3  = return $ Quit                     -- Sair do jogo
+    | sel == 2  = return $ MapCreatorTool novoEstado 0 0 -- MCT
+	| sel == 3  = return $ Help -- Tela de ajuda
+	| sel == 4  = return $ Quit                     -- Sair do jogo
 	| otherwise = return $ Menu sel
 
 
@@ -34,13 +36,14 @@ reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (Menu sel)
 
 reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) Help = return $ Menu 0 -- Voltar do Help para o menu
 reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) Help = return $ Menu 0 -- Voltar do jogo para o menu
+reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (MapCreatorTool _ _ _) = return $ Menu 0 -- Voltar do MCT para o menu
 reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (BotSimulation _ _ _ _) = return $ Menu 0 -- Ir do menu para quit
 reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (Menu 0) = return $ Quit -- Confirmar sair do jogo
 reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) Quit = exitSuccess -- sai do jogo
 
 
  
--- * FREE ROAM MODE INPUTS
+-- * PVP MODE INPUTS
 
 
 reageEventos (EventKey (SpecialKey KeyF1) Down _ _) (PVP _ _ _ _) = exitSuccess
@@ -92,8 +95,7 @@ reageEventos (EventKey (Char '2') Down _ _) (PVP est acc tick _) =
 
         return $ PVP (efetuaJogada 0 (Move Sudeste) novoEstado) acc tick (Move Sul)
 
-
--- * RESTO DE DOWNS
+-- * RESTO DE DOWNS pvp
 reageEventos (EventKey key Down _ _) (PVP est acc tick _) = 
     let (novoEst, jogada) = handleAction key est
     in return $ PVP novoEst acc tick jogada
@@ -103,12 +105,115 @@ reageEventos (EventKey key Down _ _) (PVP est acc tick _) =
 
 
 
+
+-- * MAP CREATOR
+
+
+-- AUmentar Linhas -> 
+reageEventos (EventKey (Char 'k') Down _ _) (MapCreatorTool e b a) = 
+    let 
+        mapa = mapaEstado e
+        linhas = length mapa
+        colunas = if null mapa then 0 else length (head mapa)
+        novaLinha = replicate colunas Ar
+        novoMapa = mapa ++ [novaLinha]
+    in return $ MapCreatorTool e{mapaEstado = novoMapa} b a
+
+reageEventos (EventKey (Char 'l') Down _ _) (MapCreatorTool e b a) = 
+    let 
+        mapa = mapaEstado e
+        novoMapa = map (++ [Ar]) mapa
+    in return $ MapCreatorTool e{mapaEstado = novoMapa} b a
+
+reageEventos (EventKey (Char 'n') Down _ _) (MapCreatorTool e b a) = 
+    let 
+        mapa = mapaEstado e
+        linhas = length mapa
+        colunas = if null mapa then 0 else length (head mapa)
+        novaLinha = replicate colunas Ar
+        novoMapa = init mapa
+    in return $ MapCreatorTool e{mapaEstado = novoMapa} b a
+
+reageEventos (EventKey (Char 'm') Down _ _) (MapCreatorTool e b a) = 
+    let 
+        mapa = mapaEstado e
+        novoMapa = map init  mapa
+    in return $ MapCreatorTool e{mapaEstado = novoMapa} b a
+
+reageEventos (EventKey (Char '1') Down _ _) (MapCreatorTool e b a) = 
+    let 
+        mapa = mapaEstado e
+        x = case a of
+            0 -> 4
+            1 -> 1
+            2 -> 0
+        novob = if b >= x then 0 else b + 1
+        
+    in return $ MapCreatorTool e novob a
+
+reageEventos (EventKey (Char '2') Down _ _) (MapCreatorTool e b a) = 
+    let 
+        mapa = mapaEstado e
+        novoa = if a > 1 then 0 else a + 1
+    in return $ MapCreatorTool e 0 novoa
+
+reageEventos (EventKey (MouseButton LeftButton) Down _ mousePos) (MapCreatorTool e blocoSelecionado modo) =
+    let 
+        mapa = mapaEstado e
+        (mx, my) = mousePos
+        sidebarWidth = 300
+        linha = length mapa
+        cols = if null mapa then 0 else length (head mapa)
+        largura = fromIntegral cols * cellSize
+        altura = fromIntegral linha * cellSize
+        usableWidth = janelaLargura - sidebarWidth
+        usableHeight = janelaAltura
+        sx = if largura > 0 then usableWidth / largura else 1
+        sy = if altura > 0 then usableHeight / altura else 1
+        scaleFactor = min (min sx sy) 2.0
+        offsetX = sidebarWidth / 2
+        worldX = (mx - offsetX) / scaleFactor
+        worldY = my / scaleFactor
+        colIdx = floor ((worldX + (largura / 2)) / cellSize)
+        linhaIdx = floor (((altura / 2) - worldY) / cellSize)
+        posicao = (linhaIdx, colIdx)
+        
+        -- Verifica se a posição é válida
+        posValida = linhaIdx >= 0 && linhaIdx < linha && colIdx >= 0 && colIdx < cols
+        
+        novoEstado = if posValida
+            then case modo of
+                0 -> e { mapaEstado = atualizaMapa mapa linhaIdx colIdx (getBlocoFromIndex blocoSelecionado) }
+                1 -> adicionaObjeto e blocoSelecionado posicao
+                2 -> adicionaMinhoca e posicao
+                _ -> e
+            else e
+    in return $ MapCreatorTool novoEstado blocoSelecionado modo
+
 -- Qualquer outro evento não altera o estado
-reageEventos _ s = return $ s
+reageEventos _ s = return s
 
+-- * Funções auxiliares
 
+adicionaObjeto :: Estado -> Int -> Posicao -> Estado
+adicionaObjeto e idx pos = 
+    let novoObjeto = case idx of
+            0 -> Barril pos False
+            1 -> HealthPack pos 50
+            _ -> Barril pos False
+        objetosAtuais = objetosEstado e
+        -- Remove objeto existente na mesma posição (se houver)
+        objetosFiltrados = filter (\obj -> posicaoObjeto obj /= pos) objetosAtuais
+    in e { objetosEstado = objetosFiltrados ++ [novoObjeto] }
 
-
+adicionaMinhoca :: Estado -> Posicao -> Estado
+adicionaMinhoca e pos = 
+    let minhocasAtuais = minhocasEstado e
+        -- Remove minhoca existente na mesma posição (se houver)
+        minhocasFiltradas = filter (\m -> posicaoMinhoca m /= Just pos) minhocasAtuais
+        -- Cria nova minhoca
+        novaMinhoca = Minhoca {posicaoMinhoca = Just pos, vidaMinhoca = Viva 100, jetpackMinhoca = 100, bazucaMinhoca=100, minaMinhoca = 100, dinamiteMinhoca=100, burningCounter=0, equipaMinhoca=Nothing}
+    in e { minhocasEstado = minhocasFiltradas ++ [novaMinhoca] }
 
 -- Função auxiliar para determinar direção baseada na tecla
 keyToDirection :: Key -> Direcao
@@ -126,6 +231,25 @@ keyToDirection key = case key of
     Char 'z'            -> Sudoeste
     Char 'c'            -> Sudeste
     _                   -> Sul
+
+getBlocoFromIndex :: Int -> Terreno
+getBlocoFromIndex 0 = Terra
+getBlocoFromIndex 1 = Agua
+getBlocoFromIndex 2 = Pedra
+getBlocoFromIndex 3 = Ar
+getBlocoFromIndex 4 = Lava
+getBlocoFromIndex _ = Ar
+
+atualizaMapa :: Mapa -> Int -> Int -> Terreno -> Mapa
+atualizaMapa mapa linha col novoBloco =
+    let (antes, linhaAtual:depois) = splitAt linha mapa
+        novaLinha = atualizaLinha linhaAtual col novoBloco
+    in antes ++ [novaLinha] ++ depois
+
+atualizaLinha :: [Terreno] -> Int -> Terreno -> [Terreno]
+atualizaLinha linha col novoBloco =
+    let (antes, _:depois) = splitAt col linha
+    in antes ++ [novoBloco] ++ depois
 
 
 handleAction :: Key -> Estado -> (Estado, Jogada)

@@ -66,3 +66,5 @@ reageTempo dt (PVP est acc tick jogadaUser) = return $ PVP estFinal acc tick jog
              then obj  -- Mantém a posição atual
              else obj  -- Deixa o avancaEstado lidar com outros casos
         corrigeDinamite obj = obj
+reageTempo _ (MapCreatorTool mp i a) = return (MapCreatorTool mp i a)
+reageTempo _ MapSelector = return MapSelector
