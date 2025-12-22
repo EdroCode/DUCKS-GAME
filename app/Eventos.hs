@@ -66,7 +66,7 @@ reageEventos (EventKey (Char '1') Down _ _) (PVP est acc tick _) =
 
     in
 
-        return $ PVP (efetuaJogada 0 (Move Sudeste) novoEstado) acc tick (Move Sul)
+        return $ PVP novoEstado acc tick (Move Sul)
 
 
 -- * Mudar arma minhoca
@@ -90,7 +90,7 @@ reageEventos (EventKey (Char '2') Down _ _) (PVP est acc tick _) =
 
     in
 
-        return $ PVP (efetuaJogada 0 (Move Sudeste) novoEstado) acc tick (Move Sul)
+        return $ PVP novoEstado acc tick (Move Sul)
 
 
 -- * RESTO DE DOWNS
@@ -128,19 +128,32 @@ keyToDirection key = case key of
     _                   -> Sul
 
 
+-- | Verifica se a minhoca pode se mover (está no solo)
+podeMover :: Estado -> NumMinhoca -> Bool
+podeMover est i = 
+    case encontraIndiceLista i (minhocasEstado est) of
+        Nothing -> False
+        Just minhoca -> 
+            case posicaoMinhoca minhoca of
+                Nothing -> False
+                Just pos -> estaNoSolo pos (mapaEstado est)
+
+
 handleAction :: Key -> Estado -> (Estado, Jogada)
 handleAction key est = 
     let
         maybeArma = armaSelecionada est
         i = minhocaSelecionada est
-    in case (keyToDirection key, maybeArma) of
-
-        (dir, Just arma) -> 
+        dir = keyToDirection key
+    in case maybeArma of
+        -- Se tem arma selecionada, sempre dispara
+        Just arma -> 
             let novoEst = efetuaJogada i (Dispara arma dir) est
             in (novoEst, Dispara arma dir)
         
-       
-        (dir, Nothing) -> 
-            let novoEst = efetuaJogada i (Move dir) est
-            in (novoEst, Move dir)
-        
+        -- Se não tem arma, só move se estiver no solo
+        Nothing -> 
+            if podeMover est i
+            then let novoEst = efetuaJogada i (Move dir) est
+                 in (novoEst, Move dir)
+            else (est, Move dir)
