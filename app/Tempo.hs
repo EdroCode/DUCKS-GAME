@@ -43,32 +43,35 @@ reageTempo dt (BotSimulation est acc tick ultimaJogada) = return $ BotSimulation
                         where
                                 (jogador, jogada) = jogadaTatica t st
                                 
+
 reageTempo dt (PVP est acc tick jogadaUser) = return $ PVP estFinal acc tick jogadaUser
   where
-    -- Primeiro avança o estado normalmente
-    estAvancado = AvancaEstado.avancaEstado est
-    
-    -- Depois corrige as dinamites que deveriam estar paradas
-    estFinal = corrigeDinamites estAvancado
-    
-    -- Corrige a posição das dinamites que deveriam estar paradas
-    corrigeDinamites :: EstadoDLC -> EstadoDLC
-    corrigeDinamites e = e { objetosEstadoDLC = map corrigeDinamite (objetosEstadoDLC e) }
-      where
-        mapa = mapaEstadoDLC e
-        
-        corrigeDinamite :: ObjetoDLC -> ObjetoDLC
-        corrigeDinamite obj@(DisparoDLC pos dir DinamiteDLC tempo dono) =
-          -- Verifica se há terreno sólido abaixo
-          let posAbaixo = movePosicao Sul pos
-              terrenoAbaixo = encontraPosicaoMatriz posAbaixo mapa
-              deveParar = case terrenoAbaixo of
-                Just TerraDLC -> True
-                Just PedraDLC -> True
-                _ -> False
-          in if deveParar
-             then obj  -- Mantém a posição atual
-             else obj  -- Deixa o avancaEstado lidar com outros casos
-        corrigeDinamite obj = obj
+    -- Congela dinamites que já estão no chão ANTES de avançar
+    estComDinamitesCongeladas = congelaDinamitesNoChao est
+    -- Agora avança
+    estFinal = AvancaEstado.avancaEstado estComDinamitesCongeladas
+
+
+
 reageTempo _ (MapCreatorTool mp i a) = return (MapCreatorTool mp i a)
 reageTempo _ MapSelector = return MapSelector
+
+
+congelaDinamitesNoChao :: EstadoDLC -> EstadoDLC
+congelaDinamitesNoChao e = e { objetosEstadoDLC = map congelar (objetosEstadoDLC e) }
+  where
+    mapa = mapaEstadoDLC e
+    
+    congelar :: ObjetoDLC -> ObjetoDLC
+    congelar obj@(DisparoDLC pos dir DinamiteDLC tempo dono)
+      | estaNoChao pos mapa = obj  -- já está no chão, avancaEstado não deve mover
+      | otherwise = obj  -- deixa avancaEstado aplicar gravidade
+    congelar obj = obj
+    
+    estaNoChao :: Posicao -> MapaDLC -> Bool
+    estaNoChao pos mapa = 
+      let posAbaixo = movePosicao Sul pos
+      in case encontraPosicaoMatriz posAbaixo mapa of
+           Just TerraDLC -> True
+           Just PedraDLC -> True
+           _ -> False

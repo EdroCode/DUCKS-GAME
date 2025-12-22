@@ -1,7 +1,7 @@
 module Auxiliar where
 
 
-import DataDLC( Matriz, Dimensao,VidaMinhocaDLC(VivaDLC, MortaDLC),posicaoDisparoDLC, posicaoBarrilDLC, tipoDisparoDLC,donoDisparoDLC, tempoDisparoDLC, TerrenoDLC(ArDLC, PedraDLC, AguaDLC, TerraDLC, Lava), objetosEstadoDLC,TipoArmaDLC(JetpackDLC, EscavadoraDLC, BazucaDLC, MinaDLC, DinamiteDLC), EstadoDLC(mapaEstadoDLC, objetosEstadoDLC, minhocasEstadoDLC), MapaDLC, ObjetoDLC(BarrilDLC, DisparoDLC, HealthPack), MinhocaDLC(posicaoMinhocaDLC, vidaMinhocaDLC,jetpackMinhocaDLC, escavadoraMinhocaDLC, minaMinhocaDLC, dinamiteMinhocaDLC, bazucaMinhocaDLC))
+import DataDLC( Matriz, Dimensao,VidaMinhocaDLC(VivaDLC, MortaDLC),posicaoDisparoDLC, posicaoBarrilDLC, tipoDisparoDLC,donoDisparoDLC, tempoDisparoDLC, TerrenoDLC(ArDLC, PedraDLC, AguaDLC, TerraDLC, Lava), objetosEstadoDLC,TipoArmaDLC(JetpackDLC, EscavadoraDLC, BazucaDLC, MinaDLC, DinamiteDLC), EstadoDLC(mapaEstadoDLC, objetosEstadoDLC, minhocasEstadoDLC), MapaDLC, ObjetoDLC(BarrilDLC, DisparoDLC, HealthPack, posicaoHP), MinhocaDLC(posicaoMinhocaDLC, vidaMinhocaDLC,jetpackMinhocaDLC, escavadoraMinhocaDLC, minaMinhocaDLC, dinamiteMinhocaDLC, bazucaMinhocaDLC))
 import Labs2025(NumMinhoca,Posicao, Direcao(Norte,Este,Oeste,Sul,Nordeste,Noroeste,Sudoeste,Sudeste))
 
 
@@ -120,6 +120,8 @@ ehDisparo _ = False
 posicaoObjeto :: ObjetoDLC -> Posicao
 posicaoObjeto d@(DisparoDLC {})  = posicaoDisparoDLC d
 posicaoObjeto b@(BarrilDLC {}) = posicaoBarrilDLC b
+posicaoObjeto b@(HealthPack {}) = posicaoHP b
+
 
 
 
