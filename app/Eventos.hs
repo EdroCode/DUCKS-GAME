@@ -193,6 +193,43 @@ reageEventos (EventKey (MouseButton LeftButton) Down _ mousePos) (MapCreatorTool
             else e
     in return $ MapCreatorTool novoEstado blocoSelecionado modo
 
+
+reageEventos (EventKey (MouseButton RightButton) Down _ mousePos) (MapCreatorTool e blocoSelecionado modo) =
+    let 
+        mapa = mapaEstadoDLC e
+        (mx, my) = mousePos
+        sidebarWidth = 300
+        linha = length mapa
+        cols = if null mapa then 0 else length (head mapa)
+        largura = fromIntegral cols * cellSize
+        altura = fromIntegral linha * cellSize
+        usableWidth = janelaLargura - sidebarWidth
+        usableHeight = janelaAltura
+        sx = if largura > 0 then usableWidth / largura else 1
+        sy = if altura > 0 then usableHeight / altura else 1
+        scaleFactor = min (min sx sy) 2.0
+        offsetX = sidebarWidth / 2
+        worldX = (mx - offsetX) / scaleFactor
+        worldY = my / scaleFactor
+        colIdx = floor ((worldX + (largura / 2)) / cellSize)
+        linhaIdx = floor (((altura / 2) - worldY) / cellSize)
+        posicao = (linhaIdx, colIdx)
+        
+        -- Verifica se a posição é válida
+        posValida = linhaIdx >= 0 && linhaIdx < linha && colIdx >= 0 && colIdx < cols
+        
+        novoEstado = if posValida
+            then case modo of
+                0 -> e { mapaEstadoDLC = atualizaMapa mapa linhaIdx colIdx ArDLC }
+                1 -> removeObjetoDLC e posicao
+                2 -> removeMinhocaDLC e posicao
+                _ -> e
+            else e
+    in return $ MapCreatorTool novoEstado blocoSelecionado modo
+
+
+
+
 -- Qualquer outro evento não altera o estado
 reageEventos _ s = return s
 
@@ -307,17 +344,30 @@ adicionaObjetoDLC :: EstadoDLC -> Int -> Posicao -> EstadoDLC
 adicionaObjetoDLC e idx pos = 
     let novoObjeto = case idx of
             0 -> BarrilDLC pos False
+            1 -> HealthPack pos 50
             _ -> BarrilDLC pos False
         objetosAtuais = objetosEstadoDLC e
-        -- Remove objeto existente na mesma posição (se houver)
+        
         objetosFiltrados = filter (\obj -> DataDLC.posicaoObjeto obj /= pos) objetosAtuais
     in e { objetosEstadoDLC = objetosFiltrados ++ [novoObjeto] }
 
 adicionaMinhocaDLC :: EstadoDLC -> Posicao -> EstadoDLC
 adicionaMinhocaDLC e pos = 
     let minhocasAtuais = minhocasEstadoDLC e
-        -- Remove minhoca existente na mesma posição (se houver)
+       
         minhocasFiltradas = filter (\m -> posicaoMinhocaDLC m /= Just pos) minhocasAtuais
         -- Cria nova minhoca
         novaMinhoca = MinhocaDLC {posicaoMinhocaDLC = Just pos, vidaMinhocaDLC = VivaDLC 100, jetpackMinhocaDLC = 100, bazucaMinhocaDLC=100, minaMinhocaDLC = 100, dinamiteMinhocaDLC=100, burningCounter = 0, equipaMinhoca = Nothing}
     in e { minhocasEstadoDLC = minhocasFiltradas ++ [novaMinhoca] }
+
+removeObjetoDLC :: EstadoDLC -> Posicao -> EstadoDLC
+removeObjetoDLC e pos = 
+    let objetosAtuais = objetosEstadoDLC e
+        objetosFiltrados = filter (\obj -> DataDLC.posicaoObjeto obj /= pos) objetosAtuais
+    in e { objetosEstadoDLC = objetosFiltrados }
+
+removeMinhocaDLC :: EstadoDLC -> Posicao -> EstadoDLC
+removeMinhocaDLC e pos = 
+    let minhocasAtuais = minhocasEstadoDLC e
+        minhocasFiltradas = filter (\m -> posicaoMinhocaDLC m /= Just pos) minhocasAtuais
+    in e { minhocasEstadoDLC = minhocasFiltradas }

@@ -100,7 +100,7 @@ data ObjetoDLC
         -- | A posicao do HP no mapa
         { posicaoHP :: Posicao
         -- | A quantidade de cura do HP
-        , curaHP :: Int
+        , curaHP :: Int  -- default 50
         }
     deriving (Eq,Ord,Show,Read)
 

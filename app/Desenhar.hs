@@ -77,6 +77,7 @@ drawHelp = Pictures
   , Translate (-360) (-60) $ Scale 0.25 0.25 $ Color black $ Text "Setas - mover minhoca"
   , Translate (-360) (-100) $ Scale 0.25 0.25 $ Color black $ Text "Q/E/Z/C - diagonais"
   , Translate (-360) (-220) $ Scale 0.10 0.10 $ Color (greyN 0.5) $ Text "Pressione ESC ou Enter para voltar ao menu"
+  
   ]
 
 
@@ -152,6 +153,10 @@ drawMCT p e blocoSelecionado mode = Pictures
       , Translate (-900) (-360) $ Scale 0.2 0.2 $ Color (greyN 0.5) $ Text "M - Remover coluna"
       , Translate (-900) (-390) $ Scale 0.2 0.2 $ Color (greyN 0.5) $ Text "N - Remover linha"
       , Translate (-900) (-420) $ Scale 0.2 0.2 $ Color (greyN 0.5) $ Text "1 - Selecionar bloco"
+      , Translate (-900) (-450) $ Scale 0.2 0.2 $ Color (greyN 0.5) $ Text "LMB - Colocar bloco/objeto/personagem"
+      , Translate (-900) (-480) $ Scale 0.2 0.2 $ Color (greyN 0.5) $ Text "RMB - Remover (Modo Selecionado)"
+
+
       ]
     
 
