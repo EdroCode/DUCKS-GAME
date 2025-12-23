@@ -148,7 +148,7 @@ reageEventos (EventKey (Char '1') Down _ _) (MapCreatorTool e b a) =
         mapa = mapaEstadoDLC e
         x = case a of
             0 -> 4
-            1 -> 1
+            1 -> 7
             2 -> 0
         novob = if b >= x then 0 else b + 1
         
@@ -345,6 +345,12 @@ adicionaObjetoDLC e idx pos =
     let novoObjeto = case idx of
             0 -> BarrilDLC pos False
             1 -> HealthPack pos 50
+            2 -> AmmoPack pos 50 JetpackDLC
+            3 -> AmmoPack pos 50 EscavadoraDLC
+            4 -> AmmoPack pos 50 BazucaDLC
+            5 -> AmmoPack pos 50 MinaDLC
+            6 -> AmmoPack pos 50 DinamiteDLC
+
             _ -> BarrilDLC pos False
         objetosAtuais = objetosEstadoDLC e
         

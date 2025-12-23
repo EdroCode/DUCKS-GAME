@@ -16,7 +16,7 @@ import Tarefa1
 import Foreign (moveArray)
 import Auxiliar
 
-import Labs2025(NumMinhoca, Posicao,Direcao(Norte,Este,Oeste,Sul,Nordeste,Noroeste,Sudoeste,Sudeste))
+import Labs2025(NumMinhoca, Posicao,Direcao(Norte,Este,Oeste,Sul,Nordeste,Noroeste,Sudoeste,Sudeste), TipoArma (Jetpack), Minhoca (dinamiteMinhoca))
 import DataDLC
 
 {-| Recebe o índice de uma minhoca na lista de minhocas, uma jogada, um estado e retorna um novo estado em que essa minhoca efetuou essa jogada.
@@ -71,6 +71,9 @@ efetuaJogada n (Dispara arma direcao) e = if indiceValido n e && vidaMinhocaDLC 
 
                                                         JetpackDLC -> if ePosicaoMatrizValida novaPos mapa && ePosicaoEstadoLivre novaPos e
                                                                 then EstadoDLC {mapaEstadoDLC = mapa,objetosEstadoDLC = objetos,minhocasEstadoDLC = minhocasFinais, armaSelecionada = Just arma, minhocaSelecionada = minhocaSelecionada e}
+                                                                
+                                                                
+                                                                
                                                                 else e{minhocasEstadoDLC = minhocasFinais}
 
                                                         EscavadoraDLC -> if ePosicaoMatrizValida novaPos mapa
@@ -82,14 +85,14 @@ efetuaJogada n (Dispara arma direcao) e = if indiceValido n e && vidaMinhocaDLC 
                                                                     else EstadoDLC{mapaEstadoDLC=mapa,objetosEstadoDLC=objetos,minhocasEstadoDLC=atualizaIndiceLista n (minhoca{escavadoraMinhocaDLC = escavadoraMinhocaDLC minhoca-1}) minhocas, armaSelecionada = Just arma, minhocaSelecionada = minhocaSelecionada e}
                                                                 else e{minhocasEstadoDLC = minhocasFinais}
 
-                                                        BazucaDLC -> if ePosicaoMatrizValida novaPos mapa 
+                                                        BazucaDLC -> if ePosicaoMatrizValida novaPos mapa
 
                                                                 then EstadoDLC{mapaEstadoDLC=mapaEstadoDLC e,objetosEstadoDLC = objetosEstadoDLC e ++ [DisparoDLC{posicaoDisparoDLC=novaPos, direcaoDisparoDLC=direcao, tipoDisparoDLC=BazucaDLC, tempoDisparoDLC=Nothing, donoDisparoDLC=n}], minhocasEstadoDLC = minhocasFinais, armaSelecionada = Just arma, minhocaSelecionada = minhocaSelecionada e}
                                                                 else e{minhocasEstadoDLC = minhocasFinais}
 
-                                                        MinaDLC -> if ePosicaoMatrizValida novaPos mapa 
+                                                        MinaDLC -> if ePosicaoMatrizValida novaPos mapa
                                                                 then if ePosicaoMapaLivre novaPos mapa && not (existeBarril novaPos objetos)
-                                                                    then if ePosicaoEstadoLivre novaPos e 
+                                                                    then if ePosicaoEstadoLivre novaPos e
                                                                         then EstadoDLC{mapaEstadoDLC=mapaEstadoDLC e,objetosEstadoDLC = objetosEstadoDLC e ++ [DisparoDLC{posicaoDisparoDLC=novaPos, direcaoDisparoDLC=direcao, tipoDisparoDLC=MinaDLC, tempoDisparoDLC=Nothing, donoDisparoDLC=n}], minhocasEstadoDLC = minhocasFinais, armaSelecionada = Just arma, minhocaSelecionada = minhocaSelecionada e}
                                                                         else EstadoDLC{mapaEstadoDLC=mapaEstadoDLC e,objetosEstadoDLC = objetosEstadoDLC e ++ [DisparoDLC{posicaoDisparoDLC=pos, direcaoDisparoDLC=direcao, tipoDisparoDLC=MinaDLC, tempoDisparoDLC=Nothing, donoDisparoDLC=n}], minhocasEstadoDLC = minhocasFinais, armaSelecionada = Just arma, minhocaSelecionada = minhocaSelecionada e}
 
@@ -100,7 +103,7 @@ efetuaJogada n (Dispara arma direcao) e = if indiceValido n e && vidaMinhocaDLC 
 
                                                         DinamiteDLC -> if ePosicaoMatrizValida novaPos mapa
                                                                 then if ePosicaoMapaLivre novaPos mapa && not (existeBarril novaPos objetos)
-                                                                    then if ePosicaoEstadoLivre novaPos e 
+                                                                    then if ePosicaoEstadoLivre novaPos e
                                                                         then EstadoDLC{mapaEstadoDLC=mapaEstadoDLC e,objetosEstadoDLC = objetosEstadoDLC e ++ [DisparoDLC{posicaoDisparoDLC=novaPos, direcaoDisparoDLC=direcao, tipoDisparoDLC=DinamiteDLC, tempoDisparoDLC=Just 4, donoDisparoDLC=n}], minhocasEstadoDLC = minhocasFinais, armaSelecionada = Just arma, minhocaSelecionada = minhocaSelecionada e}
                                                                         else EstadoDLC{mapaEstadoDLC=mapaEstadoDLC e,objetosEstadoDLC = objetosEstadoDLC e ++ [DisparoDLC{posicaoDisparoDLC=pos, direcaoDisparoDLC=direcao, tipoDisparoDLC=DinamiteDLC, tempoDisparoDLC=Just 4, donoDisparoDLC=n}], minhocasEstadoDLC = minhocasFinais, armaSelecionada = Just arma, minhocaSelecionada = minhocaSelecionada e}
                                                                     else EstadoDLC{mapaEstadoDLC=mapaEstadoDLC e,objetosEstadoDLC = objetosEstadoDLC e ++ [DisparoDLC{posicaoDisparoDLC=pos, direcaoDisparoDLC=direcao, tipoDisparoDLC=DinamiteDLC, tempoDisparoDLC=Just 4, donoDisparoDLC=n}], minhocasEstadoDLC = minhocasFinais, armaSelecionada = Just arma, minhocaSelecionada = minhocaSelecionada e}
@@ -190,7 +193,7 @@ efetuaJogada n (Dispara arma direcao) e = if indiceValido n e && vidaMinhocaDLC 
                                                 BazucaDLC -> bazucaMinhocaDLC m > 0
                                                 MinaDLC -> minaMinhocaDLC m > 0
                                                 DinamiteDLC -> dinamiteMinhocaDLC m > 0
-                                            
+
                                             indiceValido :: Int -> EstadoDLC -> Bool
                                             indiceValido nMinhoca estado = nMinhoca <= length (minhocasEstadoDLC estado)
 
@@ -210,7 +213,7 @@ efetuaJogada n (Move direcao) e = if vidaMinhocaDLC minhoca /= MortaDLC && posic
 
                         where
                             -- * minhoca estudada
-                            minhoca = case encontraIndiceLista n minhocas of Just m -> m 
+                            minhoca = case encontraIndiceLista n minhocas of Just m -> m
                             pos = case posicaoMinhocaDLC minhoca of Just a -> a
                             hp = case vidaMinhocaDLC minhoca of VivaDLC a -> a
 
@@ -226,14 +229,23 @@ efetuaJogada n (Move direcao) e = if vidaMinhocaDLC minhoca /= MortaDLC && posic
                             minhocaFinal = -- * Nova pos n é opaca
                                 if ePosicaoMatrizValida novaPos mapa
                                     then if ePosicaoEstadoLivre novaPos e
-                                        then if encontraPosicaoMatriz novaPos mapa /= Just AguaDLC || encontraPosicaoMatriz novaPos mapa /= Just Lava 
+                                        then if encontraPosicaoMatriz novaPos mapa /= Just AguaDLC || encontraPosicaoMatriz novaPos mapa /= Just Lava
                                             then case existeObjeto novaPos objetos of
                                                 Just (HealthPack p cura) -> minhoca { posicaoMinhocaDLC = Just p, vidaMinhocaDLC = VivaDLC (hp + cura) }
+                                                Just (AmmoPack p ammo JetpackDLC) -> minhoca { posicaoMinhocaDLC = Just p,  jetpackMinhocaDLC = jetpackMinhocaDLC minhoca + ammo}
+                                                Just (AmmoPack p ammo EscavadoraDLC) -> minhoca { posicaoMinhocaDLC = Just p,  escavadoraMinhocaDLC = escavadoraMinhocaDLC minhoca + ammo}
+                                                Just (AmmoPack p ammo BazucaDLC) -> minhoca { posicaoMinhocaDLC = Just p,  bazucaMinhocaDLC = bazucaMinhocaDLC minhoca + ammo}
+                                                Just (AmmoPack p ammo MinaDLC) -> minhoca { posicaoMinhocaDLC = Just p,  minaMinhocaDLC = minaMinhocaDLC minhoca + ammo}
+                                                Just (AmmoPack p ammo DinamiteDLC) -> minhoca { posicaoMinhocaDLC = Just p,  dinamiteMinhocaDLC = dinamiteMinhocaDLC minhoca + ammo}
+
+
+
+
                                                 _ -> minhoca { posicaoMinhocaDLC = Just novaPos }
                                             else minhoca { posicaoMinhocaDLC = Just novaPos,  vidaMinhocaDLC = MortaDLC }
                                         else minhoca
                                 else minhoca { posicaoMinhocaDLC = Nothing, vidaMinhocaDLC = MortaDLC }
-                            
+
 
                             minhocasFinais = atualizaIndiceLista n minhocaFinal minhocas
 

@@ -92,7 +92,7 @@ drawMCT p e blocoSelecionado mode = Pictures
     infoMapa = "Mapa: " ++ show (length mapa) ++ "x" ++ show (if null mapa then 0 else length (head mapa))
     
     blocos = [(0, "Terra", head p), (1, "Agua", p !! 1), (2, "Pedra", p !! 2), (3, "Ar", p !! 7), (4, "Lava", p !! 11) ]
-    objetos = [(0, "Barril", p !! 5), (1, "Health Pack", p !! 12) ]
+    objetos =     [ (0, "Barril", p !! 5) , (1, "Health Pack", p !! 12) , (2, "Jetpack", p !! 15), (3, "Escavadora", p !! 16), (4, "Bazuca", p !! 17), (5, "Mina", p !! 18), (6, "Dinamite", p !! 19)]
     personagens = [(0, "Pato", p !! 3)]
     
     drawBloco y (idx, nome, pic) = Pictures
@@ -142,19 +142,19 @@ drawMCT p e blocoSelecionado mode = Pictures
         Translate (-900) 280 $ Scale 0.3 0.3 $ Color (greyN 0.3) $ Text "Blocos:"
       
       ,
-        (case mode of 
+      (case mode of 
           0 -> Pictures $ zipWith drawBloco [240, 150, 60, -30, -120] blocos
-          1 -> Pictures $ zipWith drawObjeto [240, 150, 60, -30, -120] objetos
-          2 -> Pictures $ zipWith drawPersonagens [240, 150, 60, -30, -120] personagens)
-
+          1 -> Pictures $ zipWith drawObjeto [240, 150, 60, -30, -120, -210, -300] objetos  
+          2 -> Pictures $ zipWith drawPersonagens [240] personagens)
+    
       , 
-        Translate (-900) (-300) $ Scale 0.2 0.2 $ Color (greyN 0.5) $ Text "L - Adicionar linha"
-      , Translate (-900) (-330) $ Scale 0.2 0.2 $ Color (greyN 0.5) $ Text "C - Adicionar coluna"
-      , Translate (-900) (-360) $ Scale 0.2 0.2 $ Color (greyN 0.5) $ Text "M - Remover coluna"
-      , Translate (-900) (-390) $ Scale 0.2 0.2 $ Color (greyN 0.5) $ Text "N - Remover linha"
-      , Translate (-900) (-420) $ Scale 0.2 0.2 $ Color (greyN 0.5) $ Text "1 - Selecionar bloco"
-      , Translate (-900) (-450) $ Scale 0.2 0.2 $ Color (greyN 0.5) $ Text "LMB - Colocar bloco/objeto/personagem"
-      , Translate (-900) (-480) $ Scale 0.2 0.2 $ Color (greyN 0.5) $ Text "RMB - Remover (Modo Selecionado)"
+        Translate (-900) (-400) $ Scale 0.2 0.2 $ Color (greyN 0.5) $ Text "L - Adicionar linha"
+      , Translate (-900) (-430) $ Scale 0.2 0.2 $ Color (greyN 0.5) $ Text "C - Adicionar coluna"
+      , Translate (-900) (-460) $ Scale 0.2 0.2 $ Color (greyN 0.5) $ Text "M - Remover coluna"
+      , Translate (-900) (-490) $ Scale 0.2 0.2 $ Color (greyN 0.5) $ Text "N - Remover linha"
+      , Translate (-900) (-520) $ Scale 0.2 0.2 $ Color (greyN 0.5) $ Text "1 - Selecionar bloco"
+      , Translate (-900) (-550) $ Scale 0.2 0.2 $ Color (greyN 0.5) $ Text "LMB - Colocar bloco/objeto/personagem"
+      , Translate (-900) (-580) $ Scale 0.2 0.2 $ Color (greyN 0.5) $ Text "RMB - Remover (Modo Selecionado)"
 
 
       ]
@@ -506,6 +506,16 @@ drawObjetosDLC p objs mapa = Pictures $ map drawO objs
       where (x,y) = converteMapaDLC mapa (DataDLC.posicaoObjeto b)
     
     drawO hp@(HealthPack {}) = Translate x y $ p !! 12
+      where (x,y) = converteMapaDLC mapa (DataDLC.posicaoObjeto hp)
+    
+    drawO hp@(AmmoPack {}) = 
+      case ammoType hp of
+          JetpackDLC -> Translate x y $ p !! 15
+          EscavadoraDLC -> Translate x y $ p !! 16
+          BazucaDLC -> Translate x y $ p !! 17
+          MinaDLC -> Translate x y $ p !! 18
+          DinamiteDLC -> Translate x y $ p !! 19
+      
       where (x,y) = converteMapaDLC mapa (DataDLC.posicaoObjeto hp)
 
 getSpriteParaAcaoDLC :: MinhocaDLC -> Maybe JogadaDLC -> [Picture] -> Bool -> MapaDLC -> Posicao -> Picture

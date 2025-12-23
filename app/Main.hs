@@ -46,7 +46,16 @@ main = do
   Just patoCaindo <- loadJuicy (path ++ "PatoCaindo.png")
   Just healthPack <- loadJuicy (path ++ "health_pack.png")
   
-  let tiles = [grass, water, stone, worm, morto, barril, bazuca, sky, dinamite, mina, dirt, lava, healthPack, patoPulando, patoCaindo]
+  Just ammoJetpack <- loadJuicy (path ++ "ammo_box_jetpack.png")
+  Just ammoEscavadora <- loadJuicy (path ++ "ammo_box_escavadora.png")
+  Just ammoBazuca <- loadJuicy (path ++ "ammo_box_bazuca.png")
+  Just ammoMina <- loadJuicy (path ++ "ammo_box_mina.png")
+  Just ammoDinamite <- loadJuicy (path ++ "ammo_box_dinamite.png")
+
+
+
+  let tiles = [grass, water, stone, worm, morto, barril, bazuca, sky, dinamite, mina, dirt, lava, healthPack, patoPulando, patoCaindo, ammoJetpack, ammoEscavadora, ammoBazuca, ammoMina, ammoDinamite]
+
   let temanatal = [grass, water, stone, worm, morto, barril, bazuca, sky, dinamite, mina]
 
   playIO janela fundo fr it (desenha tiles) reageEventos reageTempo

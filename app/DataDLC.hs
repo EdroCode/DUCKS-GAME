@@ -102,6 +102,14 @@ data ObjetoDLC
         -- | A quantidade de cura do HP
         , curaHP :: Int  -- default 50
         }
+    | AmmoPack
+        -- | A posicao do AP no mapa
+        { posicaoAP :: Posicao
+        -- | A quantidade de cura do HP
+        , ammoGiven :: Int  -- default 5
+        -- | O tipo de munição dada
+        , ammoType :: TipoArmaDLC
+        }
     deriving (Eq,Ord,Show,Read)
 
 -- | Uma jogada que uma minhoca pode efetuar.
@@ -134,6 +142,8 @@ posicaoObjeto :: ObjetoDLC -> Posicao
 posicaoObjeto d@(DisparoDLC {})  = posicaoDisparoDLC d
 posicaoObjeto b@(BarrilDLC {}) = posicaoBarrilDLC b
 posicaoObjeto hp@(HealthPack {}) = posicaoHP hp
+posicaoObjeto hp@(AmmoPack {}) = posicaoAP hp
+
 
 
 fireDamage :: Int
