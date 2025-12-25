@@ -16,33 +16,49 @@ import Auxiliar (getMinhocasValidasDLC)
 -- | Função principal que reage aos eventos do usuário e atualiza o estado do jogo
 reageEventos :: Event -> Worms -> IO Worms
 
--- Navegação no menu principal
+-- Navegação no menu principal com layout 2x2
+
 reageEventos (EventKey (SpecialKey KeyUp) Down _ _) (Menu sel)
-	| sel > 0   = return $ Menu (sel - 1)
-	| otherwise = return $ Menu sel
+    | sel == 2 = return $ Menu 0  -- MAP Creator -> Bot Simulation
+    | sel == 3 = return $ Menu 1  -- Help -> PvP
+    | sel == 4 = return $ Menu 2  -- Quit -> MAP Creator (ou Help)
+    | otherwise = return $ Menu sel
+
 reageEventos (EventKey (SpecialKey KeyDown) Down _ _) (Menu sel)
-	| sel < 4   = return $ Menu (sel + 1)
-	| otherwise = return $ Menu sel
+    | sel == 0 = return $ Menu 2  -- Bot Simulation -> MAP Creator
+    | sel == 1 = return $ Menu 3  -- PvP -> Help
+    | sel == 2 || sel == 3 = return $ Menu 4  -- MAP Creator/Help -> Quit
+    | otherwise = return $ Menu sel
+
+reageEventos (EventKey (SpecialKey KeyLeft) Down _ _) (Menu sel)
+    | sel == 1 = return $ Menu 0  -- PvP -> Bot Simulation
+    | sel == 3 = return $ Menu 2  -- Help -> MAP Creator
+    | otherwise = return $ Menu sel
+
+reageEventos (EventKey (SpecialKey KeyRight) Down _ _) (Menu sel)
+    | sel == 0 = return $ Menu 1  -- Bot Simulation -> PvP
+    | sel == 2 = return $ Menu 3  -- MAP Creator -> Help
+    | otherwise = return $ Menu sel
 
 -- Seleção de opção no menu
 reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (Menu sel)
-	| sel == 0  = return $ BotSimulation novoEstado 0 0 (0, Labs2025.Move Sul)  -- Iniciar jogo com jogada default
-	| sel == 1  = return $ PVP flatWorld 0 0 (DataDLC.Move Sul) -- Iniciar jogo
-    | sel == 2  = return $ MapCreatorTool flatWorld 0 0 -- MCT
-	| sel == 3  = return $ Help -- Tela de ajuda
-	| sel == 4  = return $ Quit                     -- Sair do jogo
+	| sel == 0  = return $ BotSimulation novoEstado 0 0 (0, Labs2025.Move Sul)
+	| sel == 1  = return $ PVP flatWorld 0 0 (DataDLC.Move Sul)
+    | sel == 2  = return $ MapCreatorTool flatWorld 0 0
+	| sel == 3  = return $ Help
+	| sel == 4  = return $ Quit
 	| otherwise = return $ Menu sel
 
 
 -- * ESC LOGIC
 
 
-reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) Help = return $ Menu 0 -- Voltar do Help para o menu
-reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) Help = return $ Menu 0 -- Voltar do jogo para o menu
-reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (MapCreatorTool _ _ _) = return $ Menu 0 -- Voltar do MCT para o menu
-reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (BotSimulation _ _ _ _) = return $ Menu 0 -- Ir do menu para quit
-reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (Menu 0) = return $ Quit -- Confirmar sair do jogo
-reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) Quit = exitSuccess -- sai do jogo
+reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) Help = return $ Menu 0
+reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) Help = return $ Menu 0
+reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (MapCreatorTool _ _ _) = return $ Menu 0
+reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (BotSimulation _ _ _ _) = return $ Menu 0
+reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (Menu 0) = return $ Quit
+reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) Quit = exitSuccess
 
 
  

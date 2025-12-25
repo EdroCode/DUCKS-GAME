@@ -38,7 +38,7 @@ type EstadoGloss = (Estado, Assets)
 
 -- | Menu do jogo com múltiplas opções
 desenha :: [Picture] -> Worms -> IO Picture
-desenha p (Menu sel) = return $ drawMenu sel
+desenha p (Menu sel) = return $ drawMenu p sel
 desenha p (BotSimulation est _ _ (numMinhoca, jogada)) = return $ drawGame p est (Just numMinhoca) (Just jogada)
 desenha p (PVP est _ _ jogada) = return $ drawPvPGame p est (Just jogada)
 desenha p (MapCreatorTool e b a) = return $ (drawMCT p e b a) 
@@ -46,16 +46,35 @@ desenha p Quit = return $ Translate (-50) 0 $ Scale 0.5 0.5 $ Text "Aperte ESC p
 desenha p Help = return $ drawHelp
 
 -- | Menu principal com seletor expandido
-drawMenu :: Int -> Picture
-drawMenu sel = Pictures
-  [ Translate (-220) 180 $ Scale 0.7 0.7 $ Color black $ Text "WORMS"
-  , Translate (-220) 130 $ Scale 0.2 0.2 $ Color (greyN 0.5) $ Text "Escolha o modo de jogo"
-  , Translate (-220) 60 $ Scale 0.35 0.35 $ Color (if sel==0 then red else black) $ Text "Bot Simulation"
-  , Translate (-220) (-20) $ Scale 0.35 0.35 $ Color (if sel==1 then red else black) $ Text "Player vs Player"
-  , Translate (-220) (-100) $ Scale 0.35 0.35 $ Color (if sel==2 then red else black) $ Text "MAP Creator Tool"
-  , Translate (-220) (-160) $ Scale 0.35 0.35 $ Color (if sel==3 then red else black) $ Text "Help"
-  , Translate (-220) (-200) $ Scale 0.35 0.35 $ Color (if sel==4 then red else black) $ Text "Quit"
-  , Translate (-300) (-250) $ Scale 0.10 0.10 $ Color (greyN 0.4) $ Text (getDescription sel)
+drawMenu :: [Picture] -> Int -> Picture
+drawMenu p sel = Pictures
+  [ 
+    -- Título "WORMS"
+    Translate (-120) 200 $ Scale 1 1 $ p !! 20
+  , Translate (-280) 200 $ Scale 0.7 0.7 $ Color white $ Text "WORMS"
+  
+  , -- Subtítulo
+    Translate (0 - 280) 130 $ Scale 0.2 0.2 $ Color (greyN 0.5) $ Text "Escolha o modo de jogo" 
+  
+  , -- Bot Simulation
+    Translate (-280 - 120) (0) $ Scale 1 1 $ (if sel==0 then p !! 21 else p !! 22)
+  , Translate (-340 - 280) (-15) $ Scale 0.35 0.35 $ Color (if sel==0 then red else black) $ Text "Bot Simulation"
+  
+  , -- Player vs Player
+    Translate (280 - 120) (0) $ Scale 1 1 $ (if sel==1 then p !! 21 else p !! 22)
+  , Translate (220 - 280) (-15) $ Scale 0.35 0.35 $ Color (if sel==1 then red else black) $ Text "Player vs Player"
+  
+  , -- MAP Creator Tool
+    Translate (-280 - 120) (-130) $ Scale 1 1 $ (if sel==2 then p !! 21 else p !! 22)
+  , Translate (-340 - 280) (-145) $ Scale 0.35 0.35 $ Color (if sel==2 then red else black) $ Text "MAP Creator Tool"
+  
+  , -- Help
+    Translate (280 - 120) (-130) $ Scale 1 1 $ (if sel==3 then p !! 21 else p !! 22)
+  , Translate (220 - 280) (-145) $ Scale 0.35 0.35 $ Color (if sel==3 then red else black) $ Text "Help"
+  
+  , -- Quit
+    Translate (0 - 120) (-260) $ Scale 1 1 $ (if sel==4 then p !! 21 else p !! 22)
+  , Translate (0 - 280) (-275) $ Scale 0.35 0.35 $ Color (if sel==4 then red else black) $ Text "Quit"
   ]
 
 getDescription :: Int -> String

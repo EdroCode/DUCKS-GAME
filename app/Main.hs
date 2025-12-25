@@ -51,10 +51,13 @@ main = do
   Just ammoBazuca <- loadJuicy (path ++ "ammo_box_bazuca.png")
   Just ammoMina <- loadJuicy (path ++ "ammo_box_mina.png")
   Just ammoDinamite <- loadJuicy (path ++ "ammo_box_dinamite.png")
+  Just botao <- loadJuicy (path ++ "BotaoMenuapagado.png")
+  Just botaoOn <- loadJuicy (path ++ "BotaoMenuSelecionado.png")
+  Just botaoOff <- loadJuicy (path ++ "BotaoMenuDescelecionado.png")
 
 
 
-  let tiles = [grass, water, stone, worm, morto, barril, bazuca, sky, dinamite, mina, dirt, lava, healthPack, patoPulando, patoCaindo, ammoJetpack, ammoEscavadora, ammoBazuca, ammoMina, ammoDinamite]
+  let tiles = [grass, water, stone, worm, morto, barril, bazuca, sky, dinamite, mina, dirt, lava, healthPack, patoPulando, patoCaindo, ammoJetpack, ammoEscavadora, ammoBazuca, ammoMina, ammoDinamite, botao, botaoOn, botaoOff]
 
   let temanatal = [grass, water, stone, worm, morto, barril, bazuca, sky, dinamite, mina]
 
