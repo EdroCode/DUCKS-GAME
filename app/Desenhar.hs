@@ -21,9 +21,9 @@ import Data.Char (toLower)
 
 
 janelaLargura :: Float
-janelaLargura = 1900
+janelaLargura = 1920
 janelaAltura :: Float
-janelaAltura = 1900
+janelaAltura = 1300
 
 -- * Assets
 
@@ -43,7 +43,8 @@ desenha :: [Picture] -> Worms -> IO Picture
 desenha p (Menu sel) = return $ drawMenu p sel
 desenha p (BotSimulation est _ _ (numMinhoca, jogada)) = return $ drawGame p est (Just numMinhoca) (Just jogada)
 desenha p (PVP est _ _ jogada) = return $ drawPvPGame p est (Just jogada)
-desenha p (MapCreatorTool e b a) = return $ (drawMCT p e b a) 
+desenha p (MapCreatorTool e b a l) = return $ (drawMCT p e b a l) 
+desenha p (LevelSelector id) = return $ (drawLvlSelector p id) 
 desenha p Quit = return $ Translate (-50) 0 $ Scale 0.5 0.5 $ Text "Aperte ESC para confirmar saída."
 desenha p Help = return $ drawHelp
 
@@ -99,19 +100,49 @@ drawHelp = Pictures
   , Translate (-360) (-60) $ Scale 0.25 0.25 $ Color black $ Text "Setas - mover minhoca"
   , Translate (-360) (-100) $ Scale 0.25 0.25 $ Color black $ Text "Q/E/Z/C - diagonais"
   , Translate (-360) (-220) $ Scale 0.10 0.10 $ Color (greyN 0.5) $ Text "Pressione ESC ou Enter para voltar ao menu"
-  
   ]
 
 
-drawMCT :: [Picture] -> EstadoDLC -> Int -> Int -> Picture
-drawMCT p e blocoSelecionado mode = Pictures
-  [ Translate (-440) 330 $ Scale 0.5 0.5 $ Color black $ Text "Bem vindo ao criador de mapas", sidebar, world]
+-- | Desenha o selector de níveis como uma lista vertical
+drawLvlSelector :: [Picture] -> Int -> Picture
+drawLvlSelector p selected = Pictures
+  [ Pictures $ zipWith drawNivel [0..] niveis
+  ]
+  where
+
+    niveis = [1..10]  
+
+
+    drawNivel :: Int -> Int -> Picture
+    drawNivel idx n = Pictures
+      [ 
+        Color (if idx == selected then makeColor 0.3 0.6 1 0.5 else greyN 0.5) $
+          Translate x y $ rectangleSolid largura altura
+
+      , Translate (x - largura/4) y $ Scale 0.7 0.7 $ drawWord p (show n)
+      ]
+      where
+
+        largura = 1000
+        altura  = 50
+        espaco  = 10
+
+        x =  0+ 20 
+        y =  300 - fromIntegral idx * (altura + espaco)
+
+
+
+
+
+drawMCT :: [Picture] -> EstadoDLC -> Int -> Int -> Int -> Picture
+drawMCT p e blocoSelecionado mode secSel = Pictures
+  [ Translate (-440) 330 $ Scale 0.5 0.5 $ Color black $ drawWord p "Bem vindo ao criador de mapas", sidebar, world]
   where
     mapa = mapaEstadoDLC e
     objs = objetosEstadoDLC e
     ms = minhocasEstadoDLC e
 
-    infoMapa = "Mapa: " ++ show (length mapa) ++ "x" ++ show (if null mapa then 0 else length (head mapa))
+    infoMapa = show (length mapa) ++ "x" ++ show (if null mapa then 0 else length (head mapa))
     
     blocos = [(0, "Terra", head p), (1, "Agua", p !! 1), (2, "Pedra", p !! 2), (3, "Ar", p !! 7), (4, "Lava", p !! 11) ]
     objetos =     [ (0, "Barril", p !! 5) , (1, "Health Pack", p !! 12) , (2, "Jetpack", p !! 15), (3, "Escavadora", p !! 16), (4, "Bazuca", p !! 17), (5, "Mina", p !! 18), (6, "Dinamite", p !! 19)]
@@ -122,8 +153,8 @@ drawMCT p e blocoSelecionado mode = Pictures
         if idx == blocoSelecionado 
           then Color (makeColor 0.3 0.6 1.0 0.3) $ Translate (-750) y $ rectangleSolid 280 70
           else Blank
-      , Translate (-880) y $ Scale 0.25 0.25 $ Color black $ Text (show (idx + 1))
-      , Translate (-850) (y + 5) $ Scale 0.2 0.2 $ Color black $ Text nome
+      , Translate (-880) y $ Scale 0.6 0.6 $ drawWord p (show (idx + 1))
+      , Translate (-850) (y + 5) $ Scale 0.6 0.6 $ Color black $ drawWord p nome
       , Translate (-700) y $ Scale 2 2 $ pic
       ]
 
@@ -132,19 +163,56 @@ drawMCT p e blocoSelecionado mode = Pictures
         if idx == blocoSelecionado 
           then Color (makeColor 0.3 0.6 1.0 0.3) $ Translate (-750) y $ rectangleSolid 280 70
           else Blank
-      , Translate (-880) y $ Scale 0.25 0.25 $ Color black $ Text (show (idx + 1))
-      , Translate (-850) (y + 5) $ Scale 0.2 0.2 $ Color black $ Text nome
+      , Translate (-880) y $ Scale 0.6 0.6 $ Color black $ drawWord p (show (idx + 1))
+      , Translate (-850) (y + 5) $ Scale 0.6 0.6 $ Color black $ drawWord p nome
       , Translate (-700) y $ Scale 2 2 $ pic
       ]
+
+    weaponOffset :: Float
+    weaponOffset = 80
 
     drawPersonagens y (idx, nome, pic) = Pictures
       [ -- Highlight 
         if idx == blocoSelecionado 
           then Color (makeColor 0.3 0.6 1.0 0.3) $ Translate (-750) y $ rectangleSolid 280 70
           else Blank
-      , Translate (-880) y $ Scale 0.25 0.25 $ Color black $ Text (show (idx + 1))
-      , Translate (-850) (y + 5) $ Scale 0.2 0.2 $ Color black $ Text nome
+      , Translate (-880) y $ Scale 0.6 0.6 $ Color black $ drawWord p (show (idx + 1))
+      , Translate (-850) (y + 5) $ Scale 0.6 0.6 $ Color black $ drawWord p nome
       , Translate (-700) y $ Scale 2 2 $ pic
+
+        , Translate (-900) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 2
+        , Translate (-830) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 2
+        , Translate (-760) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 6
+        , Translate (-690) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 9
+        , Translate (-620) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 8
+
+        , Translate (-900) (y - weaponOffset) $
+            Scale 0.25 0.25 $
+              Color (if (secSel == 1 ) then dark red else black) $
+                Text (show 100)
+
+        , Translate (-830) (y - weaponOffset) $
+            Scale 0.25 0.25 $
+              Color (if (secSel == 2 ) then dark red else black) $
+                Text (show 100)
+
+        , Translate (-760) (y - weaponOffset) $
+            Scale 0.25 0.25 $
+              Color (if (secSel == 3) then dark red else black) $
+                Text (show 100)
+
+        , Translate (-690) (y - weaponOffset) $
+            Scale 0.25 0.25 $
+              Color (if (secSel == 4 ) then dark red else black) $
+                Text (show 100)
+
+        , Translate (-620) (y - weaponOffset) $
+            Scale 0.25 0.25 $
+              Color (if (secSel == 5 ) then dark red else black) $
+                Text (show  100)
+        
+     
+     
       ]
     
     
@@ -154,14 +222,14 @@ drawMCT p e blocoSelecionado mode = Pictures
       
       , 
         Color white $ Translate (-750) 380 $ rectangleSolid 280 80
-      , Translate (-870) 360 $ Scale 0.25 0.25 $ Color black $ Text infoMapa
+      , Translate (-870) 360 $ Scale 1 1 $ Color black $ drawWord p infoMapa
       
       
       , 
         Color (greyN 0.7) $ Translate (-750) 320 $ rectangleSolid 280 2
       
       , 
-        Translate (-900) 280 $ Scale 0.3 0.3 $ Color (greyN 0.3) $ Text "Blocos:"
+        Translate (-900) 280 $ Scale 0.6 0.6 $ Color (greyN 0.3) $ drawWord p "Blocos:"
       
       ,
       (case mode of 
@@ -170,13 +238,14 @@ drawMCT p e blocoSelecionado mode = Pictures
           2 -> Pictures $ zipWith drawPersonagens [240] personagens)
     
       , 
-        Translate (-900) (-400) $ Scale 0.2 0.2 $ Color (greyN 0.5) $ Text "L - Adicionar linha"
-      , Translate (-900) (-430) $ Scale 0.2 0.2 $ Color (greyN 0.5) $ Text "C - Adicionar coluna"
-      , Translate (-900) (-460) $ Scale 0.2 0.2 $ Color (greyN 0.5) $ Text "M - Remover coluna"
-      , Translate (-900) (-490) $ Scale 0.2 0.2 $ Color (greyN 0.5) $ Text "N - Remover linha"
-      , Translate (-900) (-520) $ Scale 0.2 0.2 $ Color (greyN 0.5) $ Text "1 - Selecionar bloco"
-      , Translate (-900) (-550) $ Scale 0.2 0.2 $ Color (greyN 0.5) $ Text "LMB - Colocar bloco/objeto/personagem"
-      , Translate (-900) (-580) $ Scale 0.2 0.2 $ Color (greyN 0.5) $ Text "RMB - Remover (Modo Selecionado)"
+        Translate (-900) (-400) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "L - Adicionar linha"
+      , Translate (-900) (-430) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "C - Adicionar coluna"
+      , Translate (-900) (-460) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "M - Remover coluna"
+      , Translate (-900) (-490) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "N - Remover linha"
+      , Translate (-900) (-520) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "1 - Selecionar bloco"
+      , Translate (-900) (-550) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "LMB - Colocar bloco/objeto/personagem"
+      , Translate (-900) (-580) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "RMB - Remover (Modo Selecionado)"
+      , Translate (-900) (-610) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "Enter - Exportar estado"
 
 
       ]
@@ -465,8 +534,26 @@ drawLetters p c =
     'x' -> p !! 46
     'y' -> p !! 47
     'z' -> p !! 48
-    ' ' -> p !! 49
-    _   -> p !! 49
+    ' '   -> p !! 49
+    '0' -> p !! 50
+    '1' -> p !! 51
+    '2' -> p !! 52
+    '3' -> p !! 53
+    '4' -> p !! 54
+    '5' -> p !! 55
+    '6' -> p !! 56
+    '7' -> p !! 57
+    '8' -> p !! 58
+    '9' -> p !! 59
+    '-' -> p !! 60
+    '(' -> p !! 61
+    ')' -> p !! 62
+    '/' -> p !! 63
+    ':' -> p !! 64
+
+
+
+
 
 
 bazucaDir :: [Picture] -> Direcao -> Picture

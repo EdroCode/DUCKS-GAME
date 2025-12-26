@@ -23,6 +23,7 @@ reageTempo :: Segundos -> Worms -> IO Worms
 reageTempo _ m@Menu{} = return m
 reageTempo _ Help = return Help
 reageTempo _ Quit = return Quit
+reageTempo _ (LevelSelector i) = return (LevelSelector i) 
 reageTempo dt (BotSimulation est acc tick ultimaJogada) = return $ BotSimulation estFinal acc' tick' novaJogada
         where
                 acc2 = acc + dt
@@ -53,7 +54,7 @@ reageTempo dt (PVP est acc tick jogadaUser) = return $ PVP estFinal acc tick jog
 
 
 
-reageTempo _ (MapCreatorTool mp i a) = return (MapCreatorTool mp i a)
+reageTempo _ (MapCreatorTool mp i a l) = return (MapCreatorTool mp i a l)
 reageTempo _ MapSelector = return MapSelector
 
 

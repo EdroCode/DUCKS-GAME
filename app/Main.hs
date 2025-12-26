@@ -12,7 +12,7 @@ import Graphics.Gloss.Interface.IO.Game
 
 
 janela :: Display
-janela = InWindow "Worms" (1920, 1080) (0, 0)
+janela = InWindow "Worms" (1920, 1300) (0, 0)
 
 fundo :: Color
 fundo = white
@@ -83,10 +83,27 @@ main = do
   Just x <- loadJuicy (path ++ "fontes/X.png")
   Just y <- loadJuicy (path ++ "fontes/Y.png")
   Just z <- loadJuicy (path ++ "fontes/Z.png")
+  Just _0 <- loadJuicy (path ++ "fontes/0.png")
+  Just _1 <- loadJuicy (path ++ "fontes/1.png")
+  Just _2 <- loadJuicy (path ++ "fontes/2.png")
+  Just _3 <- loadJuicy (path ++ "fontes/3.png")
+  Just _4 <- loadJuicy (path ++ "fontes/4.png")
+  Just _5 <- loadJuicy (path ++ "fontes/5.png")
+  Just _6 <- loadJuicy (path ++ "fontes/6.png")
+  Just _7 <- loadJuicy (path ++ "fontes/7.png")
+  Just _8 <- loadJuicy (path ++ "fontes/8.png")
+  Just _9 <- loadJuicy (path ++ "fontes/9.png")
+  Just dash <- loadJuicy (path ++ "fontes/dash.png")
+  Just pl <- loadJuicy (path ++ "fontes/pl.png")
+  Just pr <- loadJuicy (path ++ "fontes/pr.png")
+  Just slash <- loadJuicy (path ++ "fontes/slash.png")
+  Just dott_points <- loadJuicy (path ++ "fontes/dott_points.png")
+
+
   Just space <- loadJuicy (path ++ "fontes/blank.png")
 
 
-  let tiles = [grass, water, stone, worm, morto, barril, bazuca, sky, dinamite, mina, dirt, lava, healthPack, patoPulando, patoCaindo, ammoJetpack, ammoEscavadora, ammoBazuca, ammoMina, ammoDinamite, botao, botaoOn, botaoOff, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, space]
+  let tiles = [grass, water, stone, worm, morto, barril, bazuca, sky, dinamite, mina, dirt, lava, healthPack, patoPulando, patoCaindo, ammoJetpack, ammoEscavadora, ammoBazuca, ammoMina, ammoDinamite, botao, botaoOn, botaoOff, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, space, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, dash, pl, pr, slash, dott_points]
 
   let temanatal = [grass, water, stone, worm, morto, barril, bazuca, sky, dinamite, mina]
 

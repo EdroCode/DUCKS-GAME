@@ -12,6 +12,11 @@ import DataDLC
 import EfetuaJogada
 import AvancaEstado
 import Auxiliar (getMinhocasValidasDLC)
+import System.IO
+
+
+
+
 
 -- | Função principal que reage aos eventos do usuário e atualiza o estado do jogo
 reageEventos :: Event -> Worms -> IO Worms
@@ -43,8 +48,8 @@ reageEventos (EventKey (SpecialKey KeyRight) Down _ _) (Menu sel)
 -- Seleção de opção no menu
 reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (Menu sel)
 	| sel == 0  = return $ BotSimulation novoEstado 0 0 (0, Labs2025.Move Sul)
-	| sel == 1  = return $ PVP flatWorld 0 0 (DataDLC.Move Sul)
-    | sel == 2  = return $ MapCreatorTool flatWorld 0 0
+	| sel == 1  = return $ LevelSelector 0
+    | sel == 2  = return $ MapCreatorTool flatWorld 0 0 0
 	| sel == 3  = return $ Help
 	| sel == 4  = return $ Quit
 	| otherwise = return $ Menu sel
@@ -55,12 +60,25 @@ reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (Menu sel)
 
 reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) Help = return $ Menu 0
 reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) Help = return $ Menu 0
-reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (MapCreatorTool _ _ _) = return $ Menu 0
+reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (MapCreatorTool _ _ _ _) = return $ Menu 0
 reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (BotSimulation _ _ _ _) = return $ Menu 0
 reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (Menu 0) = return $ Quit
 reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) Quit = exitSuccess
 
 
+-- * LVL SELECTOR
+
+reageEventos (EventKey (SpecialKey KeyRight) Down _ _) (LevelSelector i) = 
+    return $ LevelSelector (i + 1)
+
+reageEventos (EventKey (SpecialKey KeyLeft) Down _ _) (LevelSelector i) = 
+    return $ LevelSelector (i - 1)
+
+reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (LevelSelector i)
+	| i == 0  = return $ PVP flatWorld 0 0 (DataDLC.Move Sul)
+	| otherwise = return $ LevelSelector i
+
+reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (LevelSelector _) = return $ Menu 0
  
 -- * PVP MODE INPUTS
 
@@ -129,37 +147,39 @@ reageEventos (EventKey key Down _ _) (PVP est acc tick _) =
 
 
 -- AUmentar Linhas -> 
-reageEventos (EventKey (Char 'k') Down _ _) (MapCreatorTool e b a) = 
+reageEventos (EventKey (Char 'k') Down _ _) (MapCreatorTool e b a l) = 
     let 
         mapa = mapaEstadoDLC e
         linhas = length mapa
         colunas = if null mapa then 0 else length (head mapa)
         novaLinha = replicate colunas ArDLC
         novoMapa = mapa ++ [novaLinha]
-    in return $ MapCreatorTool e{mapaEstadoDLC = novoMapa} b a
+    in return $ MapCreatorTool e{mapaEstadoDLC = novoMapa} b a l
 
-reageEventos (EventKey (Char 'l') Down _ _) (MapCreatorTool e b a) = 
+reageEventos (EventKey (Char 'l') Down _ _) (MapCreatorTool e b a l) = 
     let 
         mapa = mapaEstadoDLC e
         novoMapa = map (++ [ArDLC]) mapa
-    in return $ MapCreatorTool e{mapaEstadoDLC = novoMapa} b a
+    in return $ MapCreatorTool e{mapaEstadoDLC = novoMapa} b a l
 
-reageEventos (EventKey (Char 'n') Down _ _) (MapCreatorTool e b a) = 
+reageEventos (EventKey (Char 'n') Down _ _) (MapCreatorTool e b a l) = 
     let 
         mapa = mapaEstadoDLC e
         linhas = length mapa
         colunas = if null mapa then 0 else length (head mapa)
         novaLinha = replicate colunas ArDLC
         novoMapa = init mapa
-    in return $ MapCreatorTool e{mapaEstadoDLC = novoMapa} b a
+    in return $ MapCreatorTool e{mapaEstadoDLC = novoMapa} b a l
 
-reageEventos (EventKey (Char 'm') Down _ _) (MapCreatorTool e b a) = 
+reageEventos (EventKey (Char 'm') Down _ _) (MapCreatorTool e b a l) = 
     let 
         mapa = mapaEstadoDLC e
         novoMapa = map init  mapa
-    in return $ MapCreatorTool e{mapaEstadoDLC = novoMapa} b a
+    in return $ MapCreatorTool e{mapaEstadoDLC = novoMapa} b a l
 
-reageEventos (EventKey (Char '1') Down _ _) (MapCreatorTool e b a) = 
+
+
+reageEventos (EventKey (SpecialKey KeyDown) Down _ _) (MapCreatorTool e b a l) = 
     let 
         mapa = mapaEstadoDLC e
         x = case a of
@@ -168,15 +188,26 @@ reageEventos (EventKey (Char '1') Down _ _) (MapCreatorTool e b a) =
             2 -> 0
         novob = if b >= x then 0 else b + 1
         
-    in return $ MapCreatorTool e novob a
+    in return $ MapCreatorTool e novob a l
 
-reageEventos (EventKey (Char '2') Down _ _) (MapCreatorTool e b a) = 
+reageEventos (EventKey (Char '1') Down _ _) (MapCreatorTool e b a l) = 
     let 
         mapa = mapaEstadoDLC e
         novoa = if a > 1 then 0 else a + 1
-    in return $ MapCreatorTool e 0 novoa
+    in return $ MapCreatorTool e 0 novoa l
 
-reageEventos (EventKey (MouseButton LeftButton) Down _ mousePos) (MapCreatorTool e blocoSelecionado modo) =
+reageEventos (EventKey (SpecialKey KeyRight) Down _ _) (MapCreatorTool e b a l) = 
+    let 
+        lnew = l + 1
+    in return $ MapCreatorTool e b a l
+
+reageEventos (EventKey (SpecialKey KeyLeft) Down _ _) (MapCreatorTool e b a l) = 
+    let 
+        lnew = l - 1
+    in return $ MapCreatorTool e b a lnew
+
+
+reageEventos (EventKey (MouseButton LeftButton) Down _ mousePos) (MapCreatorTool e blocoSelecionado modo l) =
     let 
         mapa = mapaEstadoDLC e
         (mx, my) = mousePos
@@ -207,10 +238,10 @@ reageEventos (EventKey (MouseButton LeftButton) Down _ mousePos) (MapCreatorTool
                 2 -> adicionaMinhocaDLC e posicao
                 _ -> e
             else e
-    in return $ MapCreatorTool novoEstado blocoSelecionado modo
+    in return $ MapCreatorTool novoEstado blocoSelecionado modo l
 
 
-reageEventos (EventKey (MouseButton RightButton) Down _ mousePos) (MapCreatorTool e blocoSelecionado modo) =
+reageEventos (EventKey (MouseButton RightButton) Down _ mousePos) (MapCreatorTool e blocoSelecionado modo l) =
     let 
         mapa = mapaEstadoDLC e
         (mx, my) = mousePos
@@ -241,13 +272,47 @@ reageEventos (EventKey (MouseButton RightButton) Down _ mousePos) (MapCreatorToo
                 2 -> removeMinhocaDLC e posicao
                 _ -> e
             else e
-    in return $ MapCreatorTool novoEstado blocoSelecionado modo
+    in return $ MapCreatorTool novoEstado blocoSelecionado modo l
+
+
+
+
+
+reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) m@(MapCreatorTool e b a l) = do
+    writeFile "estado.txt" (show e)
+    return m 
+
+
+
+
+
+
 
 
 
 
 -- Qualquer outro evento não altera o estado
 reageEventos _ s = return s
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 -- * Funções auxiliares
 
