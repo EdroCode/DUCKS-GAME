@@ -17,6 +17,8 @@ import DataDLC
 import Auxiliar (getMinhocasValidasDLC, eMinhocaVivaDLC)
 import EfetuaJogada
 import AvancaEstado
+import Data.Char (toLower)
+
 
 janelaLargura :: Float
 janelaLargura = 1900
@@ -49,32 +51,33 @@ desenha p Help = return $ drawHelp
 drawMenu :: [Picture] -> Int -> Picture
 drawMenu p sel = Pictures
   [ 
+
     -- Título "WORMS"
     Translate (-120) 200 $ Scale 1 1 $ p !! 20
-  , Translate (-280) 200 $ Scale 0.7 0.7 $ Color white $ Text "WORMS"
-  
+  , Translate (-280) 200 $ Scale 1.6 1.6 $ drawWord p "worms"
+
   , -- Subtítulo
-    Translate (0 - 280) 130 $ Scale 0.2 0.2 $ Color (greyN 0.5) $ Text "Escolha o modo de jogo" 
+    Translate (0 - 340) 130 $ Scale 0.5 0.5 $ drawWord p "Escolha o modo de jogo" 
   
   , -- Bot Simulation
     Translate (-280 - 120) (0) $ Scale 1 1 $ (if sel==0 then p !! 21 else p !! 22)
-  , Translate (-340 - 280) (-15) $ Scale 0.35 0.35 $ Color (if sel==0 then red else black) $ Text "Bot Simulation"
+  , Translate (-280 - 300) (0) $ Scale 0.6 0.6 $ Color (if sel==0 then red else black) $ drawWord p " Bot Simulation"
   
   , -- Player vs Player
     Translate (280 - 120) (0) $ Scale 1 1 $ (if sel==1 then p !! 21 else p !! 22)
-  , Translate (220 - 280) (-15) $ Scale 0.35 0.35 $ Color (if sel==1 then red else black) $ Text "Player vs Player"
+  , Translate (220 - 240) (0) $ Scale 0.6 0.6 $ Color (if sel==1 then red else black) $ drawWord p  "Player vs Player"
   
   , -- MAP Creator Tool
     Translate (-280 - 120) (-130) $ Scale 1 1 $ (if sel==2 then p !! 21 else p !! 22)
-  , Translate (-340 - 280) (-145) $ Scale 0.35 0.35 $ Color (if sel==2 then red else black) $ Text "MAP Creator Tool"
+  , Translate (-340 - 240) (-130) $ Scale 0.6 0.6 $ Color (if sel==2 then red else black) $ drawWord p  "MAP Creator Tool"
   
   , -- Help
     Translate (280 - 120) (-130) $ Scale 1 1 $ (if sel==3 then p !! 21 else p !! 22)
-  , Translate (220 - 280) (-145) $ Scale 0.35 0.35 $ Color (if sel==3 then red else black) $ Text "Help"
+  , Translate (280 - 160) (-130) $ Scale 0.6 0.6 $ Color (if sel==3 then red else black) $ drawWord p  "Help"
   
   , -- Quit
     Translate (0 - 120) (-260) $ Scale 1 1 $ (if sel==4 then p !! 21 else p !! 22)
-  , Translate (0 - 280) (-275) $ Scale 0.35 0.35 $ Color (if sel==4 then red else black) $ Text "Quit"
+  , Translate (0 - 160) (-260) $ Scale 0.6 0.6 $ Color (if sel==4 then red else black) $ drawWord p  "Quit"
   ]
 
 getDescription :: Int -> String
@@ -417,6 +420,53 @@ drawObjetos p objs mapa = Pictures $ map drawO objs
       where (x,y) = converteMapa mapa (Tarefa0_2025.posicaoObjeto b)
     
 
+drawWord :: [Picture] -> String -> Picture
+drawWord p str =
+  Pictures $
+    zipWith (\x pic -> Translate x 0 pic) xs (stringToPictures p str)
+  where
+    spacing = 40
+    xs = [0, spacing ..]
+
+
+
+stringToPictures :: [Picture] -> String -> [Picture]
+stringToPictures p str =
+  map (drawLetters p) str
+
+
+drawLetters :: [Picture] -> Char -> Picture
+drawLetters p c =
+  let lc = toLower c in
+  case lc of
+    'a' -> p !! 23
+    'b' -> p !! 24
+    'c' -> p !! 25
+    'd' -> p !! 26
+    'e' -> p !! 27
+    'f' -> p !! 28
+    'g' -> p !! 29
+    'h' -> p !! 30
+    'i' -> p !! 31
+    'j' -> p !! 32
+    'k' -> p !! 33
+    'l' -> p !! 34
+    'm' -> p !! 35
+    'n' -> p !! 36
+    'o' -> p !! 37
+    'p' -> p !! 38
+    'q' -> p !! 39
+    'r' -> p !! 40
+    's' -> p !! 41
+    't' -> p !! 42
+    'u' -> p !! 43
+    'v' -> p !! 44
+    'w' -> p !! 45
+    'x' -> p !! 46
+    'y' -> p !! 47
+    'z' -> p !! 48
+    ' ' -> p !! 49
+    _   -> p !! 49
 
 
 bazucaDir :: [Picture] -> Direcao -> Picture

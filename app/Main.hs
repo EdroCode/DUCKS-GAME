@@ -55,9 +55,38 @@ main = do
   Just botaoOn <- loadJuicy (path ++ "BotaoMenuSelecionado.png")
   Just botaoOff <- loadJuicy (path ++ "BotaoMenuDescelecionado.png")
 
+  -- * Fontes
+
+  Just a <- loadJuicy (path ++ "fontes/A.png")
+  Just b <- loadJuicy (path ++ "fontes/B.png")
+  Just c <- loadJuicy (path ++ "fontes/C.png")
+  Just d <- loadJuicy (path ++ "fontes/D.png")
+  Just e <- loadJuicy (path ++ "fontes/E.png")
+  Just f <- loadJuicy (path ++ "fontes/F.png")
+  Just g <- loadJuicy (path ++ "fontes/G.png")
+  Just h <- loadJuicy (path ++ "fontes/H.png")
+  Just i <- loadJuicy (path ++ "fontes/I.png")
+  Just j <- loadJuicy (path ++ "fontes/J.png")
+  Just k <- loadJuicy (path ++ "fontes/K.png")
+  Just l <- loadJuicy (path ++ "fontes/L.png")
+  Just m <- loadJuicy (path ++ "fontes/M.png")
+  Just n <- loadJuicy (path ++ "fontes/N.png")
+  Just o <- loadJuicy (path ++ "fontes/O.png")
+  Just p <- loadJuicy (path ++ "fontes/P.png")
+  Just q <- loadJuicy (path ++ "fontes/Q.png")
+  Just r <- loadJuicy (path ++ "fontes/R.png")
+  Just s <- loadJuicy (path ++ "fontes/S.png")
+  Just t <- loadJuicy (path ++ "fontes/T.png")
+  Just u <- loadJuicy (path ++ "fontes/U.png")
+  Just v <- loadJuicy (path ++ "fontes/V.png")
+  Just w <- loadJuicy (path ++ "fontes/W.png")
+  Just x <- loadJuicy (path ++ "fontes/X.png")
+  Just y <- loadJuicy (path ++ "fontes/Y.png")
+  Just z <- loadJuicy (path ++ "fontes/Z.png")
+  Just space <- loadJuicy (path ++ "fontes/blank.png")
 
 
-  let tiles = [grass, water, stone, worm, morto, barril, bazuca, sky, dinamite, mina, dirt, lava, healthPack, patoPulando, patoCaindo, ammoJetpack, ammoEscavadora, ammoBazuca, ammoMina, ammoDinamite, botao, botaoOn, botaoOff]
+  let tiles = [grass, water, stone, worm, morto, barril, bazuca, sky, dinamite, mina, dirt, lava, healthPack, patoPulando, patoCaindo, ammoJetpack, ammoEscavadora, ammoBazuca, ammoMina, ammoDinamite, botao, botaoOn, botaoOff, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, space]
 
   let temanatal = [grass, water, stone, worm, morto, barril, bazuca, sky, dinamite, mina]
 
