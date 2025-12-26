@@ -187,27 +187,27 @@ drawMCT p e blocoSelecionado mode secSel = Pictures
         , Translate (-620) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 8
 
         , Translate (-900) (y - weaponOffset) $
-            Scale 0.25 0.25 $
+            Scale 0.4 0.4 $
               Color (if (secSel == 1 ) then dark red else black) $
                 Text (show 100)
 
         , Translate (-830) (y - weaponOffset) $
-            Scale 0.25 0.25 $
+            Scale 0.4 0.4 $
               Color (if (secSel == 2 ) then dark red else black) $
                 Text (show 100)
 
         , Translate (-760) (y - weaponOffset) $
-            Scale 0.25 0.25 $
+            Scale 0.4 0.4 $
               Color (if (secSel == 3) then dark red else black) $
                 Text (show 100)
 
         , Translate (-690) (y - weaponOffset) $
-            Scale 0.25 0.25 $
+            Scale 0.4 0.4 $
               Color (if (secSel == 4 ) then dark red else black) $
                 Text (show 100)
 
         , Translate (-620) (y - weaponOffset) $
-            Scale 0.25 0.25 $
+            Scale 0.4 0.4 $
               Color (if (secSel == 5 ) then dark red else black) $
                 Text (show  100)
         
@@ -290,11 +290,11 @@ drawGame p est numMinhoca jogada = Pictures [sidebar, world]
 
     sidebar = Pictures
       [ Color (greyN 0.9) $ Translate (-750) 0 $ rectangleSolid 300 900
-      , Translate (-900) 300 $ Scale 0.3 0.3 $ Color black $ Text infoMapa
-      , Translate (-900) 260 $ Scale 0.3 0.3 $ Color (dark green) $ Text ("Minhocas vivas: " ++ show minhocasVivas)
-      , Translate (-900) 220 $ Scale 0.3 0.3 $ Color (dark red) $ Text ("Minhocas mortas: " ++ show (totalMinhocas - minhocasVivas))
-      , Translate (-900) 180 $ Scale 0.3 0.3 $ Color black $ Text ("Total minhocas: " ++ show totalMinhocas)
-      , Translate (-900) 140 $ Scale 0.3 0.3 $ Color (dark red) $ Text ("Objetos: " ++ show totalObjetos)
+      , Translate (-900) 300 $ Scale 0.3 0.3 $ Color black $ drawWord p infoMapa
+      , Translate (-900) 260 $ Scale 0.3 0.3 $ Color (dark green) $ drawWord p ("Minhocas vivas: " ++ show minhocasVivas)
+      , Translate (-900) 220 $ Scale 0.3 0.3 $ Color (dark red) $ drawWord p ("Minhocas mortas: " ++ show (totalMinhocas - minhocasVivas))
+      , Translate (-900) 180 $ Scale 0.3 0.3 $ Color black $ drawWord p ("Total minhocas: " ++ show totalMinhocas)
+      , Translate (-900) 140 $ Scale 0.3 0.3 $ Color (dark red) $ drawWord p ("Objetos: " ++ show totalObjetos)
       ]
 
     linha = length mapa
@@ -342,17 +342,17 @@ drawPvPGame p est jogada =
         ( [ Color (greyN 0.9)
               $ Translate (-750) 0
               $ rectangleSolid (1000 - gameWindowPos) 900
-          , Translate (-900) 300 $ Scale 0.3 0.3 $ Color black $ Text infoMapa
-          , Translate (-900) 260 $ Scale 0.3 0.3 $ Color (dark green)
-              $ Text ("Minhocas vivas: " ++ show minhocasVivas)
-          , Translate (-900) 220 $ Scale 0.3 0.3 $ Color (dark red)
-              $ Text ("Minhocas mortas: " ++ show (totalMinhocas - minhocasVivas))
-          , Translate (-900) 180 $ Scale 0.3 0.3 $ Color black
-              $ Text ("Total minhocas: " ++ show totalMinhocas)
-          , Translate (-900) 140 $ Scale 0.3 0.3 $ Color black
-              $ Text ("Objetos: " ++ show totalObjetos)
-          , Translate (-900) 110 $ Scale 0.3 0.3 $ Color black
-              $ Text "---------"
+          , Translate (-900) 300 $ Scale 0.6 0.6 $ Color black $ drawWord p infoMapa
+          , Translate (-900) 260 $ Scale 0.6 0.6 $ Color (dark green)
+              $ drawWord p ("Minhocas vivas: " ++ show minhocasVivas)
+          , Translate (-900) 220 $ Scale 0.6 0.6 $ Color (dark red)
+              $ drawWord p ("Minhocas mortas: " ++ show (totalMinhocas - minhocasVivas))
+          , Translate (-900) 180 $ Scale 0.6 0.6 $ Color black
+              $ drawWord p ("Total minhocas: " ++ show totalMinhocas)
+          , Translate (-900) 140 $ Scale 0.6 0.6 $ Color black
+              $ drawWord p ("Objetos: " ++ show totalObjetos)
+          , Translate (-900) 110 $ Scale 0.6 0.6 $ Color black
+              $ drawWord p "---------"
           ]
           ++ minhocasSidebar
         )
@@ -362,70 +362,83 @@ drawPvPGame p est jogada =
     minhocasSidebar =
       zipWith drawMinhocaBar [0 ..] ms
 
+    gunOffset :: Float
+    gunOffset = 140
 
     minhocaSpacing :: Float
-    minhocaSpacing = 150
+    minhocaSpacing = 240
 
     weaponOffset :: Float
-    weaponOffset = 80
+    weaponOffset = 120
 
     drawMinhocaBar :: Int -> MinhocaDLC -> Picture
     drawMinhocaBar i m =
       Pictures
-        [ -- Nome / índice
-          Translate (-900) y $
-            Scale 0.25 0.25 $
-              Color (if (armaSelecionada est == Nothing && minhocaSelecionada est == i) then dark red else black) $
-                Text (show i)
-
+          [ -- Nome / índice
+            Translate (-800) y $
+            Scale 0.6 0.6 $
+            Color (if (armaSelecionada est == Nothing && minhocaSelecionada est == i) then dark red else black) $
+                  drawWord p (show i)
           -- Ícone vida
-        , Translate (-900) (y - 20) $ Scale 3 3 $ p !! 3
-        , Translate (-860) (y - 30) $
-            Scale 0.25 0.25 $
-              Color cor $
-                Text (show (vidaMinhocaDLC m))
-
+          , Translate (-900) (y - 20) $ Scale 2.5 2.5 $ p !! 3
+          , Translate (-800) (y - 30) $
+            Scale 0.6 0.6 $
+            Color cor $
+                  drawWord p ("HP: " ++ extrairVida (show (vidaMinhocaDLC m)))
           -- Posição
-        , Translate (-700) (y - 40) $
-            Scale 0.25 0.25 $
-              Color blue $
-                Text (show (posicaoMinhocaDLC m))
+          , Translate (-800) (y - 60) $
+            Scale 0.6 0.6 $
+            Color blue $
+                  drawWord p ("POS: " ++ extrairPosicao (show (posicaoMinhocaDLC m)))
+          -- Armas / itens (imagens)
+          , Translate (-930) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 2
+          , Translate (-840) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 2
+          , Translate (-750) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 6
+          , Translate (-660) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 9
+          , Translate (-570) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 8
+          -- Barras divisórias verticais
+          , Translate (-885) (y - weaponOffset - 10) $
+            Color (greyN 0.3) $
+            rectangleSolid 2 60
+          , Translate (-795) (y - weaponOffset - 10) $
+            Color (greyN 0.3) $
+            rectangleSolid 2 60
+          , Translate (-705) (y - weaponOffset - 10) $
+            Color (greyN 0.3) $
+            rectangleSolid 2 60
+          , Translate (-615) (y - weaponOffset - 10) $
+            Color (greyN 0.3) $
+            rectangleSolid 2 60
+          -- Textos das armas (abaixo das imagens)
+          , Translate (-938) (y - weaponOffset - 60) $
+            Scale 0.6 0.6 $
+            Color (if (armaSelecionada est == Just JetpackDLC && minhocaSelecionada est == i) then dark red else black) $
+                  drawWord p (show (jetpackMinhocaDLC m) ++ " ")
+          , Translate (-848) (y - weaponOffset - 60) $
+            Scale 0.6 0.6 $
+            Color (if (armaSelecionada est == Just EscavadoraDLC && minhocaSelecionada est == i) then dark red else black) $
+                  drawWord p (show (escavadoraMinhocaDLC m) ++ " ")
+          , Translate (-758) (y - weaponOffset - 60) $
+            Scale 0.6 0.6 $
+            Color (if (armaSelecionada est == Just BazucaDLC && minhocaSelecionada est == i) then dark red else black) $
+                  drawWord p (show (bazucaMinhocaDLC m) ++ " ")
+          , Translate (-668) (y - weaponOffset - 60) $
+            Scale 0.6 0.6 $
+            Color (if (armaSelecionada est == Just MinaDLC && minhocaSelecionada est == i) then dark red else black) $
+                  drawWord p (show (minaMinhocaDLC m) ++ " ")
+          , Translate (-578) (y - weaponOffset - 60) $
+            Scale 0.6 0.6 $
+            Color (if (armaSelecionada est == Just DinamiteDLC && minhocaSelecionada est == i) then dark red else black) $
+                  drawWord p (show (dinamiteMinhocaDLC m) ++ " ")
+          -- Barra horizontal divisória (no final de cada personagem)
+          , Translate (-750) (y - weaponOffset - 90) $
+            Color (greyN 0.4) $
+            rectangleSolid 400 3
+          ]
+        where
+          y   = 55 - fromIntegral i * minhocaSpacing
+          cor = if eMinhocaVivaDLC m then green else red
 
-          -- Armas / itens
-        , Translate (-900) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 2
-        , Translate (-830) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 2
-        , Translate (-760) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 6
-        , Translate (-690) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 9
-        , Translate (-620) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 8
-
-        , Translate (-900) (y - weaponOffset) $
-            Scale 0.25 0.25 $
-              Color (if (armaSelecionada est == Just JetpackDLC && minhocaSelecionada est == i) then dark red else black) $
-                Text (show (jetpackMinhocaDLC m))
-
-        , Translate (-830) (y - weaponOffset) $
-            Scale 0.25 0.25 $
-              Color (if (armaSelecionada est == Just EscavadoraDLC && minhocaSelecionada est == i) then dark red else black) $
-                Text (show (escavadoraMinhocaDLC m))
-
-        , Translate (-760) (y - weaponOffset) $
-            Scale 0.25 0.25 $
-              Color (if (armaSelecionada est == Just BazucaDLC && minhocaSelecionada est == i) then dark red else black) $
-                Text (show (bazucaMinhocaDLC m))
-
-        , Translate (-690) (y - weaponOffset) $
-            Scale 0.25 0.25 $
-              Color (if (armaSelecionada est == Just MinaDLC && minhocaSelecionada est == i) then dark red else black) $
-                Text (show (minaMinhocaDLC m))
-
-        , Translate (-620) (y - weaponOffset) $
-            Scale 0.25 0.25 $
-              Color (if (armaSelecionada est == Just DinamiteDLC && minhocaSelecionada est == i) then dark red else black) $
-                Text (show (dinamiteMinhocaDLC m))
-        ]
-      where
-        y   = 55 - fromIntegral i * minhocaSpacing
-        cor = if eMinhocaVivaDLC m then green else red
 
     linha = length mapa
     cols = if null mapa then 0 else length (head mapa)
@@ -550,6 +563,8 @@ drawLetters p c =
     ')' -> p !! 62
     '/' -> p !! 63
     ':' -> p !! 64
+    ',' -> p !! 65
+
 
 
 
@@ -719,3 +734,17 @@ drawMinhocasDLC p ms mapa numMinhoca jogada = Pictures $ map drawM (zip [0..] ms
           sprite = if vidaMinhocaDLC m == MortaDLC
             then p !! 4  -- Morto
             else getSpriteParaAcaoDLC m jogada p (Just i == numMinhoca) mapa s
+
+-- Função para extrair apenas o valor da vida
+extrairVida :: String -> String
+extrairVida str = case words str of
+    ["VivaDLC", hp] -> hp
+    ["MortaDLC", hp] -> hp
+    _ -> "N/A"
+
+-- Função para extrair a posição
+extrairPosicao :: String -> String
+extrairPosicao str = case words str of
+    ["Just", pos] -> pos
+    ["Nothing"] -> "N/A"
+    _ -> "N/A"

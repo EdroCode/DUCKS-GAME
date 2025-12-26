@@ -98,12 +98,14 @@ main = do
   Just pr <- loadJuicy (path ++ "fontes/pr.png")
   Just slash <- loadJuicy (path ++ "fontes/slash.png")
   Just dott_points <- loadJuicy (path ++ "fontes/dott_points.png")
+  Just comma <- loadJuicy (path ++ "fontes/comma.png")
+
 
 
   Just space <- loadJuicy (path ++ "fontes/blank.png")
 
 
-  let tiles = [grass, water, stone, worm, morto, barril, bazuca, sky, dinamite, mina, dirt, lava, healthPack, patoPulando, patoCaindo, ammoJetpack, ammoEscavadora, ammoBazuca, ammoMina, ammoDinamite, botao, botaoOn, botaoOff, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, space, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, dash, pl, pr, slash, dott_points]
+  let tiles = [grass, water, stone, worm, morto, barril, bazuca, sky, dinamite, mina, dirt, lava, healthPack, patoPulando, patoCaindo, ammoJetpack, ammoEscavadora, ammoBazuca, ammoMina, ammoDinamite, botao, botaoOn, botaoOff, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, space, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, dash, pl, pr, slash, dott_points, comma]
 
   let temanatal = [grass, water, stone, worm, morto, barril, bazuca, sky, dinamite, mina]
 

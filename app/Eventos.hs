@@ -68,10 +68,10 @@ reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) Quit = exitSuccess
 
 -- * LVL SELECTOR
 
-reageEventos (EventKey (SpecialKey KeyRight) Down _ _) (LevelSelector i) = 
+reageEventos (EventKey (SpecialKey KeyDown) Down _ _) (LevelSelector i) = 
     return $ LevelSelector (i + 1)
 
-reageEventos (EventKey (SpecialKey KeyLeft) Down _ _) (LevelSelector i) = 
+reageEventos (EventKey (SpecialKey KeyUp) Down _ _) (LevelSelector i) = 
     return $ LevelSelector (i - 1)
 
 reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (LevelSelector i)
