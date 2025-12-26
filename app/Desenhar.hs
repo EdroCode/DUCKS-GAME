@@ -47,6 +47,7 @@ desenha p (MapCreatorTool e b a l) = return $ (drawMCT p e b a l)
 desenha p (LevelSelector id) = return $ (drawLvlSelector p id) 
 desenha p Quit = return $ Translate (-50) 0 $ Scale 0.5 0.5 $ Text "Aperte ESC para confirmar saída."
 desenha p Help = return $ drawHelp
+desenha p (GameOver team) = return $ drawGameOver p team
 
 -- | Menu principal com seletor expandido
 drawMenu :: [Picture] -> Int -> Picture
@@ -132,7 +133,19 @@ drawLvlSelector p selected = Pictures
 
 
 
-
+drawGameOver :: [Picture] -> Team -> Picture
+drawGameOver p equipa =
+    Pictures
+        [Translate 0 100 $ Scale 0.8 0.8 $ Color (equipaCor equipa) $ 
+            drawWord p (equipaStr equipa ++ " Ganha!")
+        , Translate 0 (-50) $ Scale 0.4 0.4 $ Color (greyN 0.7) $ 
+            drawWord p "Pressiona ESC para retornar ao menu"
+        ]
+  where
+    equipaStr Red = "Equipa Vermelha"
+    equipaStr Blue = "Equipa Azul"
+    equipaCor Red = red
+    equipaCor Blue = blue
 
 drawMCT :: [Picture] -> EstadoDLC -> Int -> Int -> Int -> Picture
 drawMCT p e blocoSelecionado mode secSel = Pictures
@@ -383,13 +396,16 @@ drawPvPGame p est jogada =
           , Translate (-900) (y - 20) $ Scale 2.5 2.5 $ p !! 3
           , Translate (-800) (y - 30) $
             Scale 0.6 0.6 $
-            Color cor $
-                  drawWord p ("HP: " ++ extrairVida (show (vidaMinhocaDLC m)))
+            drawWord p ("HP: " ++ extrairVida (show (vidaMinhocaDLC m)))
+          -- Equipa
+          , case equipaMinhoca m of
+              Just Red -> Translate (-600) (y - 30) $ Color red $ rectangleSolid 20 20
+              Just Blue -> Translate (-600) (y - 30) $ Color blue $ rectangleSolid 20 20
+              Nothing -> Blank
           -- Posição
           , Translate (-800) (y - 60) $
             Scale 0.6 0.6 $
-            Color blue $
-                  drawWord p ("POS: " ++ extrairPosicao (show (posicaoMinhocaDLC m)))
+            drawWord p ("POS: " ++ extrairPosicao (show (posicaoMinhocaDLC m)))
           -- Armas / itens (imagens)
           , Translate (-930) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 2
           , Translate (-840) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 2
@@ -564,6 +580,11 @@ drawLetters p c =
     '/' -> p !! 63
     ':' -> p !! 64
     ',' -> p !! 65
+    '!' -> p !! 66
+    '?' -> p !! 67
+    '@' -> p !! 68
+
+
 
 
 
@@ -626,6 +647,11 @@ getSpriteParaAcao m (Just (Labs2025.Dispara arma dir)) p isActiveMinhoca _ _
       Dinamite -> if length p > 2 then p !! 3 else p !! 3    
       Mina -> if length p > 2 then p !! 3 else p !! 3        
 
+  
+
+
+
+
 drawMinhocasStatic :: [Picture] -> [MinhocaDLC] -> MapaDLC -> Picture
 drawMinhocasStatic p minhocas mapa = Pictures $ map drawM minhocas
   where
@@ -638,11 +664,6 @@ drawMinhocasStatic p minhocas mapa = Pictures $ map drawM minhocas
               VivaDLC _ -> p !! 3
                     
         in Translate x y $ Pictures [sprite]
-  
-
-
-
-
 
 
 

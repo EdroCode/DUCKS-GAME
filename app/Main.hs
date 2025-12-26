@@ -36,7 +36,7 @@ main = do
   Just lava <- loadJuicy (path ++ "lava.png")
 
 
-  Just worm   <- loadJuicy (path ++"PatoParado.png")
+  Just pato   <- loadJuicy (path ++"PatoParado.png")
   Just  morto  <- loadJuicy (path ++"Dead.png")
   Just  barril <- loadJuicy (path ++"Barril.png")
   Just  bazuca <- loadJuicy (path ++"Bazuca.png")
@@ -99,15 +99,21 @@ main = do
   Just slash <- loadJuicy (path ++ "fontes/slash.png")
   Just dott_points <- loadJuicy (path ++ "fontes/dott_points.png")
   Just comma <- loadJuicy (path ++ "fontes/comma.png")
+  
 
 
 
   Just space <- loadJuicy (path ++ "fontes/blank.png")
+  Just exclamation <- loadJuicy (path ++ "fontes/exclamation.png")
+  Just interrogation <- loadJuicy (path ++ "fontes/interrogation.png")
+  Just arrombado <- loadJuicy (path ++ "fontes/arrombado.png")
 
 
-  let tiles = [grass, water, stone, worm, morto, barril, bazuca, sky, dinamite, mina, dirt, lava, healthPack, patoPulando, patoCaindo, ammoJetpack, ammoEscavadora, ammoBazuca, ammoMina, ammoDinamite, botao, botaoOn, botaoOff, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, space, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, dash, pl, pr, slash, dott_points, comma]
 
-  let temanatal = [grass, water, stone, worm, morto, barril, bazuca, sky, dinamite, mina]
+  let tiles = [grass, water, stone, pato, morto, barril, bazuca, sky, dinamite, mina, dirt, lava, healthPack, patoPulando, patoCaindo, ammoJetpack, ammoEscavadora, ammoBazuca, ammoMina, ammoDinamite, botao, botaoOn, botaoOff, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, space, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, dash, pl, pr, slash, dott_points, comma, exclamation, interrogation, arrombado]
+
+  let temanatal = [grass, water, stone, pato, morto, barril, bazuca, sky, dinamite, mina, dirt, lava, healthPack, patoPulando, patoCaindo, ammoJetpack, ammoEscavadora, ammoBazuca, ammoMina, ammoDinamite, botao, botaoOn, botaoOff, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, space, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, dash, pl, pr, slash, dott_points, comma, exclamation, interrogation]
+
 
   playIO janela fundo fr it (desenha tiles) reageEventos reageTempo
   where

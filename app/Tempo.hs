@@ -10,7 +10,7 @@ import Tarefa4
 import DataDLC
 import AvancaEstado
 import EfetuaJogada
-
+import Auxiliar
 
 type Segundos = Float
 
@@ -45,17 +45,26 @@ reageTempo dt (BotSimulation est acc tick ultimaJogada) = return $ BotSimulation
                                 (jogador, jogada) = jogadaTatica t st
                                 
 
-reageTempo dt (PVP est acc tick jogadaUser) = return $ PVP estFinal acc tick jogadaUser
+reageTempo dt (PVP est acc tick jogadaUser) = case (null minhocasRed, null minhocasBlue) of
+        (True, False) -> return $ GameOver Blue  -- Blue venceu
+        (False, True) -> return $ GameOver Red   -- Red venceu
+        (True, True)  -> return $ GameOver Red   -- Empate (ou escolhe uma equipa)
+        _             -> return $ PVP estFinal acc tick jogadaUser
   where
-    -- Congela dinamites que já estão no chão ANTES de avançar
+    minhocasVivas = getMinhocasValidasDLC (minhocasEstadoDLC est)
+    minhocasRed = filter (\m -> equipaMinhoca m == Just Red) minhocasVivas
+    minhocasBlue = filter (\m -> equipaMinhoca m == Just Blue) minhocasVivas
+
     estComDinamitesCongeladas = congelaDinamitesNoChao est
-    -- Agora avança
+
     estFinal = AvancaEstado.avancaEstado estComDinamitesCongeladas
 
 
 
 reageTempo _ (MapCreatorTool mp i a l) = return (MapCreatorTool mp i a l)
 reageTempo _ MapSelector = return MapSelector
+reageTempo _ (GameOver team) = return (GameOver team)
+
 
 
 congelaDinamitesNoChao :: EstadoDLC -> EstadoDLC
@@ -71,8 +80,9 @@ congelaDinamitesNoChao e = e { objetosEstadoDLC = map congelar (objetosEstadoDLC
     
     estaNoChao :: Posicao -> MapaDLC -> Bool
     estaNoChao pos mapa = 
-      let posAbaixo = movePosicao Sul pos
-      in case encontraPosicaoMatriz posAbaixo mapa of
+      let posAbaixo = Tarefa0_geral.movePosicao Sul pos
+      in case Tarefa0_geral.encontraPosicaoMatriz posAbaixo mapa of
            Just TerraDLC -> True
            Just PedraDLC -> True
            _ -> False
+

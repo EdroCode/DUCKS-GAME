@@ -17,7 +17,7 @@ type Dimensao = (Int,Int)
 
 
 
-data Team = Red | Blue | Green 
+data Team = Red | Blue 
     deriving (Eq,Ord,Show,Read,Enum)
 
 data VidaMinhocaDLC

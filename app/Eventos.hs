@@ -11,7 +11,7 @@ import Tarefa0_2025 (posicaoObjeto)
 import DataDLC
 import EfetuaJogada
 import AvancaEstado
-import Auxiliar (getMinhocasValidasDLC)
+import Auxiliar (getMinhocasValidasDLC, eMinhocaVivaDLC)
 import System.IO
 
 
@@ -76,12 +76,12 @@ reageEventos (EventKey (SpecialKey KeyUp) Down _ _) (LevelSelector i) =
 
 reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (LevelSelector i)
 	| i == 0  = return $ PVP flatWorld 0 0 (DataDLC.Move Sul)
+	| i == 1  = return $ PVP flatWorld 0 0 (DataDLC.Move Sul)
 	| otherwise = return $ LevelSelector i
 
 reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (LevelSelector _) = return $ Menu 0
  
 -- * PVP MODE INPUTS
-
 
 reageEventos (EventKey (SpecialKey KeyF1) Down _ _) (PVP _ _ _ _) = exitSuccess
 
@@ -92,21 +92,24 @@ reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (PVP _ _ _ _) = return $ Me
 -- * Mudar de minhoca
 reageEventos (EventKey (Char '1') Down _ _) (PVP est acc tick _) = 
 
-    let novaMinhoca = if (minhocaSelecionada est + 1) > (length minhocasValidas - 1) then 0 else (minhocaSelecionada est + 1)
-
-        minhocasValidas = getMinhocasValidasDLC (minhocasEstadoDLC est)
+    let minhocasValidas = getMinhocasValidasDLC (minhocasEstadoDLC est)
+        minhocaAtualIndex = minhocaSelecionada est
+        
+       
+        proximoIndiceValido = encontraProximoIndiceValido minhocaAtualIndex (minhocasEstadoDLC est)
         
         novoEstado = EstadoDLC {
             mapaEstadoDLC = mapaEstadoDLC est
             , minhocasEstadoDLC = minhocasEstadoDLC est
             , objetosEstadoDLC = objetosEstadoDLC est
             , armaSelecionada = Nothing
-            , minhocaSelecionada = novaMinhoca
+            , minhocaSelecionada = proximoIndiceValido
         }    
 
     in
-
         return $ PVP novoEstado acc tick (DataDLC.Move Sul)
+
+
 
 
 -- * Mudar arma minhoca
@@ -135,10 +138,13 @@ reageEventos (EventKey (Char '2') Down _ _) (PVP est acc tick _) =
 -- * RESTO DE DOWNS pvp
 reageEventos (EventKey key Down _ _) (PVP est acc tick _) = 
     let (novoEst, jogada) = handleAction key est
-    in return $ PVP novoEst acc tick jogada
+        estadoFinal = verificaVitoria novoEst
+    in return estadoFinal
 
+-- * GAME OVER SCREEN 
 
-
+reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (GameOver _) = 
+    return $ Menu 0
 
 
 
@@ -404,14 +410,14 @@ handleAction key est =
     let
         maybeArma = armaSelecionada est
         i = minhocaSelecionada est
+        
         dir = keyToDirection key
     in case maybeArma of
-        -- Se tem arma selecionada, sempre dispara
+
         Just arma -> 
             let novoEst = EfetuaJogada.efetuaJogada i (DataDLC.Dispara arma dir) est
             in (novoEst, DataDLC.Dispara arma dir)
         
-        -- Se não tem arma, só move se estiver no solo
         Nothing -> 
             if podeMoverDLC est i
             then let novoEst = EfetuaJogada.efetuaJogada i (DataDLC.Move dir) est
@@ -458,3 +464,29 @@ removeMinhocaDLC e pos =
     let minhocasAtuais = minhocasEstadoDLC e
         minhocasFiltradas = filter (\m -> posicaoMinhocaDLC m /= Just pos) minhocasAtuais
     in e { minhocasEstadoDLC = minhocasFiltradas }
+
+
+encontraProximoIndiceValido :: Int -> [MinhocaDLC] -> Int
+encontraProximoIndiceValido atual minhocas =
+    let totalMinhocas = length minhocas
+
+        indicesValidos = [i | (i, m) <- zip [0..] minhocas, eMinhocaVivaDLC m]
+    in if null indicesValidos
+       then 0  
+       else 
+           let 
+               proximosIndices = filter (> atual) indicesValidos
+           in if null proximosIndices
+              then head indicesValidos
+              else head proximosIndices 
+
+verificaVitoria :: EstadoDLC -> Worms
+verificaVitoria est =
+    let minhocasVivas = getMinhocasValidasDLC (minhocasEstadoDLC est)
+        minhocasRed = filter (\m -> equipaMinhoca m == Just Red) minhocasVivas
+        minhocasBlue = filter (\m -> equipaMinhoca m == Just Blue) minhocasVivas
+    in case (null minhocasRed, null minhocasBlue) of
+        (True, False) -> GameOver Blue  -- Blue venceu
+        (False, True) -> GameOver Red   -- Red venceu
+        (True, True)  -> GameOver Red   -- Empate (ou escolhe uma equipa)
+        _             -> PVP est 0 0 (DataDLC.Move Sul)  -- Jogo continua
