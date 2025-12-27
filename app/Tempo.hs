@@ -69,7 +69,7 @@ reageTempo _ (PVP est acc tick jogadaUser) = case (null minhocasRed, null minhoc
 
 
 
-reageTempo _ (MapCreatorTool mp i a l) = return (MapCreatorTool mp i a l)
+reageTempo _ (MapCreatorTool mp i a secSel thirdSel edit) = return (MapCreatorTool mp i a secSel thirdSel edit)
 reageTempo _ MapSelector = return MapSelector
 reageTempo _ (GameOver team) = return (GameOver team)
 
