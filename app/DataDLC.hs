@@ -45,8 +45,10 @@ data MinhocaDLC = MinhocaDLC
     , minaMinhocaDLC :: Int
     -- | Munições de @Dinamite@.
     , dinamiteMinhocaDLC :: Int
+    -- | Munições de @FlameTrower@.
+    , flameMinhocaDLC :: Int
     -- | O estado de burning da minhoca
-    , burningCounter :: Int -- o Default dado por terrenos de lava é 5 mas pode variar
+    , burningCounter :: Int -- o Default dado por terrenos de lava é 5 mas pode variar, default flametrower é 2
     -- | Equipa da Minhoca (default é Nothing)
     , equipaMinhoca :: Maybe Team
     }
@@ -70,7 +72,7 @@ data TerrenoDLC
     deriving (Eq,Ord,Show,Read,Enum)
 
 -- | Os diversos tipos de arma disponíveis para uma minhoca.
-data TipoArmaDLC = JetpackDLC | EscavadoraDLC | BazucaDLC | MinaDLC | DinamiteDLC
+data TipoArmaDLC = JetpackDLC | EscavadoraDLC | BazucaDLC | MinaDLC | DinamiteDLC | FlameTrower
     deriving (Eq,Ord,Show,Read,Enum)
 
 -- | Um objeto colocado no mapa.

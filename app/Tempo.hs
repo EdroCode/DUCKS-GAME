@@ -1,16 +1,24 @@
 module Tempo where
 
-import Worms
+import Worms ( Worms(..) )
 import Labs2025
-import Tarefa0_geral
-import Tarefa0_2025
-import Tarefa2
-import Tarefa3
-import Tarefa4
+    ( NumMinhoca, Direcao(Sul), Posicao, Estado, Jogada )
+import Tarefa0_geral ( encontraPosicaoMatriz, movePosicao )
+import Tarefa0_2025 ()
+import Tarefa2 ( efetuaJogada )
+import Tarefa3 ( avancaEstado )
+import Tarefa4 ( jogadaTatica )
 import DataDLC
-import AvancaEstado
-import EfetuaJogada
-import Auxiliar
+    ( EstadoDLC(objetosEstadoDLC, minhocasEstadoDLC, mapaEstadoDLC),
+      MapaDLC,
+      MinhocaDLC(equipaMinhoca),
+      ObjetoDLC(DisparoDLC),
+      Team(Red, Blue),
+      TerrenoDLC(PedraDLC, TerraDLC),
+      TipoArmaDLC(DinamiteDLC) )
+import AvancaEstado ( avancaEstado )
+import EfetuaJogada ()
+import Auxiliar ( getMinhocasValidasDLC )
 
 type Segundos = Float
 
@@ -35,7 +43,7 @@ reageTempo dt (BotSimulation est acc tick ultimaJogada) = return $ BotSimulation
 
                 aplicaPassos :: Estado -> Int -> Int -> (NumMinhoca, Jogada) -> (Estado, (NumMinhoca, Jogada))
                 aplicaPassos st _ 0 lastJogada = (st, lastJogada)
-                aplicaPassos st t n lastJogada = aplicaPassos estNovo (t + 1) (n - 1) jogadaAtual
+                aplicaPassos st t n _ = aplicaPassos estNovo (t + 1) (n - 1) jogadaAtual
                         where
                                 (estNovo, jogadaAtual) = aplicaUm t st
 
@@ -45,7 +53,7 @@ reageTempo dt (BotSimulation est acc tick ultimaJogada) = return $ BotSimulation
                                 (jogador, jogada) = jogadaTatica t st
                                 
 
-reageTempo dt (PVP est acc tick jogadaUser) = case (null minhocasRed, null minhocasBlue) of
+reageTempo _ (PVP est acc tick jogadaUser) = case (null minhocasRed, null minhocasBlue) of
         (True, False) -> return $ GameOver Blue  -- Blue venceu
         (False, True) -> return $ GameOver Red   -- Red venceu
         (True, True)  -> return $ GameOver Red   -- Empate (ou escolhe uma equipa)
@@ -73,15 +81,15 @@ congelaDinamitesNoChao e = e { objetosEstadoDLC = map congelar (objetosEstadoDLC
     mapa = mapaEstadoDLC e
     
     congelar :: ObjetoDLC -> ObjetoDLC
-    congelar obj@(DisparoDLC pos dir DinamiteDLC tempo dono)
+    congelar obj@(DisparoDLC pos _ DinamiteDLC _ _)
       | estaNoChao pos mapa = obj  -- já está no chão, avancaEstado não deve mover
       | otherwise = obj  -- deixa avancaEstado aplicar gravidade
     congelar obj = obj
     
     estaNoChao :: Posicao -> MapaDLC -> Bool
-    estaNoChao pos mapa = 
+    estaNoChao pos m = 
       let posAbaixo = Tarefa0_geral.movePosicao Sul pos
-      in case Tarefa0_geral.encontraPosicaoMatriz posAbaixo mapa of
+      in case Tarefa0_geral.encontraPosicaoMatriz posAbaixo m of
            Just TerraDLC -> True
            Just PedraDLC -> True
            _ -> False

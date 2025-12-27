@@ -1,4 +1,5 @@
 {-# OPTIONS_GHC -Wno-incomplete-patterns #-}
+{-# OPTIONS_GHC -Wno-overlapping-patterns #-}
 {-|
 Module      : AvancaEstado
 Description : Avançar tempo do jogo.
@@ -10,8 +11,7 @@ module AvancaEstado where
 
 import Data.Either
 import EfetuaJogada
-import GHC.Generics ((:+:)(R1))
-import DataDLC( posicaoObjeto,TerrenoDLC(ArDLC, TerraDLC, PedraDLC, AguaDLC, Lava),  Matriz, fireDamage, VidaMinhocaDLC(MortaDLC, VivaDLC), MapaDLC,EstadoDLC(EstadoDLC), MinhocaDLC, ObjetoDLC (AmmoPack), minhocasEstadoDLC, posicaoMinhocaDLC, vidaMinhocaDLC, burningCounter, posicaoDisparoDLC, direcaoDisparoDLC, tempoDisparoDLC, tipoDisparoDLC, donoDisparoDLC, posicaoBarrilDLC, explodeBarrilDLC, ObjetoDLC, ObjetoDLC(DisparoDLC, BarrilDLC, HealthPack), minhocasEstadoDLC, objetosEstadoDLC, mapaEstadoDLC, TipoArmaDLC(MinaDLC, BazucaDLC,JetpackDLC, EscavadoraDLC, DinamiteDLC))
+import DataDLC( posicaoObjeto,TerrenoDLC(ArDLC, AguaDLC, Lava), fireDamage, VidaMinhocaDLC(MortaDLC, VivaDLC), MapaDLC,EstadoDLC(EstadoDLC), MinhocaDLC, ObjetoDLC (AmmoPack, posicaoHP, ammoType), minhocasEstadoDLC, posicaoMinhocaDLC, vidaMinhocaDLC, burningCounter, posicaoDisparoDLC, direcaoDisparoDLC, tempoDisparoDLC, tipoDisparoDLC, donoDisparoDLC, posicaoBarrilDLC, explodeBarrilDLC, ObjetoDLC, ObjetoDLC(DisparoDLC, BarrilDLC, HealthPack), minhocasEstadoDLC, objetosEstadoDLC, mapaEstadoDLC, TipoArmaDLC(MinaDLC, BazucaDLC, DinamiteDLC, FlameTrower))
 import Labs2025(NumMinhoca,Posicao, NumObjeto, Direcao(Norte,Este,Oeste,Sul,Nordeste,Noroeste,Sudoeste,Sudeste))
 import Auxiliar
 
@@ -56,7 +56,7 @@ Funcionamento:
 
 -}
 avancaMinhoca :: EstadoDLC -> NumMinhoca -> MinhocaDLC -> MinhocaDLC
-avancaMinhoca e i minhoca=
+avancaMinhoca e _ minhoca=
   case posicaoMinhocaDLC minhoca of
     Nothing -> minhoca
     Just pos ->
@@ -70,32 +70,56 @@ avancaMinhoca e i minhoca=
         terreno = encontraPosicaoMatriz posicaoTentativa mapa
 
 
-      in if not posicaoFinalValida
-            then minhoca { posicaoMinhocaDLC = Nothing, vidaMinhocaDLC = MortaDLC }
-            else case vidaMinhocaDLC minhoca of
-              MortaDLC -> minhoca { posicaoMinhocaDLC = Just posicaoTentativa, vidaMinhocaDLC = MortaDLC, burningCounter = 0 }
-              VivaDLC 0 -> case terreno of
-                Just AguaDLC -> minhoca { posicaoMinhocaDLC = Just posicaoTentativa, vidaMinhocaDLC = MortaDLC, burningCounter = 0 }
-                Just Lava -> minhoca { posicaoMinhocaDLC = Just posicaoTentativa, vidaMinhocaDLC = MortaDLC, burningCounter = 0 }
-                Just ArDLC   -> minhoca { posicaoMinhocaDLC = Just posicaoTentativa, vidaMinhocaDLC = MortaDLC, burningCounter = 0 }
-                _         -> minhoca { posicaoMinhocaDLC = Just posicaoTentativa, vidaMinhocaDLC = MortaDLC, burningCounter = 0 }
-              VivaDLC v -> case terreno of
-                Just AguaDLC -> minhoca { posicaoMinhocaDLC = Just posicaoTentativa, vidaMinhocaDLC =  MortaDLC, burningCounter = 0}
-                Just Lava -> minhoca { posicaoMinhocaDLC = Just posicaoTentativa, vidaMinhocaDLC = VivaDLC (v-fireDamage), burningCounter = 5}
-                Just ArDLC   -> minhoca { posicaoMinhocaDLC = Just posicaoTentativa, vidaMinhocaDLC = if burningCounter minhoca > 0 then VivaDLC (v-fireDamage) else VivaDLC v, burningCounter = if burningCounter minhoca > 0 then burningCounter minhoca - 1 else 0 }
-                _         -> minhoca { posicaoMinhocaDLC = Just posicaoTentativa, vidaMinhocaDLC = VivaDLC v, burningCounter = if burningCounter minhoca > 0 then burningCounter minhoca - 1 else 0 }
-
+      in if posicaoFinalValida
+            then case vidaMinhocaDLC minhoca of
+                MortaDLC -> minhoca { posicaoMinhocaDLC = Just posicaoTentativa, vidaMinhocaDLC = MortaDLC, burningCounter = 0 }
+                VivaDLC 0 -> case terreno of
+                  Just AguaDLC -> minhoca { posicaoMinhocaDLC = Just posicaoTentativa, vidaMinhocaDLC = MortaDLC, burningCounter = 0 }
+                  Just Lava -> minhoca { posicaoMinhocaDLC = Just posicaoTentativa, vidaMinhocaDLC = MortaDLC, burningCounter = 0 }
+                  Just ArDLC   -> minhoca { posicaoMinhocaDLC = Just posicaoTentativa, vidaMinhocaDLC = MortaDLC, burningCounter = 0 }
+                  _         -> minhoca { posicaoMinhocaDLC = Just posicaoTentativa, vidaMinhocaDLC = MortaDLC, burningCounter = 0 }
+                VivaDLC v -> case existeObjeto posicaoTentativa objetos of
+                  Just (DisparoDLC _ _ tipo _ _)  -> if tipo == FlameTrower then minhoca { posicaoMinhocaDLC = Just posicaoTentativa, vidaMinhocaDLC = VivaDLC (v-fireDamage), burningCounter = 2}
+                    else case terreno of
+                    Just AguaDLC -> minhoca { posicaoMinhocaDLC = Just posicaoTentativa, vidaMinhocaDLC =  MortaDLC, burningCounter = 0}
+                    Just Lava -> minhoca { posicaoMinhocaDLC = Just posicaoTentativa, vidaMinhocaDLC = VivaDLC (v-fireDamage), burningCounter = 5}
+                    Just ArDLC   -> minhoca { posicaoMinhocaDLC = Just posicaoTentativa, vidaMinhocaDLC = if burningCounter minhoca > 0 then VivaDLC (v-fireDamage) else VivaDLC v, burningCounter = if burningCounter minhoca > 0 then burningCounter minhoca - 1 else 0 }
+                    _         -> minhoca { posicaoMinhocaDLC = Just posicaoTentativa, vidaMinhocaDLC = VivaDLC v, burningCounter = if burningCounter minhoca > 0 then burningCounter minhoca - 1 else 0 }
+                  
+                  Just (HealthPack _ hp) -> case terreno of
+                    Just AguaDLC -> minhoca { posicaoMinhocaDLC = Just posicaoTentativa, vidaMinhocaDLC =  MortaDLC, burningCounter = 0}
+                    Just Lava -> minhoca { posicaoMinhocaDLC = Just posicaoTentativa, vidaMinhocaDLC = VivaDLC (v-fireDamage + hp), burningCounter = 5}
+                    Just ArDLC   -> minhoca { posicaoMinhocaDLC = Just posicaoTentativa, vidaMinhocaDLC = if burningCounter minhoca > 0 then VivaDLC (v-fireDamage+hp) else VivaDLC (v+hp), burningCounter = if burningCounter minhoca > 0 then burningCounter minhoca - 1 else 0 }
+                    _         -> minhoca { posicaoMinhocaDLC = Just posicaoTentativa, vidaMinhocaDLC = if burningCounter minhoca > 0 then VivaDLC (v-fireDamage+hp) else VivaDLC (v+hp), burningCounter = if burningCounter minhoca > 0 then burningCounter minhoca - 1 else 0 }
+                  
+                  Just (AmmoPack _ ammo ammotype) -> let 
+                      minhocaAtualizada = atualizaQuantidadeArmaMinhoca ammotype minhoca ammo
+                    
+                    in case terreno of
+                    Just AguaDLC -> minhocaAtualizada { posicaoMinhocaDLC = Just posicaoTentativa, vidaMinhocaDLC =  MortaDLC, burningCounter = 0}
+                    Just Lava -> minhocaAtualizada { posicaoMinhocaDLC = Just posicaoTentativa, vidaMinhocaDLC = VivaDLC (v-fireDamage), burningCounter = 5}
+                    Just ArDLC   -> minhocaAtualizada { posicaoMinhocaDLC = Just posicaoTentativa, vidaMinhocaDLC = if burningCounter minhoca > 0 then VivaDLC (v-fireDamage) else VivaDLC v, burningCounter = if burningCounter minhoca > 0 then burningCounter minhoca - 1 else 0 }
+                    _         -> minhocaAtualizada { posicaoMinhocaDLC = Just posicaoTentativa, vidaMinhocaDLC = VivaDLC v, burningCounter = if burningCounter minhoca > 0 then burningCounter minhoca - 1 else 0 }
+                  
+                  _ -> case terreno of
+                    Just AguaDLC -> minhoca { posicaoMinhocaDLC = Just posicaoTentativa, vidaMinhocaDLC =  MortaDLC, burningCounter = 0}
+                    Just Lava -> minhoca { posicaoMinhocaDLC = Just posicaoTentativa, vidaMinhocaDLC = VivaDLC (v-fireDamage), burningCounter = 5}
+                    Just ArDLC   -> minhoca { posicaoMinhocaDLC = Just posicaoTentativa, vidaMinhocaDLC = if burningCounter minhoca > 0 then VivaDLC (v-fireDamage) else VivaDLC v, burningCounter = if burningCounter minhoca > 0 then burningCounter minhoca - 1 else 0 }
+                    _         -> minhoca { posicaoMinhocaDLC = Just posicaoTentativa, vidaMinhocaDLC = VivaDLC v, burningCounter = if burningCounter minhoca > 0 then burningCounter minhoca - 1 else 0 }
+                  
+            else minhoca { posicaoMinhocaDLC = Nothing, vidaMinhocaDLC = MortaDLC }
+          
   where
     mapa = mapaEstadoDLC e
-
+    objetos = objetosEstadoDLC e
     estaMinhocaBaixoViva :: Posicao -> EstadoDLC -> Bool
-    estaMinhocaBaixoViva pos e =
+    estaMinhocaBaixoViva pos estado =
       let
         posAbaixo = movePosicao Sul pos
 
 
       in ePosicaoMatrizValida posAbaixo mapa
-         && not (ePosicaoEstadoLivre posAbaixo e)
+         && not (ePosicaoEstadoLivre posAbaixo estado)
 
 
 
@@ -155,7 +179,7 @@ Funcinamento Geral:
 -}
 
 avancaObjeto :: EstadoDLC -> NumObjeto -> ObjetoDLC -> Either ObjetoDLC Danos
-avancaObjeto e i o = case o of
+avancaObjeto e _ o = case o of
   BarrilDLC posBarril explode ->
     if not explode
       then
@@ -164,7 +188,9 @@ avancaObjeto e i o = case o of
           else Left o
       else Right (calculaExplosao posBarril 5)
 
-  HealthPack pos _ -> if ePosicaoEstadoLivre pos e then Left o else Right []
+  HealthPack pos _ -> let 
+                        novaPos = movePosicao Sul pos
+                      in if ePosicaoEstadoLivre novaPos e then Left o {posicaoHP = novaPos} else if ePosicaoEstadoLivre pos e then Left o else Right []
   AmmoPack pos _ _ -> if ePosicaoEstadoLivre pos e && estaNoSolo pos mapa then Left o else Right []
 
 
@@ -176,6 +202,13 @@ avancaObjeto e i o = case o of
               Just t  -> Just (t - 1)
               Nothing -> Nothing
         in (if ePosicaoEstadoLivre pos e && ePosicaoMatrizValida posNova mapa then Left (DisparoDLC{posicaoDisparoDLC = posNova, direcaoDisparoDLC = dir, tipoDisparoDLC = tipo, tempoDisparoDLC = tempoNovo, donoDisparoDLC = dono}) else Right (calculaExplosao pos 5))
+
+      FlameTrower ->
+        let posNova = movePosicao dir pos
+            tempoNovo = case tempo of
+              Just t  -> Just (t - 1)
+              Nothing -> Nothing
+        in (if ePosicaoEstadoLivre pos e && ePosicaoMatrizValida posNova mapa then Left (DisparoDLC{posicaoDisparoDLC = posNova, direcaoDisparoDLC = dir, tipoDisparoDLC = tipo, tempoDisparoDLC = tempoNovo, donoDisparoDLC = dono}) else Right [])
 
       MinaDLC ->
         case tempo of
@@ -263,15 +296,15 @@ avancaObjeto e i o = case o of
 
 
     estaEmAgua :: Posicao -> MapaDLC -> Bool
-    estaEmAgua p [] = False
-    estaEmAgua pos mapa = case encontraPosicaoMatriz (movePosicao Sul pos) mapa of
+    estaEmAgua _ [] = False
+    estaEmAgua pos m = case encontraPosicaoMatriz (movePosicao Sul pos) m of
         Nothing -> False
         Just AguaDLC -> True
         Just _ -> False
 
     estaEmLava :: Posicao -> MapaDLC -> Bool
-    estaEmLava p [] = False
-    estaEmLava pos mapa = case encontraPosicaoMatriz (movePosicao Sul pos) mapa of
+    estaEmLava _ [] = False
+    estaEmLava pos m = case encontraPosicaoMatriz (movePosicao Sul pos) m of
         Nothing -> False
         Just Lava -> True
         Just _ -> False
@@ -282,6 +315,8 @@ avancaObjeto e i o = case o of
 -- todo -> Atualmente so se usa explosoes 3,5 e 7 logo isto serve, mas no futuro é importante transformar numa função generalizada
 calculaExplosao :: Posicao -> Int -> Danos
 calculaExplosao pos d = case d of
+  1 -> [
+          (pos, d*10)]
   3 -> [
           (pos, d*10),
           (movePosicao Norte pos, (d-2)*10),(movePosicao Sul pos, (d-2)*10),(movePosicao Oeste pos, (d-2)*10),(movePosicao Este pos, (d-2)*10)
@@ -381,15 +416,15 @@ aplicaDanos danos estado = estado {
         then d + somaDanos pos ds
         else somaDanos pos ds
 
--- * Objetos
+    -- * Objetos
 
     atualizaObjetos :: Danos -> [ObjetoDLC] -> [ObjetoDLC]
     atualizaObjetos _ [] = []
-    atualizaObjetos danos (obj:resto) =
+    atualizaObjetos ds (obj:resto) =
       let pos = posicaoObjeto obj
           objAtualizado = case obj of
             BarrilDLC _ False ->
-              if posAfetado pos danos
+              if posAfetado pos ds
                 then BarrilDLC pos True
                 else obj
             _ -> obj

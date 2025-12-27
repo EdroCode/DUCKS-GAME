@@ -1,7 +1,7 @@
 module Auxiliar where
 
 
-import DataDLC( Matriz, Dimensao,VidaMinhocaDLC(VivaDLC, MortaDLC),posicaoDisparoDLC, posicaoObjeto, posicaoBarrilDLC, tipoDisparoDLC,donoDisparoDLC, tempoDisparoDLC, TerrenoDLC(ArDLC, PedraDLC, AguaDLC, TerraDLC, Lava), objetosEstadoDLC,TipoArmaDLC(JetpackDLC, EscavadoraDLC, BazucaDLC, MinaDLC, DinamiteDLC), EstadoDLC(mapaEstadoDLC, objetosEstadoDLC, minhocasEstadoDLC), MapaDLC, ObjetoDLC(BarrilDLC, DisparoDLC, HealthPack, posicaoHP), MinhocaDLC(posicaoMinhocaDLC, vidaMinhocaDLC,jetpackMinhocaDLC, escavadoraMinhocaDLC, minaMinhocaDLC, dinamiteMinhocaDLC, bazucaMinhocaDLC))
+import DataDLC( Matriz, Dimensao,VidaMinhocaDLC(VivaDLC, MortaDLC), posicaoObjeto, tipoDisparoDLC,donoDisparoDLC, TerrenoDLC(ArDLC, PedraDLC, TerraDLC), objetosEstadoDLC,TipoArmaDLC(FlameTrower,JetpackDLC, EscavadoraDLC, BazucaDLC, MinaDLC, DinamiteDLC), EstadoDLC(mapaEstadoDLC, objetosEstadoDLC, minhocasEstadoDLC), MapaDLC, ObjetoDLC(BarrilDLC, DisparoDLC), MinhocaDLC(posicaoMinhocaDLC, vidaMinhocaDLC,jetpackMinhocaDLC, escavadoraMinhocaDLC, minaMinhocaDLC, dinamiteMinhocaDLC, bazucaMinhocaDLC, flameMinhocaDLC))
 import Labs2025(NumMinhoca,Posicao, Direcao(Norte,Este,Oeste,Sul,Nordeste,Noroeste,Sudoeste,Sudeste))
 
 
@@ -22,7 +22,7 @@ encontraQuantidadeArmaMinhoca tipo m = case tipo of
     BazucaDLC -> bazucaMinhocaDLC m
     MinaDLC -> minaMinhocaDLC m
     DinamiteDLC -> dinamiteMinhocaDLC m
-
+    FlameTrower -> flameMinhocaDLC m
 -- | Atualiza a quantidade de munições disponíveis de uma minhoca para uma dada arma.
 atualizaQuantidadeArmaMinhoca :: TipoArmaDLC -> MinhocaDLC -> Int -> MinhocaDLC
 atualizaQuantidadeArmaMinhoca tipo m i = case tipo of
@@ -31,6 +31,8 @@ atualizaQuantidadeArmaMinhoca tipo m i = case tipo of
     BazucaDLC -> m {bazucaMinhocaDLC = bazucaMinhocaDLC m + i}
     MinaDLC -> m {minaMinhocaDLC = minaMinhocaDLC m + i}
     DinamiteDLC -> m {dinamiteMinhocaDLC = dinamiteMinhocaDLC m + i}
+    FlameTrower -> m {flameMinhocaDLC = flameMinhocaDLC m + i}
+
 
 listaDonos :: [ObjetoDLC] -> [(TipoArmaDLC, Int)]
 listaDonos [] = []
@@ -107,6 +109,7 @@ existeBarril pos (h:t) =
     BarrilDLC p _ -> if p == pos then True else existeBarril pos t
     _ ->  existeBarril pos t
 
+-- | Verifica se existe um dado objeto numa posicao e se existir devolve o mesmo
 existeObjeto :: Posicao -> [ObjetoDLC] -> Maybe ObjetoDLC
 existeObjeto _ [] = Nothing
 existeObjeto p (h:t) = if posicaoObjeto h == p then Just h else existeObjeto p t
@@ -221,7 +224,7 @@ rodaPosicaoDirecao (pos, d) = let p = movePosicao d pos
                                     Nordeste -> (p,Este)
                                     Sudeste  -> (p,Sul)
                                     Noroeste -> (p,Oeste)
-                                    Sudoeste -> (p,Sul) -- ! refazer isto - ta a dar problemas
+                                    Sudoeste -> (p,Sul) 
 
         
 

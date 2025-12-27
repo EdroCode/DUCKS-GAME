@@ -691,6 +691,7 @@ drawObjetosDLC p objs mapa = Pictures $ map drawO objs
       BazucaDLC -> bazucaDir p (direcaoDisparoDLC o)
       MinaDLC -> p !! 9
       DinamiteDLC -> p !! 8
+      FlameTrower -> p !! 69
       _ -> Color black $ circleSolid (cellSize * 0.4)
       where (x,y) = converteMapaDLC mapa (DataDLC.posicaoObjeto o)
 
