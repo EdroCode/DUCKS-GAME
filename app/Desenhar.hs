@@ -5,18 +5,12 @@ import Graphics.Gloss
 
 import Worms
 import Labs2025
-import Tarefa0_geral
 import Tarefa0_2025
-import Tarefa1
 import Tarefa2
-import Tarefa3
 import Tarefa4 (getMinhocasValidas)
-import Data.Semigroup (Min(Min))
-import Data.Data (ConstrRep(FloatConstr))
 import DataDLC
 import Auxiliar (getMinhocasValidasDLC, eMinhocaVivaDLC)
 import EfetuaJogada
-import AvancaEstado
 import Data.Char (toLower)
 
 
@@ -43,8 +37,8 @@ desenha :: [Picture] -> Worms -> IO Picture
 desenha p (Menu sel) = return $ drawMenu p sel
 desenha p (BotSimulation est _ _ (numMinhoca, jogada)) = return $ drawGame p est (Just numMinhoca) (Just jogada)
 desenha p (PVP est _ _ jogada) = return $ drawPvPGame p est (Just jogada)
-desenha p (MapCreatorTool e b a l) = return $ (drawMCT p e b a l) 
-desenha p (LevelSelector id) = return $ (drawLvlSelector p id) 
+desenha p (MapCreatorTool e b a l) = return $ (drawMCT p e b a l)
+desenha p (LevelSelector id) = return $ (drawLvlSelector p id)
 desenha p Quit = return $ Translate (-50) 0 $ Scale 0.5 0.5 $ Text "Aperte ESC para confirmar saída."
 desenha p Help = return $ drawHelp
 desenha p (GameOver team) = return $ drawGameOver p team
@@ -52,31 +46,31 @@ desenha p (GameOver team) = return $ drawGameOver p team
 -- | Menu principal com seletor expandido
 drawMenu :: [Picture] -> Int -> Picture
 drawMenu p sel = Pictures
-  [ 
+  [
 
     -- Título "WORMS"
     Translate (-120) 200 $ Scale 1 1 $ p !! 20
   , Translate (-280) 200 $ Scale 1.6 1.6 $ drawWord p "worms"
 
   , -- Subtítulo
-    Translate (0 - 340) 130 $ Scale 0.5 0.5 $ drawWord p "Escolha o modo de jogo" 
-  
+    Translate (0 - 340) 130 $ Scale 0.5 0.5 $ drawWord p "Escolha o modo de jogo"
+
   , -- Bot Simulation
     Translate (-280 - 120) (0) $ Scale 1 1 $ (if sel==0 then p !! 21 else p !! 22)
   , Translate (-280 - 300) (0) $ Scale 0.6 0.6 $ Color (if sel==0 then red else black) $ drawWord p " Bot Simulation"
-  
+
   , -- Player vs Player
     Translate (280 - 120) (0) $ Scale 1 1 $ (if sel==1 then p !! 21 else p !! 22)
   , Translate (220 - 240) (0) $ Scale 0.6 0.6 $ Color (if sel==1 then red else black) $ drawWord p  "Player vs Player"
-  
+
   , -- MAP Creator Tool
     Translate (-280 - 120) (-130) $ Scale 1 1 $ (if sel==2 then p !! 21 else p !! 22)
   , Translate (-340 - 240) (-130) $ Scale 0.6 0.6 $ Color (if sel==2 then red else black) $ drawWord p  "MAP Creator Tool"
-  
+
   , -- Help
     Translate (280 - 120) (-130) $ Scale 1 1 $ (if sel==3 then p !! 21 else p !! 22)
   , Translate (280 - 160) (-130) $ Scale 0.6 0.6 $ Color (if sel==3 then red else black) $ drawWord p  "Help"
-  
+
   , -- Quit
     Translate (0 - 120) (-260) $ Scale 1 1 $ (if sel==4 then p !! 21 else p !! 22)
   , Translate (0 - 160) (-260) $ Scale 0.6 0.6 $ Color (if sel==4 then red else black) $ drawWord p  "Quit"
@@ -111,12 +105,12 @@ drawLvlSelector p selected = Pictures
   ]
   where
 
-    niveis = [1..10]  
+    niveis = [1..]
 
 
     drawNivel :: Int -> Int -> Picture
     drawNivel idx n = Pictures
-      [ 
+      [
         Color (if idx == selected then makeColor 0.3 0.6 1 0.5 else greyN 0.5) $
           Translate x y $ rectangleSolid largura altura
 
@@ -128,7 +122,7 @@ drawLvlSelector p selected = Pictures
         altura  = 50
         espaco  = 10
 
-        x =  0+ 20 
+        x =  0+ 20
         y =  300 - fromIntegral idx * (altura + espaco)
 
 
@@ -136,9 +130,9 @@ drawLvlSelector p selected = Pictures
 drawGameOver :: [Picture] -> Team -> Picture
 drawGameOver p equipa =
     Pictures
-        [Translate 0 100 $ Scale 0.8 0.8 $ Color (equipaCor equipa) $ 
+        [Translate 0 100 $ Scale 0.8 0.8 $ Color (equipaCor equipa) $
             drawWord p (equipaStr equipa ++ " Ganha!")
-        , Translate 0 (-50) $ Scale 0.4 0.4 $ Color (greyN 0.7) $ 
+        , Translate 0 (-50) $ Scale 0.4 0.4 $ Color (greyN 0.7) $
             drawWord p "Pressiona ESC para retornar ao menu"
         ]
   where
@@ -156,14 +150,14 @@ drawMCT p e blocoSelecionado mode secSel = Pictures
     ms = minhocasEstadoDLC e
 
     infoMapa = show (length mapa) ++ "x" ++ show (if null mapa then 0 else length (head mapa))
-    
+
     blocos = [(0, "Terra", head p), (1, "Agua", p !! 1), (2, "Pedra", p !! 2), (3, "Ar", p !! 7), (4, "Lava", p !! 11) ]
     objetos =     [ (0, "Barril", p !! 5) , (1, "Health Pack", p !! 12) , (2, "Jetpack", p !! 15), (3, "Escavadora", p !! 16), (4, "Bazuca", p !! 17), (5, "Mina", p !! 18), (6, "Dinamite", p !! 19)]
     personagens = [(0, "Pato", p !! 3)]
-    
+
     drawBloco y (idx, nome, pic) = Pictures
       [ -- Highlight 
-        if idx == blocoSelecionado 
+        if idx == blocoSelecionado
           then Color (makeColor 0.3 0.6 1.0 0.3) $ Translate (-750) y $ rectangleSolid 280 70
           else Blank
       , Translate (-880) y $ Scale 0.6 0.6 $ drawWord p (show (idx + 1))
@@ -173,7 +167,7 @@ drawMCT p e blocoSelecionado mode secSel = Pictures
 
     drawObjeto y (idx, nome, pic) = Pictures
       [ -- Highlight 
-        if idx == blocoSelecionado 
+        if idx == blocoSelecionado
           then Color (makeColor 0.3 0.6 1.0 0.3) $ Translate (-750) y $ rectangleSolid 280 70
           else Blank
       , Translate (-880) y $ Scale 0.6 0.6 $ Color black $ drawWord p (show (idx + 1))
@@ -186,7 +180,7 @@ drawMCT p e blocoSelecionado mode secSel = Pictures
 
     drawPersonagens y (idx, nome, pic) = Pictures
       [ -- Highlight 
-        if idx == blocoSelecionado 
+        if idx == blocoSelecionado
           then Color (makeColor 0.3 0.6 1.0 0.3) $ Translate (-750) y $ rectangleSolid 280 70
           else Blank
       , Translate (-880) y $ Scale 0.6 0.6 $ Color black $ drawWord p (show (idx + 1))
@@ -223,34 +217,34 @@ drawMCT p e blocoSelecionado mode secSel = Pictures
             Scale 0.4 0.4 $
               Color (if (secSel == 5 ) then dark red else black) $
                 Text (show  100)
-        
-     
-     
+
+
+
       ]
-    
-    
+
+
     sidebar = Pictures
-      [ 
+      [
         Color (greyN 0.9) $ Translate (-750) 0 $ rectangleSolid 300 900
-      
-      , 
+
+      ,
         Color white $ Translate (-750) 380 $ rectangleSolid 280 80
       , Translate (-870) 360 $ Scale 1 1 $ Color black $ drawWord p infoMapa
-      
-      
-      , 
-        Color (greyN 0.7) $ Translate (-750) 320 $ rectangleSolid 280 2
-      
-      , 
-        Translate (-900) 280 $ Scale 0.6 0.6 $ Color (greyN 0.3) $ drawWord p "Blocos:"
-      
+
+
       ,
-      (case mode of 
+        Color (greyN 0.7) $ Translate (-750) 320 $ rectangleSolid 280 2
+
+      ,
+        Translate (-900) 280 $ Scale 0.6 0.6 $ Color (greyN 0.3) $ drawWord p "Blocos:"
+
+      ,
+      case mode of
           0 -> Pictures $ zipWith drawBloco [240, 150, 60, -30, -120] blocos
-          1 -> Pictures $ zipWith drawObjeto [240, 150, 60, -30, -120, -210, -300] objetos  
-          2 -> Pictures $ zipWith drawPersonagens [240] personagens)
-    
-      , 
+          1 -> Pictures $ zipWith drawObjeto [240, 150, 60, -30, -120, -210, -300] objetos
+          2 -> Pictures $ zipWith drawPersonagens [240] personagens
+
+      ,
         Translate (-900) (-400) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "L - Adicionar linha"
       , Translate (-900) (-430) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "C - Adicionar coluna"
       , Translate (-900) (-460) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "M - Remover coluna"
@@ -262,7 +256,7 @@ drawMCT p e blocoSelecionado mode secSel = Pictures
 
 
       ]
-    
+
 
     linha = length mapa
     cols = if null mapa then 0 else length (head mapa)
@@ -271,12 +265,12 @@ drawMCT p e blocoSelecionado mode secSel = Pictures
     sidebarWidth = 300
     usableWidth  = janelaLargura - sidebarWidth
     usableHeight = janelaAltura
-    
+
 
     sx = if largura > 0 then usableWidth / largura else 1
     sy = if altura > 0 then usableHeight / altura else 1
-    scaleFactor = min (min sx sy) 2.0  
-    
+    scaleFactor = min (min sx sy) 2.0
+
     world =
       Translate (sidebarWidth / 2) 0 $
         Scale scaleFactor scaleFactor $
@@ -317,12 +311,12 @@ drawGame p est numMinhoca jogada = Pictures [sidebar, world]
     sidebarWidth = 300
     usableWidth  = janelaLargura - sidebarWidth
     usableHeight = janelaAltura
-    
+
 
     sx = if largura > 0 then usableWidth / largura else 1
     sy = if altura > 0 then usableHeight / altura else 1
-    scaleFactor = min (min sx sy) 2.0  
-    
+    scaleFactor = min (min sx sy) 2.0
+
     world =
       Translate (sidebarWidth / 2) 0 $
         Scale scaleFactor scaleFactor $
@@ -375,9 +369,6 @@ drawPvPGame p est jogada =
     minhocasSidebar =
       zipWith drawMinhocaBar [0 ..] ms
 
-    gunOffset :: Float
-    gunOffset = 140
-
     minhocaSpacing :: Float
     minhocaSpacing = 240
 
@@ -428,23 +419,23 @@ drawPvPGame p est jogada =
           -- Textos das armas (abaixo das imagens)
           , Translate (-938) (y - weaponOffset - 60) $
             Scale 0.6 0.6 $
-            Color (if (armaSelecionada est == Just JetpackDLC && minhocaSelecionada est == i) then dark red else black) $
+            Color (if armaSelecionada est == Just JetpackDLC && minhocaSelecionada est == i then dark red else black) $
                   drawWord p (show (jetpackMinhocaDLC m) ++ " ")
           , Translate (-848) (y - weaponOffset - 60) $
             Scale 0.6 0.6 $
-            Color (if (armaSelecionada est == Just EscavadoraDLC && minhocaSelecionada est == i) then dark red else black) $
+            Color (if armaSelecionada est == Just EscavadoraDLC && minhocaSelecionada est == i then dark red else black) $
                   drawWord p (show (escavadoraMinhocaDLC m) ++ " ")
           , Translate (-758) (y - weaponOffset - 60) $
             Scale 0.6 0.6 $
-            Color (if (armaSelecionada est == Just BazucaDLC && minhocaSelecionada est == i) then dark red else black) $
+            Color (if armaSelecionada est == Just BazucaDLC && minhocaSelecionada est == i then dark red else black) $
                   drawWord p (show (bazucaMinhocaDLC m) ++ " ")
           , Translate (-668) (y - weaponOffset - 60) $
             Scale 0.6 0.6 $
-            Color (if (armaSelecionada est == Just MinaDLC && minhocaSelecionada est == i) then dark red else black) $
+            Color (if armaSelecionada est == Just MinaDLC && minhocaSelecionada est == i then dark red else black) $
                   drawWord p (show (minaMinhocaDLC m) ++ " ")
           , Translate (-578) (y - weaponOffset - 60) $
             Scale 0.6 0.6 $
-            Color (if (armaSelecionada est == Just DinamiteDLC && minhocaSelecionada est == i) then dark red else black) $
+            Color (if armaSelecionada est == Just DinamiteDLC && minhocaSelecionada est == i then dark red else black) $
                   drawWord p (show (dinamiteMinhocaDLC m) ++ " ")
           -- Barra horizontal divisória (no final de cada personagem)
           , Translate (-750) (y - weaponOffset - 90) $
@@ -453,8 +444,6 @@ drawPvPGame p est jogada =
           ]
         where
           y   = 55 - fromIntegral i * minhocaSpacing
-          cor = if eMinhocaVivaDLC m then green else red
-
 
     linha = length mapa
     cols = if null mapa then 0 else length (head mapa)
@@ -463,12 +452,12 @@ drawPvPGame p est jogada =
     sidebarWidth = 300
     usableWidth  = janelaLargura - sidebarWidth
     usableHeight = janelaAltura
-    
+
 
     sx = if largura > 0 then usableWidth / largura else 1
     sy = if altura > 0 then usableHeight / altura else 1
-    scaleFactor = min (min sx sy) 2.0  
-    
+    scaleFactor = min (min sx sy) 2.0
+
     world =
       Translate 500 0 $
         Scale scaleFactor scaleFactor $
@@ -516,7 +505,7 @@ drawObjetos p objs mapa = Pictures $ map drawO objs
 
     drawO b@(Barril {}) = Translate x y $ p !! 5
       where (x,y) = converteMapa mapa (Tarefa0_2025.posicaoObjeto b)
-    
+
 
 drawWord :: [Picture] -> String -> Picture
 drawWord p str =
@@ -627,27 +616,27 @@ drawMinhocas p ms mapa numMinhoca jogada = Pictures $ map drawM (zip [0..] ms)
  17: worm dinamite, 18: worm mina
 -}
 getSpriteParaAcao :: Minhoca -> Maybe Jogada -> [Picture] -> Bool -> Mapa -> Posicao -> Picture
-getSpriteParaAcao m Nothing p _ _ _ = p !! 3  -- Idle
+getSpriteParaAcao _ Nothing p _ _ _ = p !! 3  -- Idle
 
-getSpriteParaAcao m (Just (Labs2025.Move dir)) p isActiveMinhoca mapa pos
-  | isActiveMinhoca && not (Tarefa2.estaNoSolo pos mapa) = 
+getSpriteParaAcao _ (Just (Labs2025.Move dir)) p isActiveMinhoca mapa pos
+  | isActiveMinhoca && not (Tarefa2.estaNoSolo pos mapa) =
       if length p > 14 then p !! 14 else p !! 3  -- Caindo 
-  | isActiveMinhoca && dir `elem` [Norte, Nordeste, Noroeste] = 
+  | isActiveMinhoca && dir `elem` [Norte, Nordeste, Noroeste] =
       if length p > 13 then p !! 13 else p !! 3  -- Pulando 
-  | isActiveMinhoca = 
+  | isActiveMinhoca =
       if length p > 3 then p !! 3 else p !! 3  -- Andando 
   | otherwise = p !! 3  -- Idle 
 
-getSpriteParaAcao m (Just (Labs2025.Dispara arma dir)) p isActiveMinhoca _ _
+getSpriteParaAcao _ (Just (Labs2025.Dispara arma _)) p isActiveMinhoca _ _
   | not isActiveMinhoca = p !! 3  -- Idle 
   | otherwise = case arma of
-      Bazuca -> if length p > 2 then p !! 3 else p !! 3      
-      Jetpack -> if length p > 2 then p !! 3 else p !! 3     
-      Escavadora -> if length p > 2 then p !! 3 else p !! 3  
-      Dinamite -> if length p > 2 then p !! 3 else p !! 3    
-      Mina -> if length p > 2 then p !! 3 else p !! 3        
+      Bazuca -> p !! 3
+      Jetpack ->  p !! 3
+      Escavadora -> p !! 3
+      Dinamite -> p !! 3
+      Mina -> p !! 3
 
-  
+
 
 
 
@@ -656,13 +645,13 @@ drawMinhocasStatic :: [Picture] -> [MinhocaDLC] -> MapaDLC -> Picture
 drawMinhocasStatic p minhocas mapa = Pictures $ map drawM minhocas
   where
     drawM m = case posicaoMinhocaDLC m of
-      Nothing -> Blank  
-      Just pos -> 
+      Nothing -> Blank
+      Just pos ->
         let (x, y) = converteMapaDLC mapa pos
             sprite = case vidaMinhocaDLC m of
-              MortaDLC -> p !! 4 
+              MortaDLC -> p !! 4
               VivaDLC _ -> p !! 3
-                    
+
         in Translate x y $ Pictures [sprite]
 
 
@@ -697,40 +686,40 @@ drawObjetosDLC p objs mapa = Pictures $ map drawO objs
 
     drawO b@(BarrilDLC {}) = Translate x y $ p !! 5
       where (x,y) = converteMapaDLC mapa (DataDLC.posicaoObjeto b)
-    
+
     drawO hp@(HealthPack {}) = Translate x y $ p !! 12
       where (x,y) = converteMapaDLC mapa (DataDLC.posicaoObjeto hp)
-    
-    drawO hp@(AmmoPack {}) = 
+
+    drawO hp@(AmmoPack {}) =
       case ammoType hp of
           JetpackDLC -> Translate x y $ p !! 15
           EscavadoraDLC -> Translate x y $ p !! 16
           BazucaDLC -> Translate x y $ p !! 17
           MinaDLC -> Translate x y $ p !! 18
           DinamiteDLC -> Translate x y $ p !! 19
-      
+
       where (x,y) = converteMapaDLC mapa (DataDLC.posicaoObjeto hp)
 
 getSpriteParaAcaoDLC :: MinhocaDLC -> Maybe JogadaDLC -> [Picture] -> Bool -> MapaDLC -> Posicao -> Picture
-getSpriteParaAcaoDLC m Nothing p _ _ _ = p !! 3  -- Idle
+getSpriteParaAcaoDLC _ Nothing p _ _ _ = p !! 3  -- Idle
 
-getSpriteParaAcaoDLC m (Just (DataDLC.Move dir)) p isActiveMinhoca mapa pos
-  | isActiveMinhoca && not (EfetuaJogada.estaNoSolo pos mapa) = 
+getSpriteParaAcaoDLC _ (Just (DataDLC.Move dir)) p isActiveMinhoca mapa pos
+  | isActiveMinhoca && not (EfetuaJogada.estaNoSolo pos mapa) =
       if length p > 14 then p !! 14 else p !! 3  -- Caindo 
-  | isActiveMinhoca && dir `elem` [Norte, Nordeste, Noroeste] = 
+  | isActiveMinhoca && dir `elem` [Norte, Nordeste, Noroeste] =
       if length p > 13 then p !! 13 else p !! 3  -- Pulando 
-  | isActiveMinhoca = 
+  | isActiveMinhoca =
       if length p > 3 then p !! 3 else p !! 3  -- Andando 
   | otherwise = p !! 3  -- Idle 
 
-getSpriteParaAcaoDLC m (Just (DataDLC.Dispara arma dir)) p isActiveMinhoca _ _
+getSpriteParaAcaoDLC _ (Just (DataDLC.Dispara arma _)) p isActiveMinhoca _ _
   | not isActiveMinhoca = p !! 3  -- Idle 
   | otherwise = case arma of
-      BazucaDLC -> if length p > 2 then p !! 3 else p !! 3      
-      JetpackDLC -> if length p > 2 then p !! 3 else p !! 3     
-      EscavadoraDLC -> if length p > 2 then p !! 3 else p !! 3  
-      DinamiteDLC -> if length p > 2 then p !! 3 else p !! 3    
-      MinaDLC -> if length p > 2 then p !! 3 else p !! 3    
+      BazucaDLC -> if length p > 2 then p !! 3 else p !! 3
+      JetpackDLC -> if length p > 2 then p !! 3 else p !! 3
+      EscavadoraDLC -> if length p > 2 then p !! 3 else p !! 3
+      DinamiteDLC -> if length p > 2 then p !! 3 else p !! 3
+      MinaDLC -> if length p > 2 then p !! 3 else p !! 3
 
 
 converteMapaDLC :: MapaDLC -> Posicao -> (Float, Float)
