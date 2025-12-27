@@ -47,12 +47,12 @@ reageEventos (EventKey (SpecialKey KeyRight) Down _ _) (Menu sel)
 
 -- Seleção de opção no menu
 reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (Menu sel)
-	| sel == 0  = return $ BotSimulation novoEstado 0 0 (0, Labs2025.Move Sul)
-	| sel == 1  = return $ LevelSelector 0
+        | sel == 0  = return $ BotSimulation novoEstado 0 0 (0, Labs2025.Move Sul)
+        | sel == 1  = return $ LevelSelector 0
     | sel == 2  = return $ MapCreatorTool flatWorld 0 0 0
-	| sel == 3  = return $ Help
-	| sel == 4  = return $ Quit
-	| otherwise = return $ Menu sel
+        | sel == 3  = return $ Help
+        | sel == 4  = return $ Quit
+        | otherwise = return $ Menu sel
 
 
 -- * ESC LOGIC
@@ -68,19 +68,19 @@ reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) Quit = exitSuccess
 
 -- * LVL SELECTOR
 
-reageEventos (EventKey (SpecialKey KeyDown) Down _ _) (LevelSelector i) = 
+reageEventos (EventKey (SpecialKey KeyDown) Down _ _) (LevelSelector i) =
     return $ LevelSelector (i + 1)
 
-reageEventos (EventKey (SpecialKey KeyUp) Down _ _) (LevelSelector i) = 
+reageEventos (EventKey (SpecialKey KeyUp) Down _ _) (LevelSelector i) =
     return $ LevelSelector (i - 1)
 
 reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (LevelSelector i)
-	| i == 0  = return $ PVP flatWorld 0 0 (DataDLC.Move Sul)
-	| i == 1  = return $ PVP flatWorld 0 0 (DataDLC.Move Sul)
-	| otherwise = return $ LevelSelector i
+        | i == 0  = return $ PVP flatWorld 0 0 (DataDLC.Move Sul)
+        | i == 1  = return $ PVP flatWorld 0 0 (DataDLC.Move Sul)
+        | otherwise = return $ LevelSelector i
 
 reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (LevelSelector _) = return $ Menu 0
- 
+
 -- * PVP MODE INPUTS
 
 reageEventos (EventKey (SpecialKey KeyF1) Down _ _) (PVP _ _ _ _) = exitSuccess
@@ -90,21 +90,21 @@ reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (PVP _ _ _ _) = return $ Me
 
 
 -- * Mudar de minhoca
-reageEventos (EventKey (Char '1') Down _ _) (PVP est acc tick _) = 
+reageEventos (EventKey (Char '1') Down _ _) (PVP est acc tick _) =
 
     let minhocasValidas = getMinhocasValidasDLC (minhocasEstadoDLC est)
         minhocaAtualIndex = minhocaSelecionada est
-        
-       
+
+
         proximoIndiceValido = encontraProximoIndiceValido minhocaAtualIndex (minhocasEstadoDLC est)
-        
+
         novoEstado = EstadoDLC {
             mapaEstadoDLC = mapaEstadoDLC est
             , minhocasEstadoDLC = minhocasEstadoDLC est
             , objetosEstadoDLC = objetosEstadoDLC est
             , armaSelecionada = Nothing
             , minhocaSelecionada = proximoIndiceValido
-        }    
+        }
 
     in
         return $ PVP novoEstado acc tick (DataDLC.Move Sul)
@@ -113,7 +113,7 @@ reageEventos (EventKey (Char '1') Down _ _) (PVP est acc tick _) =
 
 
 -- * Mudar arma minhoca
-reageEventos (EventKey (Char '2') Down _ _) (PVP est acc tick _) = 
+reageEventos (EventKey (Char '2') Down _ _) (PVP est acc tick _) =
 
     let novaArma = case armaSelecionada est of
             Just JetpackDLC -> Just EscavadoraDLC
@@ -129,21 +129,21 @@ reageEventos (EventKey (Char '2') Down _ _) (PVP est acc tick _) =
             , objetosEstadoDLC = objetosEstadoDLC est
             , armaSelecionada = novaArma
             , minhocaSelecionada = minhocaSelecionada est
-        }    
+        }
 
     in
 
         return $ PVP novoEstado acc tick (DataDLC.Move Sul)
 
 -- * RESTO DE DOWNS pvp
-reageEventos (EventKey key Down _ _) (PVP est acc tick _) = 
+reageEventos (EventKey key Down _ _) (PVP est acc tick _) =
     let (novoEst, jogada) = handleAction key est
         estadoFinal = verificaVitoria novoEst
     in return estadoFinal
 
 -- * GAME OVER SCREEN 
 
-reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (GameOver _) = 
+reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (GameOver _) =
     return $ Menu 0
 
 
@@ -153,8 +153,8 @@ reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (GameOver _) =
 
 
 -- AUmentar Linhas -> 
-reageEventos (EventKey (Char 'k') Down _ _) (MapCreatorTool e b a l) = 
-    let 
+reageEventos (EventKey (Char 'k') Down _ _) (MapCreatorTool e b a l) =
+    let
         mapa = mapaEstadoDLC e
         linhas = length mapa
         colunas = if null mapa then 0 else length (head mapa)
@@ -162,14 +162,14 @@ reageEventos (EventKey (Char 'k') Down _ _) (MapCreatorTool e b a l) =
         novoMapa = mapa ++ [novaLinha]
     in return $ MapCreatorTool e{mapaEstadoDLC = novoMapa} b a l
 
-reageEventos (EventKey (Char 'l') Down _ _) (MapCreatorTool e b a l) = 
-    let 
+reageEventos (EventKey (Char '1') Down _ _) (MapCreatorTool e b a l) =
+    let
         mapa = mapaEstadoDLC e
-        novoMapa = map (++ [ArDLC]) mapa
-    in return $ MapCreatorTool e{mapaEstadoDLC = novoMapa} b a l
+        novoa = if a > 1 then 0 else a + 1
+    in return $ MapCreatorTool e 0 novoa 0
 
-reageEventos (EventKey (Char 'n') Down _ _) (MapCreatorTool e b a l) = 
-    let 
+reageEventos (EventKey (Char 'n') Down _ _) (MapCreatorTool e b a l) =
+    let
         mapa = mapaEstadoDLC e
         linhas = length mapa
         colunas = if null mapa then 0 else length (head mapa)
@@ -177,44 +177,43 @@ reageEventos (EventKey (Char 'n') Down _ _) (MapCreatorTool e b a l) =
         novoMapa = init mapa
     in return $ MapCreatorTool e{mapaEstadoDLC = novoMapa} b a l
 
-reageEventos (EventKey (Char 'm') Down _ _) (MapCreatorTool e b a l) = 
-    let 
+reageEventos (EventKey (Char 'm') Down _ _) (MapCreatorTool e b a l) =
+    let
         mapa = mapaEstadoDLC e
         novoMapa = map init  mapa
     in return $ MapCreatorTool e{mapaEstadoDLC = novoMapa} b a l
 
+reageEventos (EventKey (SpecialKey KeyUp) Down _ _) (MapCreatorTool e b a _) =
+    let
+        x = case a of
+            0 -> 4
+            1 -> 7
+            2 -> 0
+        novob = if b >= x || b <= 0 then 0 else b - 1
 
+    in return $ MapCreatorTool e novob a 0
 
-reageEventos (EventKey (SpecialKey KeyDown) Down _ _) (MapCreatorTool e b a l) = 
-    let 
-        mapa = mapaEstadoDLC e
+reageEventos (EventKey (SpecialKey KeyDown) Down _ _) (MapCreatorTool e b a _) =
+    let
         x = case a of
             0 -> 4
             1 -> 7
             2 -> 0
         novob = if b >= x then 0 else b + 1
-        
-    in return $ MapCreatorTool e novob a l
 
-reageEventos (EventKey (Char '1') Down _ _) (MapCreatorTool e b a l) = 
-    let 
+    in return $ MapCreatorTool e novob a 0
+
+reageEventos (EventKey (Char '1') Down _ _) (MapCreatorTool e b a l) =
+    let
         mapa = mapaEstadoDLC e
         novoa = if a > 1 then 0 else a + 1
     in return $ MapCreatorTool e 0 novoa l
 
-reageEventos (EventKey (SpecialKey KeyRight) Down _ _) (MapCreatorTool e b a l) = 
-    let 
-        lnew = l + 1
-    in return $ MapCreatorTool e b a l
 
-reageEventos (EventKey (SpecialKey KeyLeft) Down _ _) (MapCreatorTool e b a l) = 
-    let 
-        lnew = l - 1
-    in return $ MapCreatorTool e b a lnew
 
 
 reageEventos (EventKey (MouseButton LeftButton) Down _ mousePos) (MapCreatorTool e blocoSelecionado modo l) =
-    let 
+    let
         mapa = mapaEstadoDLC e
         (mx, my) = mousePos
         sidebarWidth = 300
@@ -233,14 +232,14 @@ reageEventos (EventKey (MouseButton LeftButton) Down _ mousePos) (MapCreatorTool
         colIdx = floor ((worldX + (largura / 2)) / cellSize)
         linhaIdx = floor (((altura / 2) - worldY) / cellSize)
         posicao = (linhaIdx, colIdx)
-        
+
         -- Verifica se a posição é válida
         posValida = linhaIdx >= 0 && linhaIdx < linha && colIdx >= 0 && colIdx < cols
-        
+
         novoEstado = if posValida
             then case modo of
                 0 -> e { mapaEstadoDLC = atualizaMapa mapa linhaIdx colIdx (getBlocoFromIndex blocoSelecionado) }
-                1 -> adicionaObjetoDLC e blocoSelecionado posicao
+                1 -> adicionaObjetoDLC e blocoSelecionado posicao l
                 2 -> adicionaMinhocaDLC e posicao
                 _ -> e
             else e
@@ -248,7 +247,7 @@ reageEventos (EventKey (MouseButton LeftButton) Down _ mousePos) (MapCreatorTool
 
 
 reageEventos (EventKey (MouseButton RightButton) Down _ mousePos) (MapCreatorTool e blocoSelecionado modo l) =
-    let 
+    let
         mapa = mapaEstadoDLC e
         (mx, my) = mousePos
         sidebarWidth = 300
@@ -267,10 +266,10 @@ reageEventos (EventKey (MouseButton RightButton) Down _ mousePos) (MapCreatorToo
         colIdx = floor ((worldX + (largura / 2)) / cellSize)
         linhaIdx = floor (((altura / 2) - worldY) / cellSize)
         posicao = (linhaIdx, colIdx)
-        
+
         -- Verifica se a posição é válida
         posValida = linhaIdx >= 0 && linhaIdx < linha && colIdx >= 0 && colIdx < cols
-        
+
         novoEstado = if posValida
             then case modo of
                 0 -> e { mapaEstadoDLC = atualizaMapa mapa linhaIdx colIdx ArDLC }
@@ -282,11 +281,29 @@ reageEventos (EventKey (MouseButton RightButton) Down _ mousePos) (MapCreatorToo
 
 
 
+reageEventos (EventKey (SpecialKey KeyLeft) Down _ _) (MapCreatorTool e b a l) =  -- * <
+    let
 
+        novol
+            | (a == 1 && b == 2) = (l - 1) `mod` 5 -- a = 1 é modo objetos, b = 2 sao os ammo packs
+            | (a == 1 && b == 3) = (l - 1) `mod` 4 -- b = 3 sao os disparos
+            | otherwise = l
 
-reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) m@(MapCreatorTool e b a l) = do
+    in if novol <= 0 then return $ MapCreatorTool e b a 0 else return $ MapCreatorTool e b a novol
+
+reageEventos (EventKey (SpecialKey KeyRight) Down _ _) (MapCreatorTool e b a l) =  -- * >
+    let
+
+        novol
+            | (a == 1 && b == 2) = (l + 1) `mod` 5 -- a = 1 é modo objetos, b = 2 sao os ammo packs
+            | (a == 1 && b == 3) = (l + 1) `mod` 4 -- b = 3 sao os disparos
+            | otherwise = l
+
+    in if novol <= 0 then return $ MapCreatorTool e b a 0 else return $ MapCreatorTool e b a novol
+
+reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) m@(MapCreatorTool e _ _ _) = do
     writeFile "estado.txt" (show e)
-    return m 
+    return m
 
 
 
@@ -323,7 +340,7 @@ reageEventos _ s = return s
 -- * Funções auxiliares
 
 adicionaObjeto :: Estado -> Int -> Posicao -> Estado
-adicionaObjeto e idx pos = 
+adicionaObjeto e idx pos =
     let novoObjeto = case idx of
             0 -> Barril pos False
             _ -> Barril pos False
@@ -333,7 +350,7 @@ adicionaObjeto e idx pos =
     in e { objetosEstado = objetosFiltrados ++ [novoObjeto] }
 
 adicionaMinhoca :: Estado -> Posicao -> Estado
-adicionaMinhoca e pos = 
+adicionaMinhoca e pos =
     let minhocasAtuais = minhocasEstado e
         -- Remove minhoca existente na mesma posição (se houver)
         minhocasFiltradas = filter (\m -> posicaoMinhoca m /= Just pos) minhocasAtuais
@@ -386,39 +403,39 @@ atualizaLinha linha col novoBloco =
 
 -- | Verifica se a minhoca pode se mover (está no solo)
 podeMover :: Estado -> NumMinhoca -> Bool
-podeMover est i = 
+podeMover est i =
     case encontraIndiceLista i (minhocasEstado est) of
         Nothing -> False
-        Just minhoca -> 
+        Just minhoca ->
             case posicaoMinhoca minhoca of
                 Nothing -> False
                 Just pos -> Tarefa2.estaNoSolo pos (mapaEstado est)
 
 -- | Verifica se a minhoca pode se mover (está no solo)
 podeMoverDLC :: EstadoDLC -> NumMinhoca -> Bool
-podeMoverDLC est i = 
+podeMoverDLC est i =
     case encontraIndiceLista i (minhocasEstadoDLC est) of
         Nothing -> False
-        Just minhoca -> 
+        Just minhoca ->
             case posicaoMinhocaDLC minhoca of
                 Nothing -> False
                 Just pos -> EfetuaJogada.estaNoSolo pos (mapaEstadoDLC est)
 
 
 handleAction :: Key -> EstadoDLC -> (EstadoDLC, JogadaDLC)
-handleAction key est = 
+handleAction key est =
     let
         maybeArma = armaSelecionada est
         i = minhocaSelecionada est
-        
+
         dir = keyToDirection key
     in case maybeArma of
 
-        Just arma -> 
+        Just arma ->
             let novoEst = EfetuaJogada.efetuaJogada i (DataDLC.Dispara arma dir) est
             in (novoEst, DataDLC.Dispara arma dir)
-        
-        Nothing -> 
+
+        Nothing ->
             if podeMoverDLC est i
             then let novoEst = EfetuaJogada.efetuaJogada i (DataDLC.Move dir) est
                  in (novoEst, DataDLC.Move dir)
@@ -427,40 +444,41 @@ handleAction key est =
 
 -- * DLC
 
-adicionaObjetoDLC :: EstadoDLC -> Int -> Posicao -> EstadoDLC
-adicionaObjetoDLC e idx pos = 
+adicionaObjetoDLC :: EstadoDLC -> Int -> Posicao -> Int -> EstadoDLC
+adicionaObjetoDLC e idx pos secSel =
     let novoObjeto = case idx of
             0 -> BarrilDLC pos False
             1 -> HealthPack pos 50
-            2 -> AmmoPack pos 50 JetpackDLC
-            3 -> AmmoPack pos 50 EscavadoraDLC
-            4 -> AmmoPack pos 50 BazucaDLC
-            5 -> AmmoPack pos 50 MinaDLC
-            6 -> AmmoPack pos 50 DinamiteDLC
-
+            2 ->let ammoPacks = [JetpackDLC, EscavadoraDLC, BazucaDLC, MinaDLC, DinamiteDLC]
+                    ammoType = ammoPacks !! (secSel `mod` 5)
+                in AmmoPack pos 50 ammoType
+            3 ->
+                let disparos = [BazucaDLC, MinaDLC, DinamiteDLC, FlameTrower]
+                    tipo = disparos !! (secSel `mod` 3)
+                in DisparoDLC pos Norte tipo Nothing 0 -- ! isto tem valores defaults que tem de ser mudados
             _ -> BarrilDLC pos False
         objetosAtuais = objetosEstadoDLC e
-        
+
         objetosFiltrados = filter (\obj -> DataDLC.posicaoObjeto obj /= pos) objetosAtuais
     in e { objetosEstadoDLC = objetosFiltrados ++ [novoObjeto] }
 
 adicionaMinhocaDLC :: EstadoDLC -> Posicao -> EstadoDLC
-adicionaMinhocaDLC e pos = 
+adicionaMinhocaDLC e pos =
     let minhocasAtuais = minhocasEstadoDLC e
-       
+
         minhocasFiltradas = filter (\m -> posicaoMinhocaDLC m /= Just pos) minhocasAtuais
         -- Cria nova minhoca
-        novaMinhoca = MinhocaDLC {posicaoMinhocaDLC = Just pos, vidaMinhocaDLC = VivaDLC 100, jetpackMinhocaDLC = 100, bazucaMinhocaDLC=100, minaMinhocaDLC = 100, dinamiteMinhocaDLC=100, burningCounter = 0, equipaMinhoca = Nothing}
-    in e { minhocasEstadoDLC = minhocasFiltradas ++ [novaMinhoca] }
+        novaMinhoca = MinhocaDLC {posicaoMinhocaDLC = Just pos, vidaMinhocaDLC = VivaDLC 100, jetpackMinhocaDLC = 100, escavadoraMinhocaDLC = 100, bazucaMinhocaDLC=100, minaMinhocaDLC = 100, dinamiteMinhocaDLC=100,flameMinhocaDLC = 100, burningCounter = 0, equipaMinhoca = Nothing}
+    in e { minhocasEstadoDLC = minhocasFiltradas ++ [novaMinhoca] }  -- ! isto tem valores defaults que tem de ser mudados
 
 removeObjetoDLC :: EstadoDLC -> Posicao -> EstadoDLC
-removeObjetoDLC e pos = 
+removeObjetoDLC e pos =
     let objetosAtuais = objetosEstadoDLC e
         objetosFiltrados = filter (\obj -> DataDLC.posicaoObjeto obj /= pos) objetosAtuais
     in e { objetosEstadoDLC = objetosFiltrados }
 
 removeMinhocaDLC :: EstadoDLC -> Posicao -> EstadoDLC
-removeMinhocaDLC e pos = 
+removeMinhocaDLC e pos =
     let minhocasAtuais = minhocasEstadoDLC e
         minhocasFiltradas = filter (\m -> posicaoMinhocaDLC m /= Just pos) minhocasAtuais
     in e { minhocasEstadoDLC = minhocasFiltradas }
@@ -472,13 +490,13 @@ encontraProximoIndiceValido atual minhocas =
 
         indicesValidos = [i | (i, m) <- zip [0..] minhocas, eMinhocaVivaDLC m]
     in if null indicesValidos
-       then 0  
-       else 
-           let 
+       then 0
+       else
+           let
                proximosIndices = filter (> atual) indicesValidos
            in if null proximosIndices
               then head indicesValidos
-              else head proximosIndices 
+              else head proximosIndices
 
 verificaVitoria :: EstadoDLC -> Worms
 verificaVitoria est =

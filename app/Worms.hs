@@ -9,7 +9,7 @@ data Worms
     = Menu Int          -- ^ Menu com opção actualmente seleccionada (0..n)
     | BotSimulation Estado Float Int (NumMinhoca, Jogada)    -- ^ Estado do jogo + accumulator (segundos) + tick counter + última jogada
     | PVP EstadoDLC Float Int JogadaDLC
-    | MapCreatorTool EstadoDLC Int Int Int-- estado blocoselected modo selecaoalternativa
+    | MapCreatorTool EstadoDLC Int Int Int-- ^ estado blocoselected modo selecaoalternativa
     | MapSelector
     | LevelSelector Int
     | Help              -- ^ Tela de ajuda (mostra instruções)

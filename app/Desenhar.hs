@@ -152,12 +152,15 @@ drawMCT p e blocoSelecionado mode secSel = Pictures
     infoMapa = show (length mapa) ++ "x" ++ show (if null mapa then 0 else length (head mapa))
 
     blocos = [(0, "Terra", head p), (1, "Agua", p !! 1), (2, "Pedra", p !! 2), (3, "Ar", p !! 7), (4, "Lava", p !! 11) ]
-    objetos =     [ (0, "Barril", p !! 5) , (1, "Health Pack", p !! 12) , (2, "Jetpack", p !! 15), (3, "Escavadora", p !! 16), (4, "Bazuca", p !! 17), (5, "Mina", p !! 18), (6, "Dinamite", p !! 19)]
+    
+    staticObjects = [(0, "Barril", p !! 5), (1, "Health Pack", p !! 12)]
+    ammoPacks = [(2, "Jetpack", p !! 15), (2, "Escavadora", p !! 16), (2, "Bazuca", p !! 17), (2, "Mina", p !! 18), (2, "Dinamite", p !! 19)]
+    disparos = [(3, "Bazuca", p !! 6), (3, "Mina", p !! 9), (3, "Dinamite", p !! 8), (3, "FireBall", p !! 69)]
+    
     personagens = [(0, "Pato", p !! 3)]
 
     drawBloco y (idx, nome, pic) = Pictures
-      [ -- Highlight 
-        if idx == blocoSelecionado
+      [ if idx == blocoSelecionado
           then Color (makeColor 0.3 0.6 1.0 0.3) $ Translate (-750) y $ rectangleSolid 280 70
           else Blank
       , Translate (-880) y $ Scale 0.6 0.6 $ drawWord p (show (idx + 1))
@@ -166,86 +169,102 @@ drawMCT p e blocoSelecionado mode secSel = Pictures
       ]
 
     drawObjeto y (idx, nome, pic) = Pictures
-      [ -- Highlight 
-        if idx == blocoSelecionado
+      [ if idx == blocoSelecionado
           then Color (makeColor 0.3 0.6 1.0 0.3) $ Translate (-750) y $ rectangleSolid 280 70
           else Blank
       , Translate (-880) y $ Scale 0.6 0.6 $ Color black $ drawWord p (show (idx + 1))
       , Translate (-850) (y + 5) $ Scale 0.6 0.6 $ Color black $ drawWord p nome
       , Translate (-700) y $ Scale 2 2 $ pic
       ]
+
+    drawAmmoPackSelector y = Pictures
+      [ if blocoSelecionado == 2
+          then Color (makeColor 0.3 0.6 1.0 0.3) $ Translate (-750) y $ rectangleSolid 280 70
+          else Blank
+      , Translate (-880) y $ Scale 0.6 0.6 $ Color black $ drawWord p (show (selectedIdx + 1))
+      , Translate (-850) (y + 5) $ Scale 0.6 0.6 $ Color black $ drawWord p "Ammo Pack"
+      , Translate (-600) y $ Scale 2 2 $ selectedPic
+      , Translate (-850) (y - 30) $ Scale 0.5 0.5 $ Color (greyN 0.5) $ drawWord p "<"
+      , Translate (-650) (y - 30) $ Scale 0.5 0.5 $ Color (greyN 0.5) $ drawWord p ">"
+      , Translate (-825) (y - 30) $ Scale 0.5 0.5 $ Color (greyN 0.5) $ drawWord p (selectedName)
+      ]
+      where
+        (selectedIdx, selectedName, selectedPic) = if blocoSelecionado == 2 then ammoPacks !! secSel else head ammoPacks
+    
+    
+    drawDisparoSelector y = Pictures
+      [ if blocoSelecionado == 3
+          then Color (makeColor 0.3 0.6 1.0 0.3) $ Translate (-750) y $ rectangleSolid 280 70
+          else Blank
+      , Translate (-880) y $ Scale 0.6 0.6 $ Color black $ drawWord p (show (selectedIdx + 1))
+      , Translate (-850) (y + 5) $ Scale 0.6 0.6 $ Color black $ drawWord p "Disparos"
+      , Translate (-600) y $ Scale 2 2 $ selectedPic
+      , Translate (-850) (y - 30) $ Scale 0.5 0.5 $ Color (greyN 0.5) $ drawWord p "<"
+      , Translate (-650) (y - 30) $ Scale 0.5 0.5 $ Color (greyN 0.5) $ drawWord p ">"
+      , Translate (-825) (y - 30) $ Scale 0.5 0.5 $ Color (greyN 0.5) $ drawWord p (selectedName)
+      ]
+      where
+        (selectedIdx, selectedName, selectedPic) = if blocoSelecionado == 3 then disparos !! secSel else head disparos
 
     weaponOffset :: Float
     weaponOffset = 80
 
     drawPersonagens y (idx, nome, pic) = Pictures
-      [ -- Highlight 
-        if idx == blocoSelecionado
+      [ if idx == blocoSelecionado
           then Color (makeColor 0.3 0.6 1.0 0.3) $ Translate (-750) y $ rectangleSolid 280 70
           else Blank
       , Translate (-880) y $ Scale 0.6 0.6 $ Color black $ drawWord p (show (idx + 1))
       , Translate (-850) (y + 5) $ Scale 0.6 0.6 $ Color black $ drawWord p nome
       , Translate (-700) y $ Scale 2 2 $ pic
 
-        , Translate (-900) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 2
-        , Translate (-830) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 2
-        , Translate (-760) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 6
-        , Translate (-690) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 9
-        , Translate (-620) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 8
+      , Translate (-900) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 2
+      , Translate (-830) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 2
+      , Translate (-760) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 6
+      , Translate (-690) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 9
+      , Translate (-620) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 8
 
-        , Translate (-900) (y - weaponOffset) $
-            Scale 0.4 0.4 $
-              Color (if (secSel == 1 ) then dark red else black) $
-                Text (show 100)
+      , Translate (-900) (y - weaponOffset) $
+          Scale 0.4 0.4 $
+            Color (if (secSel == 1 ) then dark red else black) $
+              Text (show 100)
 
-        , Translate (-830) (y - weaponOffset) $
-            Scale 0.4 0.4 $
-              Color (if (secSel == 2 ) then dark red else black) $
-                Text (show 100)
+      , Translate (-830) (y - weaponOffset) $
+          Scale 0.4 0.4 $
+            Color (if (secSel == 2 ) then dark red else black) $
+              Text (show 100)
 
-        , Translate (-760) (y - weaponOffset) $
-            Scale 0.4 0.4 $
-              Color (if (secSel == 3) then dark red else black) $
-                Text (show 100)
+      , Translate (-760) (y - weaponOffset) $
+          Scale 0.4 0.4 $
+            Color (if (secSel == 3) then dark red else black) $
+              Text (show 100)
 
-        , Translate (-690) (y - weaponOffset) $
-            Scale 0.4 0.4 $
-              Color (if (secSel == 4 ) then dark red else black) $
-                Text (show 100)
+      , Translate (-690) (y - weaponOffset) $
+          Scale 0.4 0.4 $
+            Color (if (secSel == 4 ) then dark red else black) $
+              Text (show 100)
 
-        , Translate (-620) (y - weaponOffset) $
-            Scale 0.4 0.4 $
-              Color (if (secSel == 5 ) then dark red else black) $
-                Text (show  100)
-
-
-
+      , Translate (-620) (y - weaponOffset) $
+          Scale 0.4 0.4 $
+            Color (if (secSel == 5 ) then dark red else black) $
+              Text (show  100)
       ]
 
-
     sidebar = Pictures
-      [
-        Color (greyN 0.9) $ Translate (-750) 0 $ rectangleSolid 300 900
-
-      ,
-        Color white $ Translate (-750) 380 $ rectangleSolid 280 80
+      [ Color (greyN 0.9) $ Translate (-750) 0 $ rectangleSolid 300 900
+      , Color white $ Translate (-750) 380 $ rectangleSolid 280 80
       , Translate (-870) 360 $ Scale 1 1 $ Color black $ drawWord p infoMapa
-
-
-      ,
-        Color (greyN 0.7) $ Translate (-750) 320 $ rectangleSolid 280 2
-
-      ,
-        Translate (-900) 280 $ Scale 0.6 0.6 $ Color (greyN 0.3) $ drawWord p "Blocos:"
-
-      ,
-      case mode of
+      , Color (greyN 0.7) $ Translate (-750) 320 $ rectangleSolid 280 2
+      , Translate (-900) 280 $ Scale 0.6 0.6 $ Color (greyN 0.3) $ drawWord p "Blocos:"
+      
+      , case mode of
           0 -> Pictures $ zipWith drawBloco [240, 150, 60, -30, -120] blocos
-          1 -> Pictures $ zipWith drawObjeto [240, 150, 60, -30, -120, -210, -300] objetos
+          1 -> Pictures $ 
+                 zipWith drawObjeto [240, 150] staticObjects ++
+                 [drawAmmoPackSelector 60] ++
+                 [drawDisparoSelector (-50)]
           2 -> Pictures $ zipWith drawPersonagens [240] personagens
 
-      ,
-        Translate (-900) (-400) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "L - Adicionar linha"
+      , Translate (-900) (-400) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "L - Adicionar linha"
       , Translate (-900) (-430) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "C - Adicionar coluna"
       , Translate (-900) (-460) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "M - Remover coluna"
       , Translate (-900) (-490) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "N - Remover linha"
@@ -253,10 +272,8 @@ drawMCT p e blocoSelecionado mode secSel = Pictures
       , Translate (-900) (-550) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "LMB - Colocar bloco/objeto/personagem"
       , Translate (-900) (-580) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "RMB - Remover (Modo Selecionado)"
       , Translate (-900) (-610) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "Enter - Exportar estado"
-
-
+      , Translate (-900) (-640) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "< > - Navegar"
       ]
-
 
     linha = length mapa
     cols = if null mapa then 0 else length (head mapa)
@@ -265,7 +282,6 @@ drawMCT p e blocoSelecionado mode secSel = Pictures
     sidebarWidth = 300
     usableWidth  = janelaLargura - sidebarWidth
     usableHeight = janelaAltura
-
 
     sx = if largura > 0 then usableWidth / largura else 1
     sy = if altura > 0 then usableHeight / altura else 1
@@ -572,6 +588,8 @@ drawLetters p c =
     '!' -> p !! 66
     '?' -> p !! 67
     '@' -> p !! 68
+    '<' -> p !! 70
+    '>' -> p !! 71
 
 
 

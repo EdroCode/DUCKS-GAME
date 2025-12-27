@@ -9,6 +9,7 @@ import Tempo
 
 import Graphics.Gloss.Juicy
 import Graphics.Gloss.Interface.IO.Game
+import Control.Arrow (ArrowChoice(right))
 
 
 janela :: Display
@@ -107,12 +108,13 @@ main = do
   Just exclamation <- loadJuicy (path ++ "fontes/exclamation.png")
   Just interrogation <- loadJuicy (path ++ "fontes/interrogation.png")
   Just arrombado <- loadJuicy (path ++ "fontes/arrombado.png")
+  Just leftArrow <- loadJuicy (path ++ "fontes/leftarrow.png")
+  Just rightArrow <- loadJuicy (path ++ "fontes/rightarrow.png")
 
   Just fireball <- loadJuicy (path ++ "fireball.png")
 
 
-
-  let tiles = [grass, water, stone, pato, morto, barril, bazuca, sky, dinamite, mina, dirt, lava, healthPack, patoPulando, patoCaindo, ammoJetpack, ammoEscavadora, ammoBazuca, ammoMina, ammoDinamite, botao, botaoOn, botaoOff, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, space, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, dash, pl, pr, slash, dott_points, comma, exclamation, interrogation, arrombado, fireball]
+  let tiles = [grass, water, stone, pato, morto, barril, bazuca, sky, dinamite, mina, dirt, lava, healthPack, patoPulando, patoCaindo, ammoJetpack, ammoEscavadora, ammoBazuca, ammoMina, ammoDinamite, botao, botaoOn, botaoOff, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, space, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, dash, pl, pr, slash, dott_points, comma, exclamation, interrogation, arrombado, fireball, leftArrow, rightArrow]
 
   -- let temanatal = [grass, water, stone, pato, morto, barril, bazuca, sky, dinamite, mina, dirt, lava, healthPack, patoPulando, patoCaindo, ammoJetpack, ammoEscavadora, ammoBazuca, ammoMina, ammoDinamite, botao, botaoOn, botaoOff, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, space, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, dash, pl, pr, slash, dott_points, comma, exclamation, interrogation]
 
