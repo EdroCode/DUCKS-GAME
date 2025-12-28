@@ -55,6 +55,22 @@ main = do
   Just botao <- loadJuicy (path ++ "BotaoMenuapagado.png")
   Just botaoOn <- loadJuicy (path ++ "BotaoMenuSelecionado.png")
   Just botaoOff <- loadJuicy (path ++ "BotaoMenuDescelecionado.png")
+  Just background <- loadJuicy (path ++ "Background.png")
+
+  Just patoBazucaVermelho <- loadJuicy (path ++ "PatoBazucaVermelho.png")
+  Just patoBazucaAzul <- loadJuicy (path ++ "PatoBazucaAzul.png")
+  Just patoAzulCaindo <- loadJuicy (path ++ "PatoAzulCaindo.png")
+  Just patoVermelhoCaindo <- loadJuicy (path ++ "PatoVermelhoCaindo.png")
+  Just patoAzulPulando <- loadJuicy (path ++ "PatoAzulPulando.png")
+  Just patoVermelhoPulando <- loadJuicy (path ++ "PatoVermelhoPulando.png")
+  Just patoVermelhoParado <- loadJuicy (path ++ "PatoVermelhoParado.png")
+  Just patoAzulParado <- loadJuicy (path ++ "PatoAzulParado.png")
+  Just patoMachucadoAzul <- loadJuicy (path ++ "PatoMachucadoAzul.png")
+  Just patoMachucadoVermelho <- loadJuicy (path ++ "PatoMachucadoVermelho.png")
+  Just patoEscavadoraAzul <- loadJuicy (path ++ "PatoEscavadoraAzul.png")
+  Just patoEscavadoraVermelho <- loadJuicy (path ++ "PatoEscavadoraVermelho.png")
+  Just patoFogo <- loadJuicy (path ++ "PatoFogo.png")
+  
 
   -- * Fontes
 
@@ -114,7 +130,19 @@ main = do
   Just fireball <- loadJuicy (path ++ "fireball.png")
 
 
-  let tiles = [grass, water, stone, pato, morto, barril, bazuca, sky, dinamite, mina, dirt, lava, healthPack, patoPulando, patoCaindo, ammoJetpack, ammoEscavadora, ammoBazuca, ammoMina, ammoDinamite, botao, botaoOn, botaoOff, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, space, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, dash, pl, pr, slash, dott_points, comma, exclamation, interrogation, arrombado, fireball, leftArrow, rightArrow]
+  let tiles = [grass, water, stone, pato, morto, barril, bazuca, sky, dinamite, mina, dirt, lava, healthPack, patoPulando, patoCaindo, ammoJetpack, ammoEscavadora, ammoBazuca, ammoMina, ammoDinamite, botao, botaoOn, botaoOff, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, space, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, dash, pl, pr, slash, dott_points, comma, exclamation, interrogation, arrombado, fireball, leftArrow, rightArrow, patoBazucaVermelho, patoBazucaAzul, patoAzulCaindo, patoVermelhoCaindo, patoAzulPulando, patoVermelhoPulando, patoVermelhoParado, patoAzulParado, patoMachucadoAzul, patoMachucadoVermelho, patoEscavadoraAzul, patoEscavadoraVermelho, patoFogo, background]
+
+{- Indices dos sprites:
+ 0: grass, 1: water, 2: stone, 3: pato, 4: morto, 5: barril,
+ 6: bazuca, 7: sky, 8: dinamite, 9: mina, 10: dirt,
+ 11: lava, 12: healthPack, 13: patoPulando, 14: patoCaindo,
+ 15-19: ammo packs, 20-22: botoes menu, 23-68: fontes,
+ 69: fireball, 70-71: setas, 72: patoBazucaVermelho, 73: patoBazucaAzul,
+ 74: patoAzulCaindo, 75: patoVermelhoCaindo, 76: patoAzulPulando,
+ 77: patoVermelhoPulando, 78: patoVermelhoParado, 79: patoAzulParado,
+ 80: PatoMachudadoAzul, 81: PatoMachudadoVermelho,
+ 82: patoEscavadoraAzul, 83: patoEscavadoraVermelho, 84: patoFogo
+-}
 
   -- let temanatal = [grass, water, stone, pato, morto, barril, bazuca, sky, dinamite, mina, dirt, lava, healthPack, patoPulando, patoCaindo, ammoJetpack, ammoEscavadora, ammoBazuca, ammoMina, ammoDinamite, botao, botaoOn, botaoOff, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, space, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, dash, pl, pr, slash, dott_points, comma, exclamation, interrogation]
 

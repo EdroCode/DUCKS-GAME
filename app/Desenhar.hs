@@ -48,7 +48,8 @@ desenha p (GameOver team) = return $ drawGameOver p team
 drawMenu :: [Picture] -> Int -> Picture
 drawMenu p sel = Pictures
   [
-
+    Scale 0.8 0.8 $ p !! 85
+    ,
     -- Título "WORMS"
     Translate (-120) 200 $ Scale 1 1 $ p !! 20
   , Translate (-280) 200 $ Scale 1.6 1.6 $ drawWord p "worms"
@@ -814,25 +815,54 @@ drawObjetosDLC p objs mapa = Pictures $ map drawO objs
       where (x,y) = converteMapaDLC mapa (DataDLC.posicaoObjeto hp)
 
 getSpriteParaAcaoDLC :: MinhocaDLC -> Maybe JogadaDLC -> [Picture] -> Bool -> MapaDLC -> Posicao -> Picture
-getSpriteParaAcaoDLC _ Nothing p _ _ _ = p !! 3  -- Idle
+getSpriteParaAcaoDLC _ Nothing p _ _ _ = p !! 3
 
-getSpriteParaAcaoDLC _ (Just (DataDLC.Move dir)) p isActiveMinhoca mapa pos
+getSpriteParaAcaoDLC minhoca (Just (DataDLC.Move dir)) p isActiveMinhoca mapa pos
+  | burningCounter minhoca > 0 = p !! 84  
   | isActiveMinhoca && not (EfetuaJogada.estaNoSolo pos mapa) =
-      if length p > 14 then p !! 14 else p !! 3  -- Caindo 
+      case equipaMinhoca minhoca of
+        Just Red -> p !! 75  
+        Just Blue -> p !! 74  
+        Nothing -> p !! 14
   | isActiveMinhoca && dir `elem` [Norte, Nordeste, Noroeste] =
-      if length p > 13 then p !! 13 else p !! 3  -- Pulando 
-  | isActiveMinhoca =
-      if length p > 3 then p !! 3 else p !! 3  -- Andando 
-  | otherwise = p !! 3  -- Idle 
+      case equipaMinhoca minhoca of
+        Just Red -> p !! 77  
+        Just Blue -> p !! 76 
+        Nothing -> p !! 13
+  | otherwise = 
+      case equipaMinhoca minhoca of
+        Just Red -> if burningCounter minhoca > 0 then p !! 84 else p !! 81
+        Just Blue -> if burningCounter minhoca > 0 then p !! 84 else p !! 80
+        Nothing -> p !! 3
 
-getSpriteParaAcaoDLC _ (Just (DataDLC.Dispara arma _)) p isActiveMinhoca _ _
-  | not isActiveMinhoca = p !! 3  -- Idle 
+getSpriteParaAcaoDLC minhoca (Just (DataDLC.Dispara arma _)) p isActiveMinhoca _ _
+  | burningCounter minhoca > 0 = p !! 84  
+  | not isActiveMinhoca = 
+      case equipaMinhoca minhoca of
+        Just Red -> if vidaMinhocaDLC minhoca >= VivaDLC 50 then p !! 79 else p !! 82
+        Just Blue -> if vidaMinhocaDLC minhoca >= VivaDLC 50 then p !! 80 else p !! 81
+        Nothing -> p !! 3
   | otherwise = case arma of
-      BazucaDLC -> if length p > 2 then p !! 3 else p !! 3
-      JetpackDLC -> if length p > 2 then p !! 3 else p !! 3
-      EscavadoraDLC -> if length p > 2 then p !! 3 else p !! 3
-      DinamiteDLC -> if length p > 2 then p !! 3 else p !! 3
-      MinaDLC -> if length p > 2 then p !! 3 else p !! 3
+      BazucaDLC -> case equipaMinhoca minhoca of
+        Just Red -> p !! 72  
+        Just Blue -> p !! 73  
+        Nothing -> p !! 3
+      JetpackDLC -> case equipaMinhoca minhoca of
+        Just Red -> p !! 82
+        Just Blue -> p !! 81
+        Nothing -> p !! 3
+      EscavadoraDLC -> case equipaMinhoca minhoca of
+        Just Red -> p !! 83  
+        Just Blue -> p !! 84  
+        Nothing -> p !! 3
+      DinamiteDLC -> case equipaMinhoca minhoca of
+        Just Red -> p !! 82
+        Just Blue -> p !! 81
+        Nothing -> p !! 3
+      MinaDLC -> case equipaMinhoca minhoca of
+        Just Red -> p !! 82
+        Just Blue -> p !! 81
+        Nothing -> p !! 3
 
 
 converteMapaDLC :: MapaDLC -> Posicao -> (Float, Float)
