@@ -205,6 +205,8 @@ drawLvlSelector p selected estadosImportados = Pictures
       [ Scale 1 1 $ (if idx == selected then p !! 89 else p !! 90)
       , Translate (x - largura/4) 0 $ Scale 0.7 0.7 $ drawWord p ("Level " ++ show (idx + 1))
       , Translate (x + largura/4 - 100) 0 $ Scale 0.6 0.6 $ Color black $ drawWord p infoMapa
+      , Translate (x - 20) (-140) $ Scale 0.9 0.9 $ p !! 91
+      
       ]
       where
         mapa = mapaEstadoDLC estado
@@ -823,8 +825,7 @@ getSpriteParaAcao _ (Just (Labs2025.Move dir)) p isActiveMinhoca mapa pos
       if length p > 14 then p !! 14 else p !! 3  -- Caindo 
   | isActiveMinhoca && dir `elem` [Norte, Nordeste, Noroeste] =
       if length p > 13 then p !! 13 else p !! 3  -- Pulando 
-  | isActiveMinhoca =
-      if length p > 3 then p !! 3 else p !! 3  -- Andando 
+  | isActiveMinhoca =  p !! 3  -- Andando 
   | otherwise = p !! 3  -- Idle 
 
 getSpriteParaAcao _ (Just (Labs2025.Dispara arma _)) p isActiveMinhoca _ _
@@ -850,7 +851,10 @@ drawMinhocasStatic p minhocas mapa = Pictures $ map drawM minhocas
         let (x, y) = converteMapaDLC mapa pos
             sprite = case vidaMinhocaDLC m of
               MortaDLC -> p !! 4
-              VivaDLC _ -> p !! 3
+              VivaDLC _ -> case equipaMinhoca m of
+                Just Blue -> p !! 74
+                Just Red -> p !! 75
+                _ -> p !! 3
 
         in Translate x y $ Pictures [sprite]
 

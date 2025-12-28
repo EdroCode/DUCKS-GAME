@@ -135,8 +135,11 @@ main = do
 
   Just fireball <- loadJuicy (path ++ "fireball.png")
 
+  Just lvlAddSign <- loadJuicy (path ++ "AdicioneLevelSign.png")
 
-  let tiles = [grass, water, stone, pato, morto, barril, bazuca, sky, dinamite, mina, dirt, lava, healthPack, patoPulando, patoCaindo, ammoJetpack, ammoEscavadora, ammoBazuca, ammoMina, ammoDinamite, botao, botaoOn, botaoOff, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, space, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, dash, pl, pr, slash, dott_points, comma, exclamation, interrogation, arrombado, fireball, leftArrow, rightArrow, patoBazucaVermelho, patoBazucaAzul, patoAzulCaindo, patoVermelhoCaindo, patoAzulPulando, patoVermelhoPulando, patoVermelhoParado, patoAzulParado, patoMachucadoAzul, patoMachucadoVermelho, patoEscavadoraAzul, patoEscavadoraVermelho, patoFogo, background, patoVermelhoJetpack, patoAzulJetpack, backgroundBorrado, botaoOn2, botaoOff2]
+
+
+  let tiles = [grass, water, stone, pato, morto, barril, bazuca, sky, dinamite, mina, dirt, lava, healthPack, patoPulando, patoCaindo, ammoJetpack, ammoEscavadora, ammoBazuca, ammoMina, ammoDinamite, botao, botaoOn, botaoOff, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, space, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, dash, pl, pr, slash, dott_points, comma, exclamation, interrogation, arrombado, fireball, leftArrow, rightArrow, patoBazucaVermelho, patoBazucaAzul, patoAzulCaindo, patoVermelhoCaindo, patoAzulPulando, patoVermelhoPulando, patoVermelhoParado, patoAzulParado, patoMachucadoAzul, patoMachucadoVermelho, patoEscavadoraAzul, patoEscavadoraVermelho, patoFogo, background, patoVermelhoJetpack, patoAzulJetpack, backgroundBorrado, botaoOn2, botaoOff2, lvlAddSign]
 
 {- Indices dos sprites:
  0: grass, 1: water, 2: stone, 3: pato, 4: morto, 5: barril,
