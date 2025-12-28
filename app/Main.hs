@@ -13,7 +13,7 @@ import Control.Arrow (ArrowChoice(right))
 
 
 janela :: Display
-janela = InWindow "Worms" (1920, 1300) (0, 0)
+janela = InWindow "Worms" (1920, 1080) (0,0)
 
 fundo :: Color
 fundo = white

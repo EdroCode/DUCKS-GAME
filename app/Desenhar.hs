@@ -18,7 +18,8 @@ import Data.Char (toLower)
 janelaLargura :: Float
 janelaLargura = 1920
 janelaAltura :: Float
-janelaAltura = 1300
+janelaAltura = 1080
+
 
 -- * Assets
 
@@ -44,38 +45,37 @@ desenha p Quit = return $ Translate (-50) 0 $ Scale 0.5 0.5 $ Text "Aperte ESC p
 desenha p Help = return $ drawHelp
 desenha p (GameOver team) = return $ drawGameOver p team
 
--- | Menu principal com seletor expandido
+-- | Menu principal com seletor expandido (centralizado para 1920x1080)
 drawMenu :: [Picture] -> Int -> Picture
 drawMenu p sel = Pictures
-  [
-    Scale 0.8 0.8 $ p !! 85
-    ,
-    -- Título "WORMS"
-    Translate (-120) 200 $ Scale 1 1 $ p !! 20
-  , Translate (-280) 200 $ Scale 1.6 1.6 $ drawWord p "worms"
-
-  , -- Subtítulo
-    Translate (0 - 340) 130 $ Scale 0.5 0.5 $ drawWord p "Escolha o modo de jogo"
-
-  , -- Bot Simulation
-    Translate (-280 - 120) (0) $ Scale 1 1 $ (if sel==0 then p !! 21 else p !! 22)
-  , Translate (-280 - 300) (0) $ Scale 0.6 0.6 $ Color (if sel==0 then red else black) $ drawWord p " Bot Simulation"
-
-  , -- Player vs Player
-    Translate (280 - 120) (0) $ Scale 1 1 $ (if sel==1 then p !! 21 else p !! 22)
-  , Translate (220 - 240) (0) $ Scale 0.6 0.6 $ Color (if sel==1 then red else black) $ drawWord p  "Player vs Player"
-
-  , -- MAP Creator Tool
-    Translate (-280 - 120) (-130) $ Scale 1 1 $ (if sel==2 then p !! 21 else p !! 22)
-  , Translate (-340 - 240) (-130) $ Scale 0.6 0.6 $ Color (if sel==2 then red else black) $ drawWord p  "MAP Creator Tool"
-
-  , -- Help
-    Translate (280 - 120) (-130) $ Scale 1 1 $ (if sel==3 then p !! 21 else p !! 22)
-  , Translate (280 - 160) (-130) $ Scale 0.6 0.6 $ Color (if sel==3 then red else black) $ drawWord p  "Help"
-
-  , -- Quit
-    Translate (0 - 120) (-260) $ Scale 1 1 $ (if sel==4 then p !! 21 else p !! 22)
-  , Translate (0 - 160) (-260) $ Scale 0.6 0.6 $ Color (if sel==4 then red else black) $ drawWord p  "Quit"
+  [ Scale 1 1 $ p !! 85
+  
+  -- Título "WORMS"
+  , Translate 0 350 $ Scale 1 1 $ p !! 20
+  , Translate (-140) 370 $ Scale 1.6 1.6 $ drawWord p "worms"
+  
+  -- Subtítulo
+  , Translate (-210) 290 $ Scale 0.5 0.5 $ drawWord p "Escolha o modo de jogo"
+  
+  -- Bot Simulation (esquerda superior)
+  , Translate (-300) 100 $ Scale 1 1 $ (if sel==0 then p !! 21 else p !! 22)
+  , Translate (-300- 150) 100 $ Scale 0.6 0.6 $ Color (if sel==0 then red else black) $ drawWord p "Bot Simulation"
+  
+  -- Player vs Player (direita superior)
+  , Translate 300 100 $ Scale 1 1 $ (if sel==1 then p !! 21 else p !! 22)
+  , Translate (300- 160) 100 $ Scale 0.6 0.6 $ Color (if sel==1 then red else black) $ drawWord p "Player vs Player"
+  
+  -- MAP Creator Tool (esquerda inferior)
+  , Translate (-300) (-50) $ Scale 1 1 $ (if sel==2 then p !! 21 else p !! 22)
+  , Translate (-300- 160) (-50) $ Scale 0.6 0.6 $ Color (if sel==2 then red else black) $ drawWord p "MAP Creator Tool"
+  
+  -- Help (direita inferior)
+  , Translate 300 (-50) $ Scale 1 1 $ (if sel==3 then p !! 21 else p !! 22)
+  , Translate (300 - 50) (-50) $ Scale 0.6 0.6 $ Color (if sel==3 then red else black) $ drawWord p "Help"
+  
+  -- Quit (centro baixo)
+  , Translate 0 (-200) $ Scale 1 1 $ (if sel==4 then p !! 21 else p !! 22)
+  , Translate (- 50) (-200) $ Scale 0.6 0.6 $ Color (if sel==4 then red else black) $ drawWord p "Quit"
   ]
 
 getDescription :: Int -> String
