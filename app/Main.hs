@@ -62,6 +62,9 @@ main = do
   Just patoPulando <- loadJuicy (path ++ "PatoPulando.png")
   Just pato   <- loadJuicy (path ++"PatoParado.png")
   Just patoFogo <- loadJuicy (path ++ "PatoFogo.png")
+  Just patoOutline   <- loadJuicy (path ++"PatoOutline.png")
+  Just patoOutlinePulando   <- loadJuicy (path ++"PatoOutlinePulando.png")
+
 
   -- Pato vermelho
 
@@ -141,7 +144,7 @@ main = do
   Just blank <- loadJuicy (path ++ "WormArcher.png") -- * Usado apenas para encher espacos para evitar conflitos apos major change
 
 
-  let tiles = [grass, water, stone, pato, morto, barril, bazuca, sky, dinamite, mina, dirt, lava, healthPack, patoPulando, blank, ammoJetpack, ammoEscavadora, ammoBazuca, ammoMina, ammoDinamite, botao, botaoOn, botaoOff, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, space, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, dash, pl, pr, slash, dott_points, comma, exclamation, interrogation, arrombado, fireball, leftArrow, rightArrow, patoBazucaVermelho, patoBazucaAzul, blank, blank, patoAzulPulando, patoVermelhoPulando, patoVermelhoParado, patoAzulParado, blank, blank, patoEscavadoraAzul, patoEscavadoraVermelho, patoFogo, background, patoVermelhoJetpack, patoAzulJetpack, backgroundBorrado, botaoOn2, botaoOff2, lvlAddSign]
+  let tiles = [grass, water, stone, pato, morto, barril, bazuca, sky, dinamite, mina, dirt, lava, healthPack, patoPulando, blank, ammoJetpack, ammoEscavadora, ammoBazuca, ammoMina, ammoDinamite, botao, botaoOn, botaoOff, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, space, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, dash, pl, pr, slash, dott_points, comma, exclamation, interrogation, arrombado, fireball, leftArrow, rightArrow, patoBazucaVermelho, patoBazucaAzul, blank, blank, patoAzulPulando, patoVermelhoPulando, patoVermelhoParado, patoAzulParado, blank, blank, patoEscavadoraAzul, patoEscavadoraVermelho, patoFogo, background, patoVermelhoJetpack, patoAzulJetpack, backgroundBorrado, botaoOn2, botaoOff2, lvlAddSign, patoOutline, patoOutlinePulando]
 
 {- Indices dos sprites:
  0: grass, 1: water, 2: stone, 3: pato, 4: morto, 5: barril,

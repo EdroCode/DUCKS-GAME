@@ -947,12 +947,18 @@ converteMapaDLC mapa (r,c) = (x,y)
     x = left + fromIntegral c * cellSize
     y = top - fromIntegral r * cellSize
     -- | Desenha as minhocas com sprites diferentes baseado na última jogada
+-- | Desenha as minhocas com sprites diferentes baseado na última jogada
 drawMinhocasDLC :: [Picture] -> [MinhocaDLC] -> MapaDLC -> Maybe NumMinhoca -> JogadaDLC -> EstadoDLC -> Picture
 drawMinhocasDLC p ms mapa numMinhoca jogada e = Pictures $ map drawM (zip [0..] ms)
   where
     drawM (i,m) = case posicaoMinhocaDLC m of
       Nothing -> Blank
-      Just s -> Translate x y sprite
+      Just s -> Translate x y $ Pictures
+        [ sprite
+        , if i == minhocaSelecionada e
+            then if EfetuaJogada.estaNoSolo s mapa ms then Scale 1 1 $ p !! 92 else Scale 1 1 $ p !! 93
+            else Blank
+        ]
         where
           (x,y) = converteMapaDLC mapa s
           sprite = if vidaMinhocaDLC m == MortaDLC
