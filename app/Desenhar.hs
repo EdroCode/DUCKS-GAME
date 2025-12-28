@@ -188,6 +188,7 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode char (MinhocaDLC pos 
       , Translate (-850) (y - 30) $ Scale 0.5 0.5 $ Color (greyN 0.5) $ drawWord p "<"
       , Translate (-650) (y - 30) $ Scale 0.5 0.5 $ Color (greyN 0.5) $ drawWord p ">"
       , Translate (-825) (y - 30) $ Scale 0.5 0.5 $ Color (greyN 0.5) $ drawWord p (selectedName)
+      
       ]
       where
         (selectedIdx, selectedName, selectedPic) = if blocoSelecionado == 2 then ammoPacks !! secSel else head ammoPacks
@@ -226,6 +227,8 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode char (MinhocaDLC pos 
       , Translate (-760) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 6
       , Translate (-690) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 9
       , Translate (-620) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 8
+      , Translate (-900) (y -  3*weaponOffset) $ Scale 1.5 1.5 $ p !! 69
+
       , Pictures
           [
             if thirdSel == 0
@@ -309,13 +312,13 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode char (MinhocaDLC pos 
           [
             if thirdSel == 6
               then Color editColor $ 
-                  Translate (-830) (y - weaponTextOffset - 140) $ 
+                  Translate (-600) (y - weaponTextOffset - 140) $ 
                   rectangleSolid 50 30
               else Blank
           , Translate (-830) (y - weaponTextOffset - 140) $
               Scale 0.4 0.4 $
                 Color black $
-                  drawWord p (show burn)
+                  drawWord p ("Burning counter: " ++ show burn)
           ]
           
 
