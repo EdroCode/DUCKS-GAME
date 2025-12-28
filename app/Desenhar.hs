@@ -38,7 +38,7 @@ desenha :: [Picture] -> Worms -> IO Picture
 desenha p (Menu sel) = return $ drawMenu p sel
 desenha p (BotSimulation est _ _ (numMinhoca, jogada)) = return $ drawGame p est (Just numMinhoca) (Just jogada)
 desenha p (PVP est _ _ jogada) = return $ drawPvPGame p est (Just jogada)
-desenha p (MapCreatorTool e b a secSel thirdSel edit) = return $ (drawMCT p e b a secSel thirdSel edit)
+desenha p (MapCreatorTool e b a secSel thirdSel edit char worm) = return $ (drawMCT p e b a secSel thirdSel edit char worm)
 desenha p (LevelSelector id) = return $ (drawLvlSelector p id)
 desenha p Quit = return $ Translate (-50) 0 $ Scale 0.5 0.5 $ Text "Aperte ESC para confirmar saída."
 desenha p Help = return $ drawHelp
@@ -142,8 +142,8 @@ drawGameOver p equipa =
     equipaCor Red = red
     equipaCor Blue = blue
 
-drawMCT :: [Picture] -> EstadoDLC -> Int -> Int -> Int -> Int -> Bool -> Picture
-drawMCT p e blocoSelecionado mode secSel thirdSel editMode = Pictures
+drawMCT :: [Picture] -> EstadoDLC -> Int -> Int -> Int -> Int -> Bool -> Maybe Int -> MinhocaDLC -> Picture
+drawMCT p e blocoSelecionado mode secSel thirdSel editMode char (MinhocaDLC pos vida jet esc baz mina dina flame burn equipa) = Pictures
   [ Translate (-440) 330 $ Scale 0.5 0.5 $ Color black $ drawWord p "Bem vindo ao criador de mapas", sidebar, world]
   where
     mapa = mapaEstadoDLC e
@@ -236,7 +236,7 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode = Pictures
           , Translate (-920) (y - weaponTextOffset) $
               Scale 0.4 0.4 $
                 Color black $
-                  drawWord p (show 100)
+                  drawWord p (show jet)
           ]
           
       , Pictures
@@ -249,7 +249,7 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode = Pictures
           , Translate (-830) (y - weaponTextOffset) $
               Scale 0.4 0.4 $
                 Color black $
-                  drawWord p (show 100)
+                  drawWord p (show esc)
           ]
           
       , Pictures
@@ -262,7 +262,7 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode = Pictures
           , Translate (-760) (y - weaponTextOffset) $
               Scale 0.4 0.4 $
                 Color black $
-                  drawWord p (show 100)
+                  drawWord p (show baz)
           ]
           
       , Pictures
@@ -275,7 +275,7 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode = Pictures
           , Translate (-690) (y - weaponTextOffset) $
               Scale 0.4 0.4 $
                 Color black $
-                  drawWord p (show 100)
+                  drawWord p (show mina)
           ]
           
       , Pictures
@@ -288,8 +288,41 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode = Pictures
           , Translate (-620) (y - weaponTextOffset) $
               Scale 0.4 0.4 $
                 Color black $
-                  drawWord p (show 100)
-          ]]
+                  drawWord p (show dina)
+          ]
+          
+                
+      , Pictures
+          [
+            if thirdSel == 5
+              then Color editColor $ 
+                  Translate (-910) (y - weaponTextOffset - 140) $ 
+                  rectangleSolid 50 30
+              else Blank
+          , Translate (-920) (y - weaponTextOffset - 140) $
+              Scale 0.4 0.4 $
+                Color black $
+                  drawWord p (show flame)
+          ]
+          
+      , Pictures
+          [
+            if thirdSel == 6
+              then Color editColor $ 
+                  Translate (-830) (y - weaponTextOffset - 140) $ 
+                  rectangleSolid 50 30
+              else Blank
+          , Translate (-830) (y - weaponTextOffset - 140) $
+              Scale 0.4 0.4 $
+                Color black $
+                  drawWord p (show burn)
+          ]
+          
+
+
+          
+          
+          ]
         
     sidebar = Pictures
       [ Color (greyN 0.9) $ Translate (-750) 0 $ rectangleSolid 300 900
@@ -316,9 +349,12 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode = Pictures
       , Translate (-900) (-540) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "E - Exportar estado"
       , Translate (-900) (-570) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "< > - Navegar"
       , Translate (-900) (-600) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "Enter - Editar valor"
-      , Translate (-200) (-630) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p ("1sel > " ++ show mode) -- ? debug
-      , Translate (0) (-630) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p ("-  2sel > " ++ show secSel) -- ? debug
-      , Translate (200) (-630) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p ("-  3sel > " ++ show thirdSel) -- ? debug
+      , Translate (-900) (-630) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "Backspace/Delete - Eliminar valor"
+
+      --, Translate (-200) (-630) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p ("1sel > " ++ show mode) -- ? debug
+      --, Translate (0) (-630) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p ("-  2sel > " ++ show secSel) -- ? debug
+      --, Translate (200) (-630) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p ("-  3sel > " ++ show thirdSel) -- ? debug
+      --, Translate (400) (-630) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p ("-  io > " ++ show char) -- ? debug
 
       ]
 
