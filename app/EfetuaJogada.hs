@@ -161,12 +161,6 @@ efetuaJogada n (Dispara arma direcao) e = if indiceValido n e && vidaMinhocaDLC 
                                                                     JetpackDLC    -> (Just pos, vidaMinhocaDLC minhoca)
                                                                     EscavadoraDLC -> (Just novaPos, vidaMinhocaDLC minhoca)
                                                                     _          -> (posicaoMinhocaDLC minhoca, vidaMinhocaDLC minhoca)
-                                                            Just Lava ->
-                                                                case arma of
-                                                                    JetpackDLC    -> if ePosicaoEstadoLivre novaPos e then (Just novaPos, MortaDLC) else (Just pos, vidaMinhocaDLC minhoca)
-                                                                    EscavadoraDLC -> if ePosicaoEstadoLivre novaPos e then (Just novaPos, MortaDLC) else (Just pos, vidaMinhocaDLC minhoca)
-                                                                    _          -> (posicaoMinhocaDLC minhoca, vidaMinhocaDLC minhoca)
-
                                                             _ ->
                                                                 case arma of
                                                                     JetpackDLC    ->  if ePosicaoEstadoLivre novaPos e then (Just novaPos, vidaMinhocaDLC minhoca) else (Just pos, vidaMinhocaDLC minhoca)
@@ -200,7 +194,7 @@ efetuaJogada n (Dispara arma direcao) e = if indiceValido n e && vidaMinhocaDLC 
 
 
 -- MOVIMENTO
-efetuaJogada n (Move direcao) e = if vidaMinhocaDLC minhoca /= MortaDLC && posicaoMinhocaDLC minhoca /= Nothing && estaNoSolo pos mapa
+efetuaJogada n (Move direcao) e = if vidaMinhocaDLC minhoca /= MortaDLC && posicaoMinhocaDLC minhoca /= Nothing && (estaNoSolo pos mapa minhocas || existeMinhoca (movePosicao Sul pos) minhocas)
                                                         then estadoFinal
                                                         else e
 
@@ -224,20 +218,20 @@ efetuaJogada n (Move direcao) e = if vidaMinhocaDLC minhoca /= MortaDLC && posic
                             minhocaFinal = -- * Nova pos n é opaca
                                 if ePosicaoMatrizValida novaPos mapa
                                     then if ePosicaoEstadoLivre novaPos e
-                                        then if encontraPosicaoMatriz novaPos mapa /= Just AguaDLC || encontraPosicaoMatriz novaPos mapa /= Just Lava
-                                            then case existeObjeto novaPos objetos of
-                                                Just (HealthPack p cura) -> minhoca { posicaoMinhocaDLC = Just p, vidaMinhocaDLC = VivaDLC (hp + cura) }
-                                                Just (AmmoPack p ammo JetpackDLC) -> minhoca { posicaoMinhocaDLC = Just p,  jetpackMinhocaDLC = jetpackMinhocaDLC minhoca + ammo}
-                                                Just (AmmoPack p ammo EscavadoraDLC) -> minhoca { posicaoMinhocaDLC = Just p,  escavadoraMinhocaDLC = escavadoraMinhocaDLC minhoca + ammo}
-                                                Just (AmmoPack p ammo BazucaDLC) -> minhoca { posicaoMinhocaDLC = Just p,  bazucaMinhocaDLC = bazucaMinhocaDLC minhoca + ammo}
-                                                Just (AmmoPack p ammo MinaDLC) -> minhoca { posicaoMinhocaDLC = Just p,  minaMinhocaDLC = minaMinhocaDLC minhoca + ammo}
-                                                Just (AmmoPack p ammo DinamiteDLC) -> minhoca { posicaoMinhocaDLC = Just p,  dinamiteMinhocaDLC = dinamiteMinhocaDLC minhoca + ammo}
+                        
+                                        then case existeObjeto novaPos objetos of
+                                            Just (HealthPack p cura) -> minhoca { posicaoMinhocaDLC = Just p, vidaMinhocaDLC = VivaDLC (hp + cura) }
+                                            Just (AmmoPack p ammo JetpackDLC) -> minhoca { posicaoMinhocaDLC = Just p,  jetpackMinhocaDLC = jetpackMinhocaDLC minhoca + ammo}
+                                            Just (AmmoPack p ammo EscavadoraDLC) -> minhoca { posicaoMinhocaDLC = Just p,  escavadoraMinhocaDLC = escavadoraMinhocaDLC minhoca + ammo}
+                                            Just (AmmoPack p ammo BazucaDLC) -> minhoca { posicaoMinhocaDLC = Just p,  bazucaMinhocaDLC = bazucaMinhocaDLC minhoca + ammo}
+                                            Just (AmmoPack p ammo MinaDLC) -> minhoca { posicaoMinhocaDLC = Just p,  minaMinhocaDLC = minaMinhocaDLC minhoca + ammo}
+                                            Just (AmmoPack p ammo DinamiteDLC) -> minhoca { posicaoMinhocaDLC = Just p,  dinamiteMinhocaDLC = dinamiteMinhocaDLC minhoca + ammo}
 
 
 
 
-                                                _ -> minhoca { posicaoMinhocaDLC = Just novaPos }
-                                            else minhoca { posicaoMinhocaDLC = Just novaPos,  vidaMinhocaDLC = MortaDLC }
+                                            _ -> minhoca { posicaoMinhocaDLC = Just novaPos }
+                                        
                                         else minhoca
                                 else minhoca { posicaoMinhocaDLC = Nothing, vidaMinhocaDLC = MortaDLC }
 
@@ -279,10 +273,10 @@ True
 False
 
 -}
-estaNoSolo :: Posicao -> MapaDLC -> Bool
-estaNoSolo pos mapa = case encontraPosicaoMatriz (movePosicao Sul pos) mapa of
+estaNoSolo :: Posicao -> MapaDLC -> [MinhocaDLC] -> Bool
+estaNoSolo pos mapa minhocas = case encontraPosicaoMatriz (movePosicao Sul pos) mapa of
     Nothing -> False
     Just blocoInferior -> case encontraPosicaoMatriz pos mapa of
         Nothing -> False
-        Just blocoAtual -> eTerrenoOpaco blocoInferior && not (eTerrenoOpaco blocoAtual)
-
+        Just blocoAtual -> (eTerrenoOpaco blocoInferior || existeMinhocaViva (movePosicao Sul pos) minhocas) 
+                           && not (eTerrenoOpaco blocoAtual)

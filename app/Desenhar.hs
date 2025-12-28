@@ -576,7 +576,7 @@ drawPvPGame p est jogada =
           Pictures
             [ drawMapaDLC p mapa
             , drawObjetosDLC p objs mapa
-            , drawMinhocasDLC p ms mapa (Just 0) jogada
+            , drawMinhocasDLC p ms mapa (Just 0) jogada est
             ]
 
 
@@ -814,12 +814,12 @@ drawObjetosDLC p objs mapa = Pictures $ map drawO objs
 
       where (x,y) = converteMapaDLC mapa (DataDLC.posicaoObjeto hp)
 
-getSpriteParaAcaoDLC :: MinhocaDLC -> Maybe JogadaDLC -> [Picture] -> Bool -> MapaDLC -> Posicao -> Picture
-getSpriteParaAcaoDLC _ Nothing p _ _ _ = p !! 3
+getSpriteParaAcaoDLC :: MinhocaDLC -> Maybe JogadaDLC -> [Picture] -> Bool -> MapaDLC -> Posicao -> EstadoDLC -> Picture
+getSpriteParaAcaoDLC _ Nothing p _ _ _ e = p !! 3
 
-getSpriteParaAcaoDLC minhoca (Just (DataDLC.Move dir)) p isActiveMinhoca mapa pos
+getSpriteParaAcaoDLC minhoca (Just (DataDLC.Move dir)) p isActiveMinhoca mapa pos e 
   | burningCounter minhoca > 0 = p !! 84  
-  | isActiveMinhoca && not (EfetuaJogada.estaNoSolo pos mapa) =
+  | isActiveMinhoca && not (EfetuaJogada.estaNoSolo pos mapa (minhocasEstadoDLC e)) =
       case equipaMinhoca minhoca of
         Just Red -> p !! 75  
         Just Blue -> p !! 74  
@@ -835,7 +835,7 @@ getSpriteParaAcaoDLC minhoca (Just (DataDLC.Move dir)) p isActiveMinhoca mapa po
         Just Blue -> if burningCounter minhoca > 0 then p !! 84 else p !! 80
         Nothing -> p !! 3
 
-getSpriteParaAcaoDLC minhoca (Just (DataDLC.Dispara arma _)) p isActiveMinhoca _ _
+getSpriteParaAcaoDLC minhoca (Just (DataDLC.Dispara arma _)) p isActiveMinhoca _ _ e
   | burningCounter minhoca > 0 = p !! 84  
   | not isActiveMinhoca = 
       case equipaMinhoca minhoca of
@@ -877,8 +877,8 @@ converteMapaDLC mapa (r,c) = (x,y)
     x = left + fromIntegral c * cellSize
     y = top - fromIntegral r * cellSize
     -- | Desenha as minhocas com sprites diferentes baseado na última jogada
-drawMinhocasDLC :: [Picture] -> [MinhocaDLC] -> MapaDLC -> Maybe NumMinhoca -> Maybe JogadaDLC -> Picture
-drawMinhocasDLC p ms mapa numMinhoca jogada = Pictures $ map drawM (zip [0..] ms)
+drawMinhocasDLC :: [Picture] -> [MinhocaDLC] -> MapaDLC -> Maybe NumMinhoca -> Maybe JogadaDLC -> EstadoDLC -> Picture
+drawMinhocasDLC p ms mapa numMinhoca jogada e = Pictures $ map drawM (zip [0..] ms)
   where
     drawM (i,m) = case posicaoMinhocaDLC m of
       Nothing -> Blank
@@ -887,7 +887,7 @@ drawMinhocasDLC p ms mapa numMinhoca jogada = Pictures $ map drawM (zip [0..] ms
           (x,y) = converteMapaDLC mapa s
           sprite = if vidaMinhocaDLC m == MortaDLC
             then p !! 4  -- Morto
-            else getSpriteParaAcaoDLC m jogada p (Just i == numMinhoca) mapa s
+            else getSpriteParaAcaoDLC m jogada p (Just i == numMinhoca) mapa s e
 
 -- Função para extrair apenas o valor da vida
 extrairVida :: String -> String

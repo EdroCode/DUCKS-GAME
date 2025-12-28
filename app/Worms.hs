@@ -67,6 +67,8 @@ flatWorld = EstadoDLC
     , minhocasEstadoDLC =
         [MinhocaDLC {posicaoMinhocaDLC = Just (0,4), vidaMinhocaDLC = VivaDLC 100, jetpackMinhocaDLC = 100, escavadoraMinhocaDLC = 100, bazucaMinhocaDLC = 100, minaMinhocaDLC = 100, dinamiteMinhocaDLC = 100, flameMinhocaDLC = 20,burningCounter = 0, equipaMinhoca = Just Red}
         ,MinhocaDLC {posicaoMinhocaDLC = Just (0,7), vidaMinhocaDLC = VivaDLC 100, jetpackMinhocaDLC = 100, escavadoraMinhocaDLC = 100, bazucaMinhocaDLC = 100, minaMinhocaDLC = 100, dinamiteMinhocaDLC = 100, flameMinhocaDLC = 20,burningCounter = 0, equipaMinhoca = Just Blue}
+        ,MinhocaDLC {posicaoMinhocaDLC = Just (5,7), vidaMinhocaDLC = VivaDLC 100, jetpackMinhocaDLC = 100, escavadoraMinhocaDLC = 100, bazucaMinhocaDLC = 100, minaMinhocaDLC = 100, dinamiteMinhocaDLC = 100, flameMinhocaDLC = 20,burningCounter = 0, equipaMinhoca = Just Blue}
+        
         ]
     , armaSelecionada = Nothing
     , minhocaSelecionada = 0

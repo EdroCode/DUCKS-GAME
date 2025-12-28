@@ -510,7 +510,7 @@ podeMoverDLC est i =
         Just minhoca ->
             case posicaoMinhocaDLC minhoca of
                 Nothing -> False
-                Just pos -> EfetuaJogada.estaNoSolo pos (mapaEstadoDLC est)
+                Just pos -> EfetuaJogada.estaNoSolo pos (mapaEstadoDLC est) (minhocasEstadoDLC est)
 
 
 handleAction :: Key -> EstadoDLC -> (EstadoDLC, JogadaDLC)

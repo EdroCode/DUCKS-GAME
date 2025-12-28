@@ -100,7 +100,14 @@ existeMinhoca :: Posicao -> [MinhocaDLC] -> Bool
 existeMinhoca _ [] = False
 existeMinhoca (x,y) (h:t) = let pos = posicaoMinhocaDLC h
                             in if pos == Just (x,y) then True else existeMinhoca (x,y) t
-                       
+
+-- | Verifica se numa lista de minhocas já existe uma 'MinhocaDLC' na dada 'Posicao'.(Utilizado na função 'ePosicaoEstadoLivre')
+existeMinhocaViva :: Posicao -> [MinhocaDLC] -> Bool
+existeMinhocaViva _ [] = False
+existeMinhocaViva (x,y) (h:t) = let pos = posicaoMinhocaDLC h
+                            in if pos == Just (x,y) && vidaMinhocaDLC h /= MortaDLC then True else existeMinhoca (x,y) t
+
+
 -- | Verifica se numa lista de objetos já existe um 'Barril' na dada 'Posicao'.(Utilizado na função 'ePosicaoEstadoLivre')                   
 existeBarril :: Posicao -> [ObjetoDLC] -> Bool
 existeBarril _ [] = False
