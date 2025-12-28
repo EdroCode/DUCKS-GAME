@@ -198,29 +198,24 @@ drawHelp pagina = Pictures
 -- | Desenha o selector de níveis como uma lista vertical
 drawLvlSelector :: [Picture] -> Int -> [EstadoDLC] -> Picture
 drawLvlSelector p selected estadosImportados = Pictures
-  [ Pictures $ zipWith drawNivel [0..] estadosImportados
-  ]
+  ([p !! 88] ++ (zipWith drawNivel [0..] estadosImportados))
   where
     drawNivel :: Int -> EstadoDLC -> Picture
-    drawNivel idx estado = Pictures
-      [ 
-        p !! 88
-      ,
-        Color (if idx == selected then makeColor 0.3 0.6 1 0.5 else greyN 0.5) $
-          Translate x y $ rectangleSolid largura altura
-      , Translate (x - largura/4) y $ Scale 0.7 0.7 $ drawWord p ("Level " ++ show (idx + 1))
-      , Translate (x + largura/4 - 100) y $ Scale 0.5 0.5 $ Color black $ drawWord p infoMapa
+    drawNivel idx estado = Translate 0 y $ Pictures
+      [ Scale 1 1 $ (if idx == selected then p !! 89 else p !! 90)
+      , Translate (x - largura/4) 0 $ Scale 0.7 0.7 $ drawWord p ("Level " ++ show (idx + 1))
+      , Translate (x + largura/4 - 100) 0 $ Scale 0.6 0.6 $ Color black $ drawWord p infoMapa
       ]
       where
         mapa = mapaEstadoDLC estado
         infoMapa = show (length mapa) ++ "x" ++ show (if null mapa then 0 else length (head mapa))
         largura = 1000
         altura  = 50
-        espaco  = 10
-        x = 0 + 20
+        espaco  = 90
+        x = 20
         y = 300 - fromIntegral idx * (altura + espaco)
-
-
+  
+  
 drawGameOver :: [Picture] -> Team -> Picture
 drawGameOver p equipa =
     Pictures

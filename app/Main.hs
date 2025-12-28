@@ -55,6 +55,9 @@ main = do
   Just botao <- loadJuicy (path ++ "BotaoMenuapagado.png")
   Just botaoOn <- loadJuicy (path ++ "BotaoMenuSelecionado.png")
   Just botaoOff <- loadJuicy (path ++ "BotaoMenuDescelecionado.png")
+  Just botaoOn2 <- loadJuicy (path ++ "BotaoMenuSelecionado2.png")
+  Just botaoOff2 <- loadJuicy (path ++ "BotaoMenuDescelecionado2.png")
+  
   Just background <- loadJuicy (path ++ "Background.png")
   Just backgroundBorrado <- loadJuicy (path ++ "BackgroundBorrado.png")
 
@@ -133,7 +136,7 @@ main = do
   Just fireball <- loadJuicy (path ++ "fireball.png")
 
 
-  let tiles = [grass, water, stone, pato, morto, barril, bazuca, sky, dinamite, mina, dirt, lava, healthPack, patoPulando, patoCaindo, ammoJetpack, ammoEscavadora, ammoBazuca, ammoMina, ammoDinamite, botao, botaoOn, botaoOff, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, space, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, dash, pl, pr, slash, dott_points, comma, exclamation, interrogation, arrombado, fireball, leftArrow, rightArrow, patoBazucaVermelho, patoBazucaAzul, patoAzulCaindo, patoVermelhoCaindo, patoAzulPulando, patoVermelhoPulando, patoVermelhoParado, patoAzulParado, patoMachucadoAzul, patoMachucadoVermelho, patoEscavadoraAzul, patoEscavadoraVermelho, patoFogo, background, patoVermelhoJetpack, patoAzulJetpack, backgroundBorrado]
+  let tiles = [grass, water, stone, pato, morto, barril, bazuca, sky, dinamite, mina, dirt, lava, healthPack, patoPulando, patoCaindo, ammoJetpack, ammoEscavadora, ammoBazuca, ammoMina, ammoDinamite, botao, botaoOn, botaoOff, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, space, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, dash, pl, pr, slash, dott_points, comma, exclamation, interrogation, arrombado, fireball, leftArrow, rightArrow, patoBazucaVermelho, patoBazucaAzul, patoAzulCaindo, patoVermelhoCaindo, patoAzulPulando, patoVermelhoPulando, patoVermelhoParado, patoAzulParado, patoMachucadoAzul, patoMachucadoVermelho, patoEscavadoraAzul, patoEscavadoraVermelho, patoFogo, background, patoVermelhoJetpack, patoAzulJetpack, backgroundBorrado, botaoOn2, botaoOff2]
 
 {- Indices dos sprites:
  0: grass, 1: water, 2: stone, 3: pato, 4: morto, 5: barril,

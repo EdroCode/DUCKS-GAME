@@ -103,11 +103,11 @@ reageEventos (EventKey (Char 'i') Down _ _) (LevelSelector i ei) = do
                 Nothing -> return (LevelSelector i ei)
                 Just estado -> return (LevelSelector i (ei ++ [estado]))
 
-reageEventos (EventKey (SpecialKey KeyDown) Down _ _) (LevelSelector i ei) =
+reageEventos (EventKey (SpecialKey KeyDown) Down _ _) (LevelSelector i ei) = -- * Down
     return $ LevelSelector (i + 1) ei
 
-reageEventos (EventKey (SpecialKey KeyUp) Down _ _) (LevelSelector i ei) =
-    return $ LevelSelector (i - 1) ei
+reageEventos (EventKey (SpecialKey KeyUp) Down _ _) (LevelSelector i ei) = -- * Up
+    return $ LevelSelector (if (i - 1) > 0 then (i - 1) else 0) ei
 
 reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (LevelSelector i ei)
         | i == 0  = return $ PVP flatWorld 0 0 (DataDLC.Move Sul)
