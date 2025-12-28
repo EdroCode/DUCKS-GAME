@@ -321,7 +321,21 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode char (MinhocaDLC pos 
                   drawWord p ("Burning counter: " ++ show burn)
           ]
           
-
+      , Pictures
+        [ if thirdSel == 7
+            then Color editColor $ 
+              Translate (-800) (y - weaponTextOffset - 240) $ 
+              rectangleSolid 50 30
+            else Blank
+        , Translate (-800) (y - weaponTextOffset - 240) $ Scale 0.6 0.6 $ drawWord p "Equipa:"
+        
+        ,Translate (-830) (y - weaponTextOffset - 240) $
+            Scale 1 1 $
+              case equipa of
+                Just Red -> Color red $ rectangleSolid 20 20
+                Just Blue -> Color blue $ rectangleSolid 20 20
+                Nothing -> Color (greyN 0.5) $ rectangleSolid 20 20
+        ]
 
           
           

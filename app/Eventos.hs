@@ -34,7 +34,7 @@ minhocaDefault = MinhocaDLC
 
     , burningCounter = 0
 
-    , equipaMinhoca = Nothing
+    , equipaMinhoca = Just Blue
     }
 
 -- | Função principal que reage aos eventos do usuário e atualiza o estado do jogo
@@ -191,6 +191,8 @@ reageEventos (EventKey (SpecialKey KeyBackspace) Down _ _) (MapCreatorTool e b 2
         2 -> MapCreatorTool e b 2 l t True c (w{bazucaMinhocaDLC = max 0 (bazucaMinhocaDLC w `div` 10)})
         3 -> MapCreatorTool e b 2 l t True c (w{minaMinhocaDLC = max 0 (minaMinhocaDLC w `div` 10)})
         4 -> MapCreatorTool e b 2 l t True c (w{dinamiteMinhocaDLC = max 0 (dinamiteMinhocaDLC w `div` 10)})
+        5 -> MapCreatorTool e b 2 l t True c (w{flameMinhocaDLC = max 0 (flameMinhocaDLC w `div` 10)})
+        6 -> MapCreatorTool e b 2 l t True c (w{burningCounter = max 0 (burningCounter w `div` 10)})
         _ -> MapCreatorTool e b 2 l t True c w
 
 reageEventos (EventKey (SpecialKey KeyDelete) Down _ _) (MapCreatorTool e b 2 l t True c w) =
@@ -200,6 +202,18 @@ reageEventos (EventKey (SpecialKey KeyDelete) Down _ _) (MapCreatorTool e b 2 l 
         2 -> MapCreatorTool e b 2 l t True c (w{bazucaMinhocaDLC = max 0 (bazucaMinhocaDLC w `div` 10)})
         3 -> MapCreatorTool e b 2 l t True c (w{minaMinhocaDLC = max 0 (minaMinhocaDLC w `div` 10)})
         4 -> MapCreatorTool e b 2 l t True c (w{dinamiteMinhocaDLC = max 0 (dinamiteMinhocaDLC w `div` 10)})
+        5 -> MapCreatorTool e b 2 l t True c (w{flameMinhocaDLC = max 0 (flameMinhocaDLC w `div` 10)})
+        6 -> MapCreatorTool e b 2 l t True c (w{burningCounter = max 0 (burningCounter w `div` 10)})    
+        _ -> MapCreatorTool e b 2 l t True c w
+
+reageEventos (EventKey (SpecialKey KeyRight) Down _ _) (MapCreatorTool e b 2 l t True c w) =
+    return $ case t of
+        7 -> MapCreatorTool e b 2 l t True c (w{equipaMinhoca = Just Red})
+        _ -> MapCreatorTool e b 2 l t True c w
+
+reageEventos (EventKey (SpecialKey KeyLeft) Down _ _) (MapCreatorTool e b 2 l t True c w) =
+    return $ case t of
+        7 -> MapCreatorTool e b 2 l t True c (w{equipaMinhoca = Just Blue})
         _ -> MapCreatorTool e b 2 l t True c w
 
 -- *
@@ -338,7 +352,7 @@ reageEventos (EventKey (SpecialKey KeyLeft) Down _ _) (MapCreatorTool e b a l t 
             | otherwise = l
 
         novot
-            | a == 2 && l == 0 = (t - 1) `mod` 7
+            | a == 2 && l == 0 = (t - 1) `mod` 8
             | otherwise = 0
 
     in if novol <= 0 then return $ MapCreatorTool e b a 0 novot False c w else return $ MapCreatorTool e b a novol novot False c w
@@ -354,7 +368,7 @@ reageEventos (EventKey (SpecialKey KeyRight) Down _ _) (MapCreatorTool e b a l t
             | otherwise = l
         
         novot
-            | a == 2 && l == 0 = (t + 1) `mod` 7
+            | a == 2 && l == 0 = (t + 1) `mod` 8
             | otherwise = 0
 
     in if novol <= 0 then return $ MapCreatorTool e b a 0 novot False c w else return $ MapCreatorTool e b a novol novot False c w
