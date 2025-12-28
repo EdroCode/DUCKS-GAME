@@ -38,7 +38,7 @@ type EstadoGloss = (Estado, Assets)
 desenha :: [Picture] -> Worms -> IO Picture
 desenha p (Menu sel) = return $ drawMenu p sel
 desenha p (BotSimulation est _ _ (numMinhoca, jogada)) = return $ drawGame p est (Just numMinhoca) (Just jogada)
-desenha p (PVP est _ _ jogada) = return $ drawPvPGame p est (Just jogada)
+desenha p (PVP est _ _ jogada) = return $ drawPvPGame p est jogada
 desenha p (MapCreatorTool e b a secSel thirdSel edit char worm) = return $ (drawMCT p e b a secSel thirdSel edit char worm)
 desenha p (LevelSelector id estImp) = return $ (drawLvlSelector p id estImp)
 desenha p Quit = return $ Translate (-50) 0 $ Scale 0.5 0.5 $ Text "Aperte ESC para confirmar saída."
@@ -534,7 +534,7 @@ drawGame p est numMinhoca jogada = Pictures [sidebar, world]
             , drawMinhocas p ms mapa numMinhoca jogada
             ]
 
-drawPvPGame :: [Picture] -> EstadoDLC -> Maybe JogadaDLC -> Picture
+drawPvPGame :: [Picture] -> EstadoDLC -> JogadaDLC -> Picture
 drawPvPGame p est jogada =
   Pictures [sidebar, world]
   where
@@ -852,8 +852,8 @@ drawMinhocasStatic p minhocas mapa = Pictures $ map drawM minhocas
             sprite = case vidaMinhocaDLC m of
               MortaDLC -> p !! 4
               VivaDLC _ -> case equipaMinhoca m of
-                Just Blue -> p !! 74
-                Just Red -> p !! 75
+                Just Blue -> p !! 78
+                Just Red -> p !! 79
                 _ -> p !! 3
 
         in Translate x y $ Pictures [sprite]
@@ -904,55 +904,35 @@ drawObjetosDLC p objs mapa = Pictures $ map drawO objs
 
       where (x,y) = converteMapaDLC mapa (DataDLC.posicaoObjeto hp)
 
-getSpriteParaAcaoDLC :: MinhocaDLC -> Maybe JogadaDLC -> [Picture] -> Bool -> MapaDLC -> Posicao -> EstadoDLC -> Picture
-getSpriteParaAcaoDLC _ Nothing p _ _ _ e = p !! 3
+getSpriteParaAcaoDLC :: MinhocaDLC -> JogadaDLC -> [Picture] -> EstadoDLC -> Picture
+getSpriteParaAcaoDLC minhoca (DataDLC.Move dir) p e
+  | burningCounter minhoca > 0 = p !! 82
+  | eMinhocaVivaDLC minhoca = let
+      pos = case posicaoMinhocaDLC minhoca of Just a -> a
+    in case equipaMinhoca minhoca of
+      Just Red -> if EfetuaJogada.estaNoSolo pos (mapaEstadoDLC e) (minhocasEstadoDLC e) then p !! 78 else p !! 77
+      Just Blue -> if EfetuaJogada.estaNoSolo pos (mapaEstadoDLC e) (minhocasEstadoDLC e) then p !! 79 else p !! 76
+      _ -> p !! 3
 
-getSpriteParaAcaoDLC minhoca (Just (DataDLC.Move dir)) p isActiveMinhoca mapa pos e 
-  | burningCounter minhoca > 0 = p !! 84  
-  | isActiveMinhoca && not (EfetuaJogada.estaNoSolo pos mapa (minhocasEstadoDLC e)) =
-      case equipaMinhoca minhoca of
-        Just Red -> p !! 75  
-        Just Blue -> p !! 74  
-        Nothing -> p !! 14
-  | isActiveMinhoca && dir `elem` [Norte, Nordeste, Noroeste] =
-      case equipaMinhoca minhoca of
-        Just Red -> p !! 77  
-        Just Blue -> p !! 76 
-        Nothing -> p !! 13
-  | otherwise = 
-      case equipaMinhoca minhoca of
-        Just Red -> if burningCounter minhoca > 0 then p !! 84 else p !! 81
-        Just Blue -> if burningCounter minhoca > 0 then p !! 84 else p !! 80
-        Nothing -> p !! 3
+getSpriteParaAcaoDLC minhoca (DataDLC.Dispara arma _) p e 
+  | burningCounter minhoca > 0 = p !! 82
+  | eMinhocaVivaDLC minhoca = let
+      pos = case posicaoMinhocaDLC minhoca of Just a -> a
+    in case equipaMinhoca minhoca of
+      Just Red -> case arma of
 
-getSpriteParaAcaoDLC minhoca (Just (DataDLC.Dispara arma _)) p isActiveMinhoca _ _ e
-  | burningCounter minhoca > 0 = p !! 84  
-  | not isActiveMinhoca = 
-      case equipaMinhoca minhoca of
-        Just Red -> if vidaMinhocaDLC minhoca >= VivaDLC 50 then p !! 79 else p !! 82
-        Just Blue -> if vidaMinhocaDLC minhoca >= VivaDLC 50 then p !! 80 else p !! 81
-        Nothing -> p !! 3
-  | otherwise = case arma of
-      BazucaDLC -> case equipaMinhoca minhoca of
-        Just Red -> p !! 72  
-        Just Blue -> p !! 73  
-        Nothing -> p !! 3
-      JetpackDLC -> case equipaMinhoca minhoca of
-        Just Red -> p !! 82
-        Just Blue -> p !! 81
-        Nothing -> p !! 3
-      EscavadoraDLC -> case equipaMinhoca minhoca of
-        Just Red -> p !! 83  
-        Just Blue -> p !! 84  
-        Nothing -> p !! 3
-      DinamiteDLC -> case equipaMinhoca minhoca of
-        Just Red -> p !! 82
-        Just Blue -> p !! 81
-        Nothing -> p !! 3
-      MinaDLC -> case equipaMinhoca minhoca of
-        Just Red -> p !! 82
-        Just Blue -> p !! 81
-        Nothing -> p !! 3
+        JetpackDLC -> p !! 86
+        EscavadoraDLC -> p !! 83
+        BazucaDLC -> p !! 72
+        _ -> if EfetuaJogada.estaNoSolo pos (mapaEstadoDLC e) (minhocasEstadoDLC e) then p !! 80 else p !! 79
+
+      Just Blue -> case arma of
+
+        JetpackDLC -> p !! 87
+        EscavadoraDLC -> p !! 82
+        BazucaDLC -> p !! 73
+        _ -> if EfetuaJogada.estaNoSolo pos (mapaEstadoDLC e) (minhocasEstadoDLC e) then p !! 80 else p !! 79
+
 
 
 converteMapaDLC :: MapaDLC -> Posicao -> (Float, Float)
@@ -967,7 +947,7 @@ converteMapaDLC mapa (r,c) = (x,y)
     x = left + fromIntegral c * cellSize
     y = top - fromIntegral r * cellSize
     -- | Desenha as minhocas com sprites diferentes baseado na última jogada
-drawMinhocasDLC :: [Picture] -> [MinhocaDLC] -> MapaDLC -> Maybe NumMinhoca -> Maybe JogadaDLC -> EstadoDLC -> Picture
+drawMinhocasDLC :: [Picture] -> [MinhocaDLC] -> MapaDLC -> Maybe NumMinhoca -> JogadaDLC -> EstadoDLC -> Picture
 drawMinhocasDLC p ms mapa numMinhoca jogada e = Pictures $ map drawM (zip [0..] ms)
   where
     drawM (i,m) = case posicaoMinhocaDLC m of
@@ -977,7 +957,7 @@ drawMinhocasDLC p ms mapa numMinhoca jogada e = Pictures $ map drawM (zip [0..] 
           (x,y) = converteMapaDLC mapa s
           sprite = if vidaMinhocaDLC m == MortaDLC
             then p !! 4  -- Morto
-            else getSpriteParaAcaoDLC m jogada p (Just i == numMinhoca) mapa s e
+            else getSpriteParaAcaoDLC m jogada p e
 
 -- Função para extrair apenas o valor da vida
 extrairVida :: String -> String
