@@ -13,7 +13,8 @@ import EfetuaJogada
 import AvancaEstado
 import Auxiliar (getMinhocasValidasDLC, eMinhocaVivaDLC)
 import System.IO
-
+import System.Directory (doesFileExist)
+import Text.Read (readMaybe)
 
 minhocaDefault = MinhocaDLC   
     { posicaoMinhocaDLC = Just (0,0)
@@ -65,7 +66,7 @@ reageEventos (EventKey (SpecialKey KeyRight) Down _ _) (Menu sel)
 -- Seleção de opção no menu
 reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (Menu sel)
         | sel == 0  = return $ BotSimulation novoEstado 0 0 (0, Labs2025.Move Sul)
-        | sel == 1  = return $ LevelSelector 0
+        | sel == 1  = return $ LevelSelector 0 [flatWorld]
         | sel == 2  = return $ MapCreatorTool flatWorld 0 0 0 0 False Nothing minhocaDefault
         | sel == 3  = return $ Help
         | sel == 4  = return $ Quit
@@ -85,18 +86,28 @@ reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) Quit = exitSuccess
 
 -- * LVL SELECTOR
 
-reageEventos (EventKey (SpecialKey KeyDown) Down _ _) (LevelSelector i) =
-    return $ LevelSelector (i + 1)
+reageEventos (EventKey (Char 'i') Down _ _) (LevelSelector i ei) = do
+    existe <- doesFileExist "estado.txt"
+    if not existe
+        then return (LevelSelector i ei)
+        else do
+            conteudo <- readFile "estado.txt"
+            case readMaybe conteudo :: Maybe EstadoDLC of
+                Nothing -> return (LevelSelector i ei)
+                Just estado -> return (LevelSelector i (ei ++ [estado]))
 
-reageEventos (EventKey (SpecialKey KeyUp) Down _ _) (LevelSelector i) =
-    return $ LevelSelector (i - 1)
+reageEventos (EventKey (SpecialKey KeyDown) Down _ _) (LevelSelector i ei) =
+    return $ LevelSelector (i + 1) ei
 
-reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (LevelSelector i)
+reageEventos (EventKey (SpecialKey KeyUp) Down _ _) (LevelSelector i ei) =
+    return $ LevelSelector (i - 1) ei
+
+reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (LevelSelector i ei)
         | i == 0  = return $ PVP flatWorld 0 0 (DataDLC.Move Sul)
         | i == 1  = return $ PVP flatWorld 0 0 (DataDLC.Move Sul)
-        | otherwise = return $ LevelSelector i
+        | otherwise = return $ LevelSelector i ei
 
-reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (LevelSelector _) = return $ Menu 0
+reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (LevelSelector _ _) = return $ Menu 0
 
 -- * PVP MODE INPUTS
 
@@ -227,9 +238,12 @@ reageEventos (EventKey (Char 'k') Down _ _) (MapCreatorTool e b a l t ed c w) =
         novoMapa = mapa ++ [novaLinha]
     in return $ MapCreatorTool e{mapaEstadoDLC = novoMapa} b a l t ed c w
  
-reageEventos (EventKey (Char '1') Down _ _) (MapCreatorTool e _ a _ t ed c w) =
-    let novoa = if a > 1 then 0 else a + 1
-    in return $ MapCreatorTool e 0 novoa 0 t ed c w
+reageEventos (EventKey (Char 'l') Down _ _) (MapCreatorTool e b a l t ed c w) = 
+    let 
+        mapa = mapaEstadoDLC e
+        novoMapa = map (++ [ArDLC]) mapa
+    in return $ MapCreatorTool e{mapaEstadoDLC = novoMapa} b a  l t ed c w
+
 
 reageEventos (EventKey (Char 'n') Down _ _) (MapCreatorTool e b a l t ed c w) =
     let

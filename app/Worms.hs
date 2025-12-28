@@ -11,7 +11,7 @@ data Worms
     | PVP EstadoDLC Float Int JogadaDLC
     | MapCreatorTool EstadoDLC Int Int Int Int Bool (Maybe Int) MinhocaDLC -- ^ Estado Selecao SelecaoModo SelecaoTipo SelecaoParametros EditMode Input patoPlace
     | MapSelector
-    | LevelSelector Int
+    | LevelSelector Int [EstadoDLC]
     | Help              -- ^ Tela de ajuda (mostra instruções)
     | Quit              -- ^ Estado de saída (mostrado apenas)
     | GameOver Team         -- ^ Tela de fim de jogo PVP

@@ -113,7 +113,7 @@ executable worms-game
     main-is:          Main.hs
 
     build-depends:
-        base, gloss, gloss-juicy, worms
+        base, gloss, gloss-juicy, worms, directory
 
     hs-source-dirs:   app
 

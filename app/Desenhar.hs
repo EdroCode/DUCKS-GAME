@@ -39,7 +39,7 @@ desenha p (Menu sel) = return $ drawMenu p sel
 desenha p (BotSimulation est _ _ (numMinhoca, jogada)) = return $ drawGame p est (Just numMinhoca) (Just jogada)
 desenha p (PVP est _ _ jogada) = return $ drawPvPGame p est (Just jogada)
 desenha p (MapCreatorTool e b a secSel thirdSel edit char worm) = return $ (drawMCT p e b a secSel thirdSel edit char worm)
-desenha p (LevelSelector id) = return $ (drawLvlSelector p id)
+desenha p (LevelSelector id estImp) = return $ (drawLvlSelector p id estImp)
 desenha p Quit = return $ Translate (-50) 0 $ Scale 0.5 0.5 $ Text "Aperte ESC para confirmar saída."
 desenha p Help = return $ drawHelp
 desenha p (GameOver team) = return $ drawGameOver p team
@@ -98,34 +98,27 @@ drawHelp = Pictures
   , Translate (-360) (-220) $ Scale 0.10 0.10 $ Color (greyN 0.5) $ Text "Pressione ESC ou Enter para voltar ao menu"
   ]
 
-
 -- | Desenha o selector de níveis como uma lista vertical
-drawLvlSelector :: [Picture] -> Int -> Picture
-drawLvlSelector p selected = Pictures
-  [ Pictures $ zipWith drawNivel [0..] niveis
+drawLvlSelector :: [Picture] -> Int -> [EstadoDLC] -> Picture
+drawLvlSelector p selected estadosImportados = Pictures
+  [ Pictures $ zipWith drawNivel [0..] estadosImportados
   ]
   where
-
-    niveis = [1]
-
-
-    drawNivel :: Int -> Int -> Picture
-    drawNivel idx n = Pictures
-      [
-        Color (if idx == selected then makeColor 0.3 0.6 1 0.5 else greyN 0.5) $
+    drawNivel :: Int -> EstadoDLC -> Picture
+    drawNivel idx estado = Pictures
+      [ Color (if idx == selected then makeColor 0.3 0.6 1 0.5 else greyN 0.5) $
           Translate x y $ rectangleSolid largura altura
-
-      , Translate (x - largura/4) y $ Scale 0.7 0.7 $ drawWord p (show n)
+      , Translate (x - largura/4) y $ Scale 0.7 0.7 $ drawWord p ("Level " ++ show (idx + 1))
+      , Translate (x + largura/4 - 100) y $ Scale 0.5 0.5 $ Color black $ drawWord p infoMapa
       ]
       where
-
+        mapa = mapaEstadoDLC estado
+        infoMapa = show (length mapa) ++ "x" ++ show (if null mapa then 0 else length (head mapa))
         largura = 1000
         altura  = 50
         espaco  = 10
-
-        x =  0+ 20
-        y =  300 - fromIntegral idx * (altura + espaco)
-
+        x = 0 + 20
+        y = 300 - fromIntegral idx * (altura + espaco)
 
 
 drawGameOver :: [Picture] -> Team -> Picture
