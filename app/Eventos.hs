@@ -68,7 +68,7 @@ reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (Menu sel)
         | sel == 0  = return $ BotSimulation novoEstado 0 0 (0, Labs2025.Move Sul)
         | sel == 1  = return $ LevelSelector 0 [flatWorld]
         | sel == 2  = return $ MapCreatorTool flatWorld 0 0 0 0 False Nothing minhocaDefault
-        | sel == 3  = return $ Help
+        | sel == 3  = return $ Help 0
         | sel == 4  = return $ Quit
         | otherwise = return $ Menu sel
 
@@ -76,8 +76,15 @@ reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (Menu sel)
 -- * ESC LOGIC
 
 
-reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) Help = return $ Menu 0
-reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) Help = return $ Menu 0
+reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (Help _) = return $ Menu 0
+reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (Help _) = return $ Menu 0
+
+reageEventos (EventKey (SpecialKey KeyLeft) Down _ _) (Help p) = 
+    return $ Help (max 0 (p - 1))
+
+reageEventos (EventKey (SpecialKey KeyRight) Down _ _) (Help p) = 
+    return $ Help (min 5 (p + 1))
+
 reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (MapCreatorTool _ _ _ _ _ _ _ _) = return $ Menu 0
 reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (BotSimulation _ _ _ _) = return $ Menu 0
 reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (Menu 0) = return $ Quit

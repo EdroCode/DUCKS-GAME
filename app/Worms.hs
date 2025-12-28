@@ -6,15 +6,15 @@ import DataDLC( JogadaDLC,TerrenoDLC(ArDLC, TerraDLC, PedraDLC, AguaDLC), Team(B
 
 -- | Estado usado pela interface Gloss: pode estar no menu, a jogar ou em estado de saída.
 data Worms
-    = Menu Int          -- ^ Menu com opção actualmente seleccionada (0..n)
-    | BotSimulation Estado Float Int (NumMinhoca, Jogada)    -- ^ Estado do jogo + accumulator (segundos) + tick counter + última jogada
+    = Menu Int          
+    | BotSimulation Estado Float Int (NumMinhoca, Jogada)    
     | PVP EstadoDLC Float Int JogadaDLC
-    | MapCreatorTool EstadoDLC Int Int Int Int Bool (Maybe Int) MinhocaDLC -- ^ Estado Selecao SelecaoModo SelecaoTipo SelecaoParametros EditMode Input patoPlace
+    | MapCreatorTool EstadoDLC Int Int Int Int Bool (Maybe Int) MinhocaDLC 
     | MapSelector
     | LevelSelector Int [EstadoDLC]
-    | Help              -- ^ Tela de ajuda (mostra instruções)
-    | Quit              -- ^ Estado de saída (mostrado apenas)
-    | GameOver Team         -- ^ Tela de fim de jogo PVP
+    | Help Int          
+    | Quit              
+    | GameOver Team         
     deriving (Eq, Show)
 
 

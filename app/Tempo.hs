@@ -29,7 +29,7 @@ intervalo = 1
 -- | Função que avança o tempo no estado do jogo no Gloss.
 reageTempo :: Segundos -> Worms -> IO Worms
 reageTempo _ m@Menu{} = return m
-reageTempo _ Help = return Help
+reageTempo _ (Help p) = return (Help p)
 reageTempo _ Quit = return Quit
 reageTempo _ (LevelSelector i ei) = return (LevelSelector i ei) 
 reageTempo dt (BotSimulation est acc tick ultimaJogada) = return $ BotSimulation estFinal acc' tick' novaJogada
