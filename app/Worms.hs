@@ -14,7 +14,7 @@ data Worms
     | MapSelector
     | LevelSelector Int [EstadoDLC]
     | Help Int          
-    | Quit              
+    | Quit Int              
     | GameOver Team         
     deriving (Eq, Show)
 

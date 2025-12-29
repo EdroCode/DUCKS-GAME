@@ -70,7 +70,7 @@ reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (Menu sel)
         | sel == 1  = return $ LevelSelector 0 [flatWorld]
         | sel == 2  = return $ MapCreatorTool flatWorld 0 0 0 0 False Nothing minhocaDefault
         | sel == 3  = return $ Help 0
-        | sel == 4  = return $ Quit
+        | sel == 4  = return $ Quit 1
         | otherwise = return $ Menu sel
 
 
@@ -88,8 +88,15 @@ reageEventos (EventKey (SpecialKey KeyRight) Down _ _) (Help p) =
 
 reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (MapCreatorTool {}) = return $ Menu 0
 reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (BotSimulation {}) = return $ Menu 0
-reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (Menu 0) = return $ Quit
-reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) Quit = exitSuccess
+reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (Menu 0) = return $ Quit 1
+
+-- Quit confirmation UI input handling
+reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (Quit _) = return $ Menu 0
+reageEventos (EventKey (SpecialKey KeyLeft) Down _ _) (Quit sel) = return $ Quit (max 0 (sel - 1))
+reageEventos (EventKey (SpecialKey KeyRight) Down _ _) (Quit sel) = return $ Quit (min 1 (sel + 1))
+reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (Quit sel)
+    | sel == 0 = exitSuccess
+    | otherwise = return $ Menu 0
 
 
 -- * LVL SELECTOR

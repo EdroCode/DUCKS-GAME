@@ -30,7 +30,7 @@ intervalo = 1
 reageTempo :: Segundos -> Worms -> IO Worms
 reageTempo _ m@Menu{} = return m
 reageTempo _ (Help p) = return (Help p)
-reageTempo _ Quit = return Quit
+reageTempo _ (Quit sel) = return (Quit sel)
 reageTempo _ (LevelSelector i ei) = return (LevelSelector i ei) 
 reageTempo dt (BotSimulation est acc tick ultimaJogada) = return $ BotSimulation estFinal acc' tick' novaJogada
         where

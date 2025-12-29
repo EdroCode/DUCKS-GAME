@@ -40,10 +40,22 @@ desenha p (Menu sel) = return $ drawMenu p sel
 desenha p (BotSimulation est _ _ (numMinhoca, jogada)) = return $ drawGame p est (Just numMinhoca) (Just jogada)
 desenha p (PVP est _ _ jogada) = return $ drawPvPGame p est jogada
 desenha p (MapCreatorTool e b a secSel thirdSel edit char worm) = return $ (drawMCT p e b a secSel thirdSel edit char worm)
-desenha p (LevelSelector i estImp) = return $ (drawLvlSelector p i estImp)
-desenha p Quit = return $ Translate (-900) 0 $ Scale 1.9 1.9 $ drawWord p "Aperte ESC para confirmar saida."
+desenha p (LevelSelector id estImp) = return $ (drawLvlSelector p id estImp)
+desenha p (Quit sel) = return $ drawQuitConfirm p sel
 desenha p (Help pagina) = return $ drawHelp p pagina
 desenha p (GameOver team) = return $ drawGameOver p team
+
+-- | UI for quit confirmation with two buttons (Confirmar / Cancelar)
+drawQuitConfirm :: [Picture] -> Int -> Picture
+drawQuitConfirm p sel = Pictures
+  [ p !! 88
+  , Translate 50 350 $ Scale 1 1 $ p !! 89
+  , Translate (-400) 350 $ Scale 1.2 1.2 $ Color black $ drawWord p "Deseja sair do jogo?"
+  , Translate (-300) (-50) $ Scale 1 1 $ (if sel==0 then p !! 21 else p !! 22)
+  , Translate (300) (-50) $ Scale 1 1 $ (if sel==1 then p !! 21 else p !! 22)
+  , Translate (-460) (-50) $ Scale 1 1 $ drawWord p "Confirmar"
+  , Translate (150) (-50) $ Scale 1 1 $ drawWord p "Cancelar"
+  ]
 
 -- | Menu principal com seletor expandido (centralizado para 1920x1080)
 drawMenu :: [Picture] -> Int -> Picture
@@ -125,10 +137,12 @@ drawHelp p pagina = Pictures
       , Translate (-800) 200 $ Scale 1 1 $ Color black $ drawWord p "Setas: Navegar entre opcoes"
       , Translate (-800) 140 $ Scale 1 1 $ Color black $ drawWord p "Enter: Selecionar opcao"
       , Translate (-800) 80 $ Scale 1 1 $ Color black $ drawWord p "ESC: Voltar/Sair"
-      , Translate (-800) (-100) $ Scale 0.9 0.9 $ Color black $ drawWord p "Para evitar qualquer nuances durante a gameplay é "
-      , Translate (-800) (-180) $ Scale 0.9 0.9 $ Color black $ drawWord p "recomendado a leitura do ficheiro "
-      , Translate (-800) (-260) $ Scale 0.9 0.9 $ Color black $ drawWord p "- GUIA COMPLETO DE COMANDOS.txt -"
-
+      , Translate (-800) (-50) $ Scale 1.5 1.5 $ Color (greyN 0.4) $ drawWord p "Opcoes disponiveis:"
+      , Translate (-800) (-100) $ Scale 1 1 $ Color black $ drawWord p "- Bot Simulation"
+      , Translate (-800) (-140) $ Scale 1 1 $ Color black $ drawWord p "- Player vs Player"
+      , Translate (-800) (-180) $ Scale 1 1 $ Color black $ drawWord p "- MAP Creator Tool"
+      , Translate (-800) (-220) $ Scale 1 1 $ Color black $ drawWord p "- Help"
+      , Translate (-800) (-260) $ Scale 1 1 $ Color black $ drawWord p "- Quit"
       ]
     
     conteudoPagina 1 = Pictures 
@@ -220,21 +234,30 @@ drawLvlSelector p selected estadosImportados = Pictures
 drawGameOver :: [Picture] -> Team -> Picture
 drawGameOver p equipa =
     Pictures
-        [Translate 0 100 $ Scale 0.8 0.8 $ Color (equipaCor equipa) $
-            drawWord p (equipaStr equipa ++ " Ganha!")
-        , Translate 0 (-50) $ Scale 0.4 0.4 $ Color (greyN 0.7) $
-            drawWord p "Pressiona ESC para retornar ao menu"
+        [ bg
+        , Pictures
+            [Translate (-200) 100 $ Scale 0.8 0.8 $ Color (equipaCor equipa) $
+                drawWord p (equipaStr equipa ++ " Ganha!")
+            ]
+        , Pictures
+            [ Translate (70) (-50) $ Color white $ rectangleSolid 580 20
+            , Translate (-200) (-50) $ Scale 0.4 0.4 $ Color (greyN 0.7) $
+                drawWord p "Pressiona ESC para retornar ao menu"
+            ]
         ]
   where
+    bg = case equipa of
+      Red -> Pictures [Translate 0 0 $ Scale 1 1 $ p !! 115, Translate (125) 100 $ Color white $ rectangleSolid 720 60]
+      Blue -> Pictures [Translate 0 0 $ Scale 1 1 $ p !! 116, Translate (70) 100 $ Color white $ rectangleSolid 580 60]
+
     equipaStr Red = "Equipa Vermelha"
     equipaStr Blue = "Equipa Azul"
     equipaCor Red = red
     equipaCor Blue = blue
 
-
 drawMCT :: [Picture] -> EstadoDLC -> Int -> Int -> Int -> Int -> Bool -> Maybe Int -> MinhocaDLC -> Picture
-drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet esc baz mina dina flame burn equipa) = Pictures
-  [ p !! 88, Translate (-440) 330 $ Scale 0.5 0.5 $ Color black $ drawWord p "Bem vindo ao criador de mapas", p!!97, sidebar, world]
+drawMCT p e blocoSelecionado mode secSel thirdSel editMode char (MinhocaDLC pos vida jet esc baz mina dina flame burn equipa) = Pictures
+  [ Translate (-440) 330 $ Scale 0.5 0.5 $ Color black $ drawWord p "Bem vindo ao criador de mapas", sidebar, world]
   where
     mapa = mapaEstadoDLC e
     objs = objetosEstadoDLC e
@@ -245,8 +268,8 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
     blocos = [(0, "Terra", Scale 0.66 0.66 $ p !! 0), (1, "Agua", p !! 1), (2, "Pedra", p !! 2), (3, "Ar", p !! 7), (4, "Lava", p !! 11) ]
     
     staticObjects = [(0, "Barril", p !! 5), (1, "Health Pack", p !! 12)]
-    ammoPacks = [(2 :: Int, "Jetpack", p !! 15), (2, "Escavadora", p !! 16), (2, "Bazuca", p !! 17), (2, "Mina", p !! 18), (2, "Dinamite", p !! 19)]
-    disparos = [(3 :: Int, "Bazuca", p !! 6), (3, "Mina", p !! 9), (3, "Dinamite", p !! 8), (3, "FireBall", p !! 69)]
+    ammoPacks = [(2, "Jetpack", p !! 15), (2, "Escavadora", p !! 16), (2, "Bazuca", p !! 17), (2, "Mina", p !! 18), (2, "Dinamite", p !! 19)]
+    disparos = [(3, "Bazuca", p !! 6), (3, "Mina", p !! 9), (3, "Dinamite", p !! 8), (3, "FireBall", p !! 69)]
     
     personagens = [(0, "Pato", p !! 3)]
 
@@ -514,8 +537,7 @@ drawGame p est numMinhoca jogada = Pictures [p !! 88, sidebar, world]
       , Translate (-900) 180 $ Scale 0.3 0.3 $ Color black $ drawWord p ("Total minhocas: " ++ show totalMinhocas)
       , Translate (-900) 140 $ Scale 0.3 0.3 $ Color (dark red) $ drawWord p ("Objetos: " ++ show totalObjetos)
       ]
-    
-    
+
     linha = length mapa
     cols = if null mapa then 0 else length (head mapa)
     
@@ -556,7 +578,6 @@ drawPvPGame p est jogada =
     minhocasVivas = length (getMinhocasValidasDLC ms)
     totalMinhocas = length ms
     totalObjetos  = length objs
-
 
     selectedSprite :: Picture
     selectedSprite =
@@ -620,8 +641,8 @@ drawPvPGame p est jogada =
             Scale 0.6 0.6 $
             drawWord p ("POS: " ++ extrairPosicao (show (posicaoMinhocaDLC m)))
           -- Armas / itens (imagens)
-          , Translate (-930) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 2
-          , Translate (-840) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 2
+          , Translate (-930) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 113
+          , Translate (-840) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 114
           , Translate (-750) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 6
           , Translate (-660) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 9
           , Translate (-570) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 8
@@ -680,7 +701,7 @@ drawPvPGame p est jogada =
 
 
     world =
-      Translate 50 0 $
+      Translate 100 0 $
         Scale scaleFactor scaleFactor $
           Pictures
             [ drawMapaDLC p mapa
@@ -1018,4 +1039,3 @@ getXWayDLC d = case d of
   Nordeste  -> Este
   Sudeste   -> Este
   _         -> Este
-
