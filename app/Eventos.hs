@@ -156,12 +156,12 @@ reageEventos (EventKey (Char '1') Down _ _) (PVP est acc tick _) =
 reageEventos (EventKey (Char '2') Down _ _) (PVP est acc tick _) =
 
     let novaArma = case armaSelecionada est of
-            Just JetpackDLC -> Just JetpackDLC
-            Just EscavadoraDLC -> Just EscavadoraDLC
-            Just BazucaDLC -> Just BazucaDLC
-            Just MinaDLC -> Just MinaDLC
-            Just DinamiteDLC -> Just DinamiteDLC
-            Just FlameTrower -> Just FlameTrower
+            Just JetpackDLC -> Just EscavadoraDLC
+            Just EscavadoraDLC -> Just BazucaDLC
+            Just BazucaDLC -> Just MinaDLC
+            Just MinaDLC -> Just DinamiteDLC
+            Just DinamiteDLC -> Just FlameTrower
+            Just FlameTrower -> Just JetpackDLC
             Nothing -> Just JetpackDLC
 
         nEstado = EstadoDLC {
