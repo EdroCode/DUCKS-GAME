@@ -12,6 +12,7 @@ import DataDLC
 import Auxiliar (getMinhocasValidasDLC, eMinhocaVivaDLC)
 import EfetuaJogada
 import Data.Char (toLower)
+import GHC.IO.Handle.Types (HandleType(ReadHandle))
 
 
 
@@ -627,7 +628,10 @@ drawPvPGame p est jogada =
             Color (if armaSelecionada est == Nothing then dark red else black) $
                   drawWord p ("Player " ++ show i)
           -- Ícone vida
-          , Translate (-900) (y - 20) $ Scale 2.5 2.5 $ p !! 3
+          , Translate (-900) (y - 20) $ Scale 2.5 2.5 $ (case equipaMinhoca m of 
+            Just Blue -> p !! 79 
+            Just Red -> p !! 78
+            _ -> p !! 3)
           , Translate (-800) (y - 30) $
             Scale 0.6 0.6 $
             drawWord p ("HP: " ++ extrairVida (show (vidaMinhocaDLC m)))
@@ -641,11 +645,36 @@ drawPvPGame p est jogada =
             Scale 0.6 0.6 $
             drawWord p ("POS: " ++ extrairPosicao (show (posicaoMinhocaDLC m)))
           -- Armas / itens (imagens)
+          , if armaSelecionada est == Just JetpackDLC
+              then Translate (-930) (y - weaponOffset) $ Scale 1.8 1.8 $ p !! 117
+              else Blank
           , Translate (-930) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 113
+
+          , if armaSelecionada est == Just EscavadoraDLC
+              then Translate (-840) (y - weaponOffset) $ Scale 1.8 1.8 $ p !! 117
+              else Blank
           , Translate (-840) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 114
+
+          , if armaSelecionada est == Just BazucaDLC
+              then Translate (-750) (y - weaponOffset) $ Scale 1.8 1.8 $ p !! 117
+              else Blank
           , Translate (-750) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 6
+
+          , if armaSelecionada est == Just MinaDLC
+              then Translate (-660) (y - weaponOffset) $ Scale 1.8 1.8 $ p !! 117
+              else Blank
           , Translate (-660) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 9
+
+          , if armaSelecionada est == Just DinamiteDLC
+              then Translate (-570) (y - weaponOffset) $ Scale 1.8 1.8 $ p !! 117
+              else Blank
           , Translate (-570) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 8
+
+          , if armaSelecionada est == Just FlameTrower
+              then Translate (-930) (y - 2 * weaponOffset) $ Scale 1.8 1.8 $ p !! 117
+              else Blank
+          , Translate (-930) (y - 2 * weaponOffset) $ Scale 1.5 1.5 $ p !! 69
+
           -- Barras divisórias verticais
           , Translate (-885) (y - weaponOffset - 10) $
             Color (greyN 0.3) $
@@ -680,6 +709,10 @@ drawPvPGame p est jogada =
             Scale 0.6 0.6 $
             Color (if armaSelecionada est == Just DinamiteDLC then dark red else black) $
                   drawWord p (show (dinamiteMinhocaDLC m) ++ " ")
+          , Translate (-938) (y - weaponOffset - 180) $
+            Scale 0.6 0.6 $
+            Color (if armaSelecionada est == Just FlameTrower then dark red else black) $
+                  drawWord p (show (flameMinhocaDLC m) ++ " ")
           ]
         where
           y = 55
