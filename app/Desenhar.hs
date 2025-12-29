@@ -62,30 +62,30 @@ drawQuitConfirm p sel = Pictures
 drawMenu :: [Picture] -> Int -> Picture
 drawMenu p sel = Pictures
   [ Scale 1 1 $ p !! 85
-  
+
   -- Título "WORMS"
   , Translate 0 350 $ Scale 1 1 $ p !! 20
   , Translate (-140) 370 $ Scale 1.6 1.6 $ drawWord p "worms"
-  
+
   -- Subtítulo
   , Translate (-210) 290 $ Scale 0.5 0.5 $ drawWord p "Escolha o modo de jogo"
-  
+
   -- Bot Simulation (esquerda superior)
   , Translate (-300) 100 $ Scale 1 1 $ (if sel==0 then p !! 21 else p !! 22)
   , Translate (-300- 150) 100 $ Scale 0.6 0.6 $ Color (if sel==0 then red else black) $ drawWord p "Bot Simulation"
-  
+
   -- Player vs Player (direita superior)
   , Translate 300 100 $ Scale 1 1 $ (if sel==1 then p !! 21 else p !! 22)
   , Translate (300- 160) 100 $ Scale 0.6 0.6 $ Color (if sel==1 then red else black) $ drawWord p "Player vs Player"
-  
+
   -- MAP Creator Tool (esquerda inferior)
   , Translate (-300) (-50) $ Scale 1 1 $ (if sel==2 then p !! 21 else p !! 22)
   , Translate (-300- 160) (-50) $ Scale 0.6 0.6 $ Color (if sel==2 then red else black) $ drawWord p "MAP Creator Tool"
-  
+
   -- Help (direita inferior)
   , Translate 300 (-50) $ Scale 1 1 $ (if sel==3 then p !! 21 else p !! 22)
   , Translate (300 - 50) (-50) $ Scale 0.6 0.6 $ Color (if sel==3 then red else black) $ drawWord p "Help"
-  
+
   -- Quit (centro baixo)
   , Translate 0 (-200) $ Scale 1 1 $ (if sel==4 then p !! 21 else p !! 22)
   , Translate (- 50) (-200) $ Scale 0.6 0.6 $ Color (if sel==4 then red else black) $ drawWord p "Quit"
@@ -101,30 +101,30 @@ getDescription _ = ""
 
 drawHelp :: [Picture] -> Int -> Picture
 drawHelp p pagina = Pictures
-  [ 
+  [
     Translate (-800) 450 $ Scale 2 2 $ Color black $ drawWord p (titulosPaginas !! pagina)
-  
+
 
   , conteudoPagina pagina
-  
+
 
   , Translate (-50) (-450) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p ("Pagina " ++ show (pagina + 1) ++ " de " ++ show totalPaginas)
-  
 
-  , if pagina > 0 
+
+  , if pagina > 0
       then Translate (-320) (-450) $ Scale 0.6 0.6 $ Color (makeColor 0.2 0.4 0.8 1.0) $ drawWord p "< Anterior"
       else Blank
-  
+
   , if pagina < totalPaginas - 1
       then Translate (300) (-450) $ Scale 0.6 0.6 $ Color (makeColor 0.2 0.4 0.8 1.0) $ drawWord p "Proximo >"
       else Blank
-  
+
   , Translate (-800) (-500) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "Use Setas Esq/Dir para navegar | ESC para voltar ao menu"
   ]
   where
     totalPaginas = length titulosPaginas
-    
-    titulosPaginas = 
+
+    titulosPaginas =
       [ "MENU PRINCIPAL"
       , "LEVEL SELECTOR"
       , "MOVIMENTACAO PVP"
@@ -132,7 +132,7 @@ drawHelp p pagina = Pictures
       , "MAP CREATOR 1"
       , "MAP CREATOR 2"
       ]
-    
+
     conteudoPagina 0 = Pictures
       [ Translate (-800) 300 $ Scale 1.5 1.5 $ Color (makeColor 0.2 0.4 0.8 1.0) $ drawWord p "MENU PRINCIPAL"
       , Translate (-800) 200 $ Scale 1 1 $ Color black $ drawWord p "Setas: Navegar entre opcoes"
@@ -145,16 +145,16 @@ drawHelp p pagina = Pictures
       , Translate (-800) (-220) $ Scale 1 1 $ Color black $ drawWord p "- Help"
       , Translate (-800) (-260) $ Scale 1 1 $ Color black $ drawWord p "- Quit"
       ]
-    
-    conteudoPagina 1 = Pictures 
+
+    conteudoPagina 1 = Pictures
       [ Translate (-800) 300 $ Scale 1.5 1.5 $ Color (makeColor 0.2 0.4 0.8 1.0) $ drawWord p "LEVEL SELECTOR"
       , Translate (-800) 200 $ Scale 1 1 $ Color black $ drawWord p "I: Importa mapa salvo"
       , Translate (-800) 140 $ Scale 1 1 $ Color black $ drawWord p "Setas Cima/Baixo: Navegar niveis"
       , Translate (-800) 80 $ Scale 1 1 $ Color black $ drawWord p "Enter: Jogar nivel selecionado"
       , Translate (-800) 20 $ Scale 1 1 $ Color black $ drawWord p "ESC: Voltar ao menu"
       ]
-    
-    conteudoPagina 2 = Pictures 
+
+    conteudoPagina 2 = Pictures
       [ Translate (-800) 300 $ Scale 1.5 1.5 $ Color (makeColor 0.2 0.4 0.8 1.0) $ drawWord p "MODO PVP - MOVIMENTACAO"
       , Translate (-800) 200 $ Scale 1 1 $ Color (greyN 0.4) $ drawWord p "Movimento Base:"
       , Translate (-800) 150 $ Scale 1 1 $ Color black $ drawWord p "WASD ou Setas: Norte/Sul/Este/Oeste"
@@ -164,8 +164,8 @@ drawHelp p pagina = Pictures
       , Translate (-800) (-80) $ Scale 1 1 $ Color black $ drawWord p "Z: Sudoeste"
       , Translate (-800) (-130) $ Scale 1 1 $ Color black $ drawWord p "C: Sudeste"
       ]
-    
-    conteudoPagina 3 = Pictures 
+
+    conteudoPagina 3 = Pictures
       [ Translate (-800) 300 $ Scale 1.5 1.5 $ Color (makeColor 0.2 0.4 0.8 1.0) $ drawWord p "MODO PVP - CONTROLES"
       , Translate (-800) 200 $ Scale 1 1 $ Color black $ drawWord p "1: Trocar minhoca"
       , Translate (-800) 160 $ Scale 1 1 $ Color (greyN 0.4) $ drawWord p "  (Cicla para a proxima minhoca viva)"
@@ -174,8 +174,8 @@ drawHelp p pagina = Pictures
       , Translate (-800) 20 $ Scale 1 1 $ Color (greyN 0.4) $ drawWord p "         -> Mina -> Dinamite -> Nenhuma"
       , Translate (-800) (-50) $ Scale 1 1 $ Color black $ drawWord p "ESC: Voltar ao menu"
       ]
-    
-    conteudoPagina 4 = Pictures 
+
+    conteudoPagina 4 = Pictures
       [ Translate (-800) 300 $ Scale 1.5 1.5 $ Color (makeColor 0.2 0.4 0.8 1.0) $ drawWord p "MAP CREATOR - GERAL"
       , Translate (-800) 200 $ Scale 1 1 $ Color (greyN 0.4) $ drawWord p "Navegacao:"
       , Translate (-800) 160 $ Scale 1 1 $ Color black $ drawWord p "1: Alternar modo"
@@ -188,8 +188,8 @@ drawHelp p pagina = Pictures
       , Translate (-800) (-150) $ Scale 1 1 $ Color black $ drawWord p "Clique Direito: Remover elemento"
       , Translate (-800) (-220) $ Scale 0.7 0.7 $ Color (greyN 0.4) $ drawWord p "(Remove apenas do modo selecionado)"
       ]
-    
-    conteudoPagina 5 = Pictures 
+
+    conteudoPagina 5 = Pictures
       [ Translate (-800) 350 $ Scale 1.5 1.5 $ Color (makeColor 0.2 0.4 0.8 1.0) $ drawWord p "MAP CREATOR - EDICAO"
       , Translate (-800) 270 $ Scale 1 1 $ Color (greyN 0.4) $ drawWord p "Edicao do Mapa:"
       , Translate (-800) 230 $ Scale 1 1 $ Color black $ drawWord p "K: Adicionar linha abaixo"
@@ -205,7 +205,7 @@ drawHelp p pagina = Pictures
       , Translate (-800) (-185) $ Scale 1 1 $ Color black $ drawWord p "E: Exportar estado"
       , Translate (-800) (-220) $ Scale 0.7 0.7 $ Color (greyN 0.4) $ drawWord p "  (Salva em 'estado.txt')"
       ]
-    
+
     conteudoPagina _ = Blank
 
 -- | Desenha o selector de níveis como uma lista vertical
@@ -230,8 +230,8 @@ drawLvlSelector p selected estadosImportados = Pictures
         x = 20
 
         y = 300 - fromIntegral idx * (altura + espaco)
-  
-  
+
+
 drawGameOver :: [Picture] -> Team -> Picture
 drawGameOver p equipa =
     Pictures
@@ -267,11 +267,11 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
     infoMapa = show (length mapa) ++ "x" ++ show (if null mapa then 0 else length (head mapa))
 
     blocos = [(0, "Terra", Scale 0.66 0.66 $ p !! 0), (1, "Agua", p !! 1), (2, "Pedra", p !! 2), (3, "Ar", p !! 7), (4, "Lava", p !! 11) ]
-    
+
     staticObjects = [(0, "Barril", p !! 5), (1, "Health Pack", p !! 12)]
     ammoPacks = [(2 :: Int, "Jetpack", p !! 15), (2, "Escavadora", p !! 16), (2, "Bazuca", p !! 17), (2, "Mina", p !! 18), (2, "Dinamite", p !! 19)]
     disparos = [(3 :: Int, "Bazuca", p !! 6), (3, "Mina", p !! 9), (3, "Dinamite", p !! 8), (3, "FireBall", p !! 69)]
-    
+
     personagens = [(0, "Pato", p !! 3)]
 
     drawBloco y (idx, nome, pic) = Pictures
@@ -302,12 +302,12 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
       , Translate (-850) (y - 30) $ Scale 0.5 0.5 $ Color (greyN 0.5) $ drawWord p "<"
       , Translate (-650) (y - 30) $ Scale 0.5 0.5 $ Color (greyN 0.5) $ drawWord p ">"
       , Translate (-825) (y - 30) $ Scale 0.5 0.5 $ Color (greyN 0.5) $ drawWord p (selectedName)
-      
+
       ]
       where
         (selectedIdx, selectedName, selectedPic) = if blocoSelecionado == 2 then ammoPacks !! secSel else head ammoPacks
-    
-    
+
+
     drawDisparoSelector y = Pictures
       [ if blocoSelecionado == 3
           then Color (makeColor 0.3 0.6 1.0 0.3) $ Translate (-750) y $ rectangleSolid 280 70
@@ -346,8 +346,8 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
       , Pictures
           [
             if thirdSel == 0
-              then Color editColor $ 
-                  Translate (-910) (y - weaponTextOffset) $ 
+              then Color editColor $
+                  Translate (-910) (y - weaponTextOffset) $
                   rectangleSolid 50 30
               else Blank
           , Translate (-920) (y - weaponTextOffset) $
@@ -355,12 +355,12 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
                 Color black $
                   drawWord p (show jet)
           ]
-          
+
       , Pictures
-          [ 
+          [
             if thirdSel == 1
-              then Color editColor $ 
-                  Translate (-840) (y - weaponTextOffset) $ 
+              then Color editColor $
+                  Translate (-840) (y - weaponTextOffset) $
                   rectangleSolid 50 30
               else Blank
           , Translate (-830) (y - weaponTextOffset) $
@@ -368,12 +368,12 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
                 Color black $
                   drawWord p (show esc)
           ]
-          
+
       , Pictures
-          [ 
+          [
             if thirdSel == 2
-              then Color editColor $ 
-                  Translate (-770) (y - weaponTextOffset) $ 
+              then Color editColor $
+                  Translate (-770) (y - weaponTextOffset) $
                   rectangleSolid 50 30
               else Blank
           , Translate (-760) (y - weaponTextOffset) $
@@ -381,12 +381,12 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
                 Color black $
                   drawWord p (show baz)
           ]
-          
+
       , Pictures
-          [ 
+          [
             if thirdSel == 3
-              then Color editColor $ 
-                  Translate (-700) (y - weaponTextOffset) $ 
+              then Color editColor $
+                  Translate (-700) (y - weaponTextOffset) $
                   rectangleSolid 50 30
               else Blank
           , Translate (-690) (y - weaponTextOffset) $
@@ -394,12 +394,12 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
                 Color black $
                   drawWord p (show mina)
           ]
-          
+
       , Pictures
-          [ 
+          [
             if thirdSel == 4
-              then Color editColor $ 
-                  Translate (-630) (y - weaponTextOffset) $ 
+              then Color editColor $
+                  Translate (-630) (y - weaponTextOffset) $
                   rectangleSolid 50 30
               else Blank
           , Translate (-620) (y - weaponTextOffset) $
@@ -407,13 +407,13 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
                 Color black $
                   drawWord p (show dina)
           ]
-          
-                
+
+
       , Pictures
           [
             if thirdSel == 5
-              then Color editColor $ 
-                  Translate (-910) (y - weaponTextOffset - 140) $ 
+              then Color editColor $
+                  Translate (-910) (y - weaponTextOffset - 140) $
                   rectangleSolid 50 30
               else Blank
           , Translate (-920) (y - weaponTextOffset - 140) $
@@ -421,12 +421,12 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
                 Color black $
                   drawWord p (show flame)
           ]
-          
+
       , Pictures
           [
             if thirdSel == 6
-              then Color editColor $ 
-                  Translate (-600) (y - weaponTextOffset - 140) $ 
+              then Color editColor $
+                  Translate (-600) (y - weaponTextOffset - 140) $
                   rectangleSolid 50 30
               else Blank
           , Translate (-830) (y - weaponTextOffset - 140) $
@@ -434,15 +434,15 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
                 Color black $
                   drawWord p ("Burning counter: " ++ show burn)
           ]
-          
+
       , Pictures
         [ if thirdSel == 7
-            then Color editColor $ 
-              Translate (-800) (y - weaponTextOffset - 240) $ 
+            then Color editColor $
+              Translate (-800) (y - weaponTextOffset - 240) $
               rectangleSolid 50 30
             else Blank
         , Translate (-800) (y - weaponTextOffset - 240) $ Scale 0.6 0.6 $ drawWord p "Equipa:"
-        
+
         ,Translate (-830) (y - weaponTextOffset - 240) $
             Scale 1 1 $
               case equipa of
@@ -451,19 +451,19 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
                 Nothing -> Color (greyN 0.5) $ rectangleSolid 20 20
         ]
 
-          
-          
+
+
           ]
-        
+
     sidebar = Pictures
       [ Translate (-750) 80 $ p !! 94
       , Translate (-870) 360 $ Scale 1 1 $ Color black $ drawWord p infoMapa
       , Color (greyN 0.7) $ Translate (-750) 320 $ rectangleSolid 280 2
       , Translate (-900) 280 $ Scale 0.6 0.6 $ Color (greyN 0.3) $ drawWord p "Blocos:"
-      
+
       , case mode of
           0 -> Pictures $ zipWith drawBloco [240, 150, 60, -30, -120] blocos
-          1 -> Pictures $ 
+          1 -> Pictures $
                  zipWith drawObjeto [240, 150] staticObjects ++
                  [drawAmmoPackSelector 60] ++
                  [drawDisparoSelector (-50)]
@@ -490,17 +490,17 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
 
     linha = length mapa
     cols = if null mapa then 0 else length (head mapa)
-    
+
     larguraMapa = fromIntegral cols * cellSize
     alturaMapa  = fromIntegral linha * cellSize
-    
+
     sidebarWidth = 1000
     maxWorldWidth  = janelaLargura - sidebarWidth
     maxWorldHeight = janelaAltura - 400
-    
+
     scaleX = if larguraMapa > 0 then maxWorldWidth / larguraMapa else 1
     scaleY = if alturaMapa > 0 then maxWorldHeight / alturaMapa else 1
-    
+
     scaleFactor = min (min scaleX scaleY) 2.0
 
     editColor = if editMode == False then makeColor 0.3 0.6 1.0 0.3 else red
@@ -541,20 +541,20 @@ drawGame p est numMinhoca jogada = Pictures [p !! 88, sidebar, world]
 
     linha = length mapa
     cols = if null mapa then 0 else length (head mapa)
-    
+
     larguraMapa = fromIntegral cols * cellSize
     alturaMapa  = fromIntegral linha * cellSize
-    
+
     sidebarWidth = 200
     maxWorldWidth  = janelaLargura - sidebarWidth
     maxWorldHeight = janelaAltura - 400
-    
+
     scaleX = if larguraMapa > 0 then maxWorldWidth / larguraMapa else 1
     scaleY = if alturaMapa > 0 then maxWorldHeight / alturaMapa else 1
-    
+
     scaleFactor = min (min scaleX scaleY) 2.0
 
-   
+
     world =
       Translate (sidebarWidth / 2) 0 $
         Scale scaleFactor scaleFactor $
@@ -628,8 +628,8 @@ drawPvPGame p est jogada =
             Color (if armaSelecionada est == Nothing then dark red else black) $
                   drawWord p ("Player " ++ show i)
           -- Ícone vida
-          , Translate (-900) (y - 20) $ Scale 2.5 2.5 $ (case equipaMinhoca m of 
-            Just Blue -> p !! 79 
+          , Translate (-900) (y - 20) $ Scale 2.5 2.5 $ (case equipaMinhoca m of
+            Just Blue -> p !! 79
             Just Red -> p !! 78
             _ -> p !! 3)
           , Translate (-800) (y - 30) $
@@ -719,17 +719,17 @@ drawPvPGame p est jogada =
 
     linha = length mapa
     cols = if null mapa then 0 else length (head mapa)
-    
+
     larguraMapa = fromIntegral cols * cellSize
     alturaMapa  = fromIntegral linha * cellSize
-    
+
     sidebarWidth = 1000
     maxWorldWidth  = janelaLargura - sidebarWidth
     maxWorldHeight = janelaAltura - 400
-    
+
     scaleX = if larguraMapa > 0 then maxWorldWidth / larguraMapa else 1
     scaleY = if alturaMapa > 0 then maxWorldHeight / alturaMapa else 1
-    
+
     scaleFactor = min (min scaleX scaleY) 2.0
 
 
@@ -906,11 +906,11 @@ getSpriteParaAcao minhoca (Just (Labs2025.Dispara arma direcaoDisparo)) p isActi
         pos = case posicaoMinhoca minhoca of Just a -> a
         estaNoChao = Tarefa2.estaNoSolo pos mapa
         direcaoHorizontal = getXWay direcaoDisparo
-    in 
-      if isActiveMinhoca 
+    in
+      if isActiveMinhoca
         then
           case direcaoHorizontal of
-          
+
           Este ->
 
             case arma of
@@ -920,15 +920,15 @@ getSpriteParaAcao minhoca (Just (Labs2025.Dispara arma direcaoDisparo)) p isActi
               Dinamite -> p !! 99
               Mina -> p !! 99
 
-          Oeste -> 
-          
+          Oeste ->
+
             case arma of
               Bazuca -> p !! 3
               Jetpack ->  p !! 3
               Escavadora -> p !! 3
               Dinamite -> p !! 3
               Mina -> p !! 3
-      else if estaNoChao then p !! 3 else p !! 13  
+      else if estaNoChao then p !! 3 else p !! 13
 
 
 
@@ -1001,9 +1001,9 @@ getSpriteParaAcaoDLC :: MinhocaDLC -> JogadaDLC -> [Picture] -> EstadoDLC -> Pic
 getSpriteParaAcaoDLC minhoca (DataDLC.Move _) p e
   | burningCounter minhoca > 0 =
       case ultimaDirecaoHorizontal minhoca of
-        Oeste -> p !! 84  
-        Este  -> p !! 100 
-        
+        Oeste -> p !! 84
+        Este  -> p !! 100
+
   | eMinhocaVivaDLC minhoca =
       let pos = case posicaoMinhocaDLC minhoca of Just a -> a
           estaNoChao = EfetuaJogada.estaNoSolo pos (mapaEstadoDLC e) (minhocasEstadoDLC e)
@@ -1012,9 +1012,9 @@ getSpriteParaAcaoDLC minhoca (DataDLC.Move _) p e
 
         Just Red ->
           case direcaoHorizontal of
-            Este -> 
+            Este ->
               if estaNoChao then p !! 104 else p !! 103
-            _ ->  
+            _ ->
               if estaNoChao then p !! 78 else p !! 77
 
         Just Blue ->
@@ -1030,11 +1030,11 @@ getSpriteParaAcaoDLC minhoca (DataDLC.Move _) p e
             _ -> p !! 3
 
 getSpriteParaAcaoDLC minhoca (DataDLC.Dispara arma _) p e
-  | burningCounter minhoca > 0 = 
+  | burningCounter minhoca > 0 =
       case ultimaDirecaoHorizontal minhoca of
         Oeste -> p !! 84
         Este  -> p !! 100
-        
+
   | eMinhocaVivaDLC minhoca =
       let pos = case posicaoMinhocaDLC minhoca of Just a -> a
           estaNoChao = EfetuaJogada.estaNoSolo pos (mapaEstadoDLC e) (minhocasEstadoDLC e)
@@ -1042,15 +1042,15 @@ getSpriteParaAcaoDLC minhoca (DataDLC.Dispara arma _) p e
       in case equipaMinhoca minhoca of
 
         Just Red -> case arma of
-          JetpackDLC     -> 
+          JetpackDLC     ->
             case direcaoHorizontal of
               Este -> p !! 109
               _ -> p !! 86
-          EscavadoraDLC  -> 
+          EscavadoraDLC  ->
             case direcaoHorizontal of
               Este -> p !! 107
               _ -> p !! 83
-          BazucaDLC      -> 
+          BazucaDLC      ->
             case direcaoHorizontal of
               Este -> p !! 105
               _ -> p !! 72
@@ -1060,15 +1060,15 @@ getSpriteParaAcaoDLC minhoca (DataDLC.Dispara arma _) p e
               _ -> if estaNoChao then p !! 78 else p !! 77
 
         Just Blue -> case arma of
-          JetpackDLC     -> 
+          JetpackDLC     ->
             case direcaoHorizontal of
               Este -> p !! 110
               _ -> p !! 87
-          EscavadoraDLC  -> 
+          EscavadoraDLC  ->
             case direcaoHorizontal of
               Este -> p !! 108
               _ -> p !! 82
-          BazucaDLC      -> 
+          BazucaDLC      ->
             case direcaoHorizontal of
               Este -> p !! 106
               _ -> p !! 73
@@ -1102,13 +1102,13 @@ drawMinhocasDLC p ms mapa _ jogada e = Pictures $ map drawM (zip [0..] ms)
       Nothing -> Blank
       Just s -> Translate x y $ Pictures
         [ sprite
-        , if i == minhocaSelecionada e
-            then if eMinhocaVivaDLC m
-              then case ultimaDirecaoHorizontal m of
-                Oeste -> if EfetuaJogada.estaNoSolo s mapa ms then Scale 1 1 $ p !! 92 else Scale 1 1 $ p !! 93
-                Este -> if EfetuaJogada.estaNoSolo s mapa ms then Scale 1 1 $ p !! 101 else Scale 1 1 $ p !! 102
-              else Blank
-            else Blank
+        , if (i == minhocaSelecionada e) && eMinhocaVivaDLC m then (case ultimaDirecaoHorizontal m of
+                Oeste -> if burningCounter m > 0
+                  then p !! 118
+                  else if EfetuaJogada.estaNoSolo s mapa ms then Scale 1 1 $ p !! 92 else Scale 1 1 $ p !! 93
+                Este -> if burningCounter m > 0
+                  then p !! 119
+                  else if EfetuaJogada.estaNoSolo s mapa ms then Scale 1 1 $ p !! 101 else Scale 1 1 $ p !! 102) else Blank
         ]
         where
           (x,y) = converteMapaDLC mapa s
