@@ -41,8 +41,8 @@ desenha p (BotSimulation est _ _ (numMinhoca, jogada)) = return $ drawGame p est
 desenha p (PVP est _ _ jogada) = return $ drawPvPGame p est jogada
 desenha p (MapCreatorTool e b a secSel thirdSel edit char worm) = return $ (drawMCT p e b a secSel thirdSel edit char worm)
 desenha p (LevelSelector id estImp) = return $ (drawLvlSelector p id estImp)
-desenha p Quit = return $ Translate (-50) 0 $ Scale 0.5 0.5 $ Text "Aperte ESC para confirmar saída."
-desenha p (Help pagina) = return $ drawHelp pagina 
+desenha p Quit = return $ Translate (-900) 0 $ Scale 1.9 1.9 $ drawWord p "Aperte ESC para confirmar saida."
+desenha p (Help pagina) = return $ drawHelp p pagina
 desenha p (GameOver team) = return $ drawGameOver p team
 
 -- | Menu principal com seletor expandido (centralizado para 1920x1080)
@@ -86,27 +86,27 @@ getDescription 3 = "Veja os controles e instruções"
 getDescription 4 = "Sair do jogo"
 getDescription _ = ""
 
-drawHelp :: Int -> Picture
-drawHelp pagina = Pictures
+drawHelp :: [Picture] -> Int -> Picture
+drawHelp p pagina = Pictures
   [ 
-    Translate (-400) 450 $ Scale 0.7 0.7 $ Color black $ Text ("GUIA - " ++ titulosPaginas !! pagina)
+    Translate (-800) 450 $ Scale 2 2 $ Color black $ drawWord p (titulosPaginas !! pagina)
   
 
   , conteudoPagina pagina
   
 
-  , Translate (-50) (-450) $ Scale 0.3 0.3 $ Color (greyN 0.5) $ Text ("Pagina " ++ show (pagina + 1) ++ " de " ++ show totalPaginas)
+  , Translate (-50) (-450) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p ("Pagina " ++ show (pagina + 1) ++ " de " ++ show totalPaginas)
   
 
   , if pagina > 0 
-      then Translate (-280) (-450) $ Scale 0.3 0.3 $ Color (makeColor 0.2 0.4 0.8 1.0) $ Text "< Anterior"
+      then Translate (-320) (-450) $ Scale 0.6 0.6 $ Color (makeColor 0.2 0.4 0.8 1.0) $ drawWord p "< Anterior"
       else Blank
   
   , if pagina < totalPaginas - 1
-      then Translate (300) (-450) $ Scale 0.3 0.3 $ Color (makeColor 0.2 0.4 0.8 1.0) $ Text "Proximo >"
+      then Translate (300) (-450) $ Scale 0.6 0.6 $ Color (makeColor 0.2 0.4 0.8 1.0) $ drawWord p "Proximo >"
       else Blank
   
-  , Translate (-450) (-500) $ Scale 0.25 0.25 $ Color (greyN 0.5) $ Text "Use Setas Esq/Dir para navegar | ESC para voltar ao menu"
+  , Translate (-800) (-500) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "Use Setas Esq/Dir para navegar | ESC para voltar ao menu"
   ]
   where
     totalPaginas = length titulosPaginas
@@ -114,83 +114,83 @@ drawHelp pagina = Pictures
     titulosPaginas = 
       [ "MENU PRINCIPAL"
       , "LEVEL SELECTOR"
-      , "MODO PVP - MOVIMENTACAO"
-      , "MODO PVP - CONTROLES"
-      , "MAP CREATOR - GERAL"
-      , "MAP CREATOR - EDICAO"
+      , "MOVIMENTACAO PVP"
+      , "CONTROLES PVP"
+      , "MAP CREATOR 1"
+      , "MAP CREATOR 2"
       ]
     
     conteudoPagina 0 = Pictures
-      [ Translate (-300) 300 $ Scale 0.4 0.4 $ Color (makeColor 0.2 0.4 0.8 1.0) $ Text "MENU PRINCIPAL"
-      , Translate (-300) 200 $ Scale 0.35 0.35 $ Color black $ Text "Setas: Navegar entre opcoes"
-      , Translate (-300) 140 $ Scale 0.35 0.35 $ Color black $ Text "Enter: Selecionar opcao"
-      , Translate (-300) 80 $ Scale 0.35 0.35 $ Color black $ Text "ESC: Voltar/Sair"
-      , Translate (-300) (-50) $ Scale 0.3 0.3 $ Color (greyN 0.4) $ Text "Opcoes disponiveis:"
-      , Translate (-300) (-100) $ Scale 0.3 0.3 $ Color black $ Text "- Bot Simulation"
-      , Translate (-300) (-140) $ Scale 0.3 0.3 $ Color black $ Text "- Player vs Player"
-      , Translate (-300) (-180) $ Scale 0.3 0.3 $ Color black $ Text "- MAP Creator Tool"
-      , Translate (-300) (-220) $ Scale 0.3 0.3 $ Color black $ Text "- Help"
-      , Translate (-300) (-260) $ Scale 0.3 0.3 $ Color black $ Text "- Quit"
+      [ Translate (-800) 300 $ Scale 1.5 1.5 $ Color (makeColor 0.2 0.4 0.8 1.0) $ drawWord p "MENU PRINCIPAL"
+      , Translate (-800) 200 $ Scale 1 1 $ Color black $ drawWord p "Setas: Navegar entre opcoes"
+      , Translate (-800) 140 $ Scale 1 1 $ Color black $ drawWord p "Enter: Selecionar opcao"
+      , Translate (-800) 80 $ Scale 1 1 $ Color black $ drawWord p "ESC: Voltar/Sair"
+      , Translate (-800) (-50) $ Scale 1.5 1.5 $ Color (greyN 0.4) $ drawWord p "Opcoes disponiveis:"
+      , Translate (-800) (-100) $ Scale 1 1 $ Color black $ drawWord p "- Bot Simulation"
+      , Translate (-800) (-140) $ Scale 1 1 $ Color black $ drawWord p "- Player vs Player"
+      , Translate (-800) (-180) $ Scale 1 1 $ Color black $ drawWord p "- MAP Creator Tool"
+      , Translate (-800) (-220) $ Scale 1 1 $ Color black $ drawWord p "- Help"
+      , Translate (-800) (-260) $ Scale 1 1 $ Color black $ drawWord p "- Quit"
       ]
     
     conteudoPagina 1 = Pictures 
-      [ Translate (-300) 300 $ Scale 0.4 0.4 $ Color (makeColor 0.2 0.4 0.8 1.0) $ Text "LEVEL SELECTOR"
-      , Translate (-300) 200 $ Scale 0.35 0.35 $ Color black $ Text "I: Importa mapa salvo"
-      , Translate (-300) 140 $ Scale 0.35 0.35 $ Color black $ Text "Setas Cima/Baixo: Navegar niveis"
-      , Translate (-300) 80 $ Scale 0.35 0.35 $ Color black $ Text "Enter: Jogar nivel selecionado"
-      , Translate (-300) 20 $ Scale 0.35 0.35 $ Color black $ Text "ESC: Voltar ao menu"
+      [ Translate (-800) 300 $ Scale 1.5 1.5 $ Color (makeColor 0.2 0.4 0.8 1.0) $ drawWord p "LEVEL SELECTOR"
+      , Translate (-800) 200 $ Scale 1 1 $ Color black $ drawWord p "I: Importa mapa salvo"
+      , Translate (-800) 140 $ Scale 1 1 $ Color black $ drawWord p "Setas Cima/Baixo: Navegar niveis"
+      , Translate (-800) 80 $ Scale 1 1 $ Color black $ drawWord p "Enter: Jogar nivel selecionado"
+      , Translate (-800) 20 $ Scale 1 1 $ Color black $ drawWord p "ESC: Voltar ao menu"
       ]
     
     conteudoPagina 2 = Pictures 
-      [ Translate (-300) 300 $ Scale 0.4 0.4 $ Color (makeColor 0.2 0.4 0.8 1.0) $ Text "MODO PVP - MOVIMENTACAO"
-      , Translate (-300) 200 $ Scale 0.35 0.35 $ Color (greyN 0.4) $ Text "Movimento Base:"
-      , Translate (-300) 150 $ Scale 0.3 0.3 $ Color black $ Text "WASD ou Setas: Norte/Sul/Este/Oeste"
-      , Translate (-300) 70 $ Scale 0.35 0.35 $ Color (greyN 0.4) $ Text "Movimentos Diagonais:"
-      , Translate (-300) 20 $ Scale 0.3 0.3 $ Color black $ Text "Q: Noroeste"
-      , Translate (-300) (-30) $ Scale 0.3 0.3 $ Color black $ Text "E: Nordeste"
-      , Translate (-300) (-80) $ Scale 0.3 0.3 $ Color black $ Text "Z: Sudoeste"
-      , Translate (-300) (-130) $ Scale 0.3 0.3 $ Color black $ Text "C: Sudeste"
+      [ Translate (-800) 300 $ Scale 1.5 1.5 $ Color (makeColor 0.2 0.4 0.8 1.0) $ drawWord p "MODO PVP - MOVIMENTACAO"
+      , Translate (-800) 200 $ Scale 1 1 $ Color (greyN 0.4) $ drawWord p "Movimento Base:"
+      , Translate (-800) 150 $ Scale 1 1 $ Color black $ drawWord p "WASD ou Setas: Norte/Sul/Este/Oeste"
+      , Translate (-800) 70 $ Scale 1 1 $ Color (greyN 0.4) $ drawWord p "Movimentos Diagonais:"
+      , Translate (-800) 20 $ Scale 1 1 $ Color black $ drawWord p "Q: Noroeste"
+      , Translate (-800) (-30) $ Scale 1 1 $ Color black $ drawWord p "E: Nordeste"
+      , Translate (-800) (-80) $ Scale 1 1 $ Color black $ drawWord p "Z: Sudoeste"
+      , Translate (-800) (-130) $ Scale 1 1 $ Color black $ drawWord p "C: Sudeste"
       ]
     
     conteudoPagina 3 = Pictures 
-      [ Translate (-300) 300 $ Scale 0.4 0.4 $ Color (makeColor 0.2 0.4 0.8 1.0) $ Text "MODO PVP - CONTROLES"
-      , Translate (-300) 200 $ Scale 0.35 0.35 $ Color black $ Text "1: Trocar minhoca"
-      , Translate (-300) 160 $ Scale 0.25 0.25 $ Color (greyN 0.4) $ Text "  (Cicla para a proxima minhoca viva)"
-      , Translate (-300) 90 $ Scale 0.35 0.35 $ Color black $ Text "2: Trocar arma"
-      , Translate (-300) 50 $ Scale 0.25 0.25 $ Color (greyN 0.4) $ Text "  Ciclo: Jetpack -> Escavadora -> Bazuca"
-      , Translate (-300) 20 $ Scale 0.25 0.25 $ Color (greyN 0.4) $ Text "         -> Mina -> Dinamite -> Nenhuma"
-      , Translate (-300) (-50) $ Scale 0.35 0.35 $ Color black $ Text "ESC: Voltar ao menu"
+      [ Translate (-800) 300 $ Scale 1.5 1.5 $ Color (makeColor 0.2 0.4 0.8 1.0) $ drawWord p "MODO PVP - CONTROLES"
+      , Translate (-800) 200 $ Scale 1 1 $ Color black $ drawWord p "1: Trocar minhoca"
+      , Translate (-800) 160 $ Scale 1 1 $ Color (greyN 0.4) $ drawWord p "  (Cicla para a proxima minhoca viva)"
+      , Translate (-800) 90 $ Scale 1 1 $ Color black $ drawWord p "2: Trocar arma"
+      , Translate (-800) 50 $ Scale 1 1 $ Color (greyN 0.4) $ drawWord p "  Ciclo: Jetpack -> Escavadora -> Bazuca"
+      , Translate (-800) 20 $ Scale 1 1 $ Color (greyN 0.4) $ drawWord p "         -> Mina -> Dinamite -> Nenhuma"
+      , Translate (-800) (-50) $ Scale 1 1 $ Color black $ drawWord p "ESC: Voltar ao menu"
       ]
     
     conteudoPagina 4 = Pictures 
-      [ Translate (-300) 300 $ Scale 0.4 0.4 $ Color (makeColor 0.2 0.4 0.8 1.0) $ Text "MAP CREATOR - GERAL"
-      , Translate (-300) 200 $ Scale 0.35 0.35 $ Color (greyN 0.4) $ Text "Navegacao:"
-      , Translate (-300) 160 $ Scale 0.3 0.3 $ Color black $ Text "1: Alternar modo"
-      , Translate (-300) 130 $ Scale 0.25 0.25 $ Color (greyN 0.4) $ Text "  (Blocos -> Objetos -> Minhocas)"
-      , Translate (-300) 80 $ Scale 0.3 0.3 $ Color black $ Text "Setas Cima/Baixo: Navegar opcoes"
-      , Translate (-300) 40 $ Scale 0.3 0.3 $ Color black $ Text "Setas Esq/Dir: Navegar subopcoes"
-      , Translate (-300) 0 $ Scale 0.3 0.3 $ Color black $ Text "ESC: Voltar ao menu"
-      , Translate (-300) (-70) $ Scale 0.35 0.35 $ Color (greyN 0.4) $ Text "Mouse:"
-      , Translate (-300) (-110) $ Scale 0.3 0.3 $ Color black $ Text "Clique Esquerdo: Adicionar elemento"
-      , Translate (-300) (-150) $ Scale 0.3 0.3 $ Color black $ Text "Clique Direito: Remover elemento"
-      , Translate (-300) (-220) $ Scale 0.25 0.25 $ Color (greyN 0.4) $ Text "(Remove apenas do modo selecionado)"
+      [ Translate (-800) 300 $ Scale 1.5 1.5 $ Color (makeColor 0.2 0.4 0.8 1.0) $ drawWord p "MAP CREATOR - GERAL"
+      , Translate (-800) 200 $ Scale 1 1 $ Color (greyN 0.4) $ drawWord p "Navegacao:"
+      , Translate (-800) 160 $ Scale 1 1 $ Color black $ drawWord p "1: Alternar modo"
+      , Translate (-800) 130 $ Scale 1 1 $ Color (greyN 0.4) $ drawWord p "  (Blocos -> Objetos -> Minhocas)"
+      , Translate (-800) 80 $ Scale 1 1 $ Color black $ drawWord p "Setas Cima/Baixo: Navegar opcoes"
+      , Translate (-800) 40 $ Scale 1 1 $ Color black $ drawWord p "Setas Esq/Dir: Navegar subopcoes"
+      , Translate (-800) 0 $ Scale 1 1 $ Color black $ drawWord p "ESC: Voltar ao menu"
+      , Translate (-800) (-70) $ Scale 1 1 $ Color (greyN 0.4) $ drawWord p "Mouse:"
+      , Translate (-800) (-110) $ Scale 1 1 $ Color black $ drawWord p "Clique Esquerdo: Adicionar elemento"
+      , Translate (-800) (-150) $ Scale 1 1 $ Color black $ drawWord p "Clique Direito: Remover elemento"
+      , Translate (-800) (-220) $ Scale 0.7 0.7 $ Color (greyN 0.4) $ drawWord p "(Remove apenas do modo selecionado)"
       ]
     
     conteudoPagina 5 = Pictures 
-      [ Translate (-300) 350 $ Scale 0.4 0.4 $ Color (makeColor 0.2 0.4 0.8 1.0) $ Text "MAP CREATOR - EDICAO"
-      , Translate (-300) 270 $ Scale 0.35 0.35 $ Color (greyN 0.4) $ Text "Edicao do Mapa:"
-      , Translate (-300) 230 $ Scale 0.3 0.3 $ Color black $ Text "K: Adicionar linha abaixo"
-      , Translate (-300) 195 $ Scale 0.3 0.3 $ Color black $ Text "L: Adicionar coluna a direita"
-      , Translate (-300) 160 $ Scale 0.3 0.3 $ Color black $ Text "N: Remover ultima linha"
-      , Translate (-300) 125 $ Scale 0.3 0.3 $ Color black $ Text "M: Remover ultima coluna"
-      , Translate (-300) 60 $ Scale 0.35 0.35 $ Color (greyN 0.4) $ Text "Edicao de Minhocas:"
-      , Translate (-300) 20 $ Scale 0.3 0.3 $ Color black $ Text "Enter: Ativar/desativar modo edicao"
-      , Translate (-300) (-15) $ Scale 0.3 0.3 $ Color black $ Text "0-9: Digitar valores"
-      , Translate (-300) (-50) $ Scale 0.3 0.3 $ Color black $ Text "Backspace/Delete: Apagar digito"
-      , Translate (-300) (-85) $ Scale 0.3 0.3 $ Color black $ Text "Seta Esq/Dir: Navegar atributos"
-      , Translate (-300) (-150) $ Scale 0.35 0.35 $ Color (greyN 0.4) $ Text "Salvar/Carregar:"
-      , Translate (-300) (-185) $ Scale 0.3 0.3 $ Color black $ Text "E: Exportar estado"
-      , Translate (-300) (-220) $ Scale 0.25 0.25 $ Color (greyN 0.4) $ Text "  (Salva em 'estado.txt')"
+      [ Translate (-800) 350 $ Scale 1.5 1.5 $ Color (makeColor 0.2 0.4 0.8 1.0) $ drawWord p "MAP CREATOR - EDICAO"
+      , Translate (-800) 270 $ Scale 1 1 $ Color (greyN 0.4) $ drawWord p "Edicao do Mapa:"
+      , Translate (-800) 230 $ Scale 1 1 $ Color black $ drawWord p "K: Adicionar linha abaixo"
+      , Translate (-800) 195 $ Scale 1 1 $ Color black $ drawWord p "L: Adicionar coluna a direita"
+      , Translate (-800) 160 $ Scale 1 1 $ Color black $ drawWord p "N: Remover ultima linha"
+      , Translate (-800) 125 $ Scale 1 1 $ Color black $ drawWord p "M: Remover ultima coluna"
+      , Translate (-800) 60 $ Scale 1 1 $ Color (greyN 0.4) $ drawWord p "Edicao de Minhocas:"
+      , Translate (-800) 20 $ Scale 1 1 $ Color black $ drawWord p "Enter: Ativar/desativar modo edicao"
+      , Translate (-800) (-15) $ Scale 1 1 $ Color black $ drawWord p "0-9: Digitar valores"
+      , Translate (-800) (-50) $ Scale 1 1 $ Color black $ drawWord p "Backspace/Delete: Apagar digito"
+      , Translate (-800) (-85) $ Scale 1 1 $ Color black $ drawWord p "Seta Esq/Dir: Navegar atributos"
+      , Translate (-800) (-150) $ Scale 1 1 $ Color (greyN 0.4) $ drawWord p "Salvar/Carregar:"
+      , Translate (-800) (-185) $ Scale 1 1 $ Color black $ drawWord p "E: Exportar estado"
+      , Translate (-800) (-220) $ Scale 0.7 0.7 $ Color (greyN 0.4) $ drawWord p "  (Salva em 'estado.txt')"
       ]
     
     conteudoPagina _ = Blank
@@ -786,6 +786,7 @@ drawLetters p c =
     '@' -> p !! 68
     '<' -> p !! 70
     '>' -> p !! 71
+    _ -> Blank
 
 
 
