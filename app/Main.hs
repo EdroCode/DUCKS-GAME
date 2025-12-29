@@ -179,22 +179,82 @@ main = do
 
   let tiles = [grass, water, stone, pato, morto, barril, bazuca, sky, dinamite, mina, dirt, lava, healthPack, patoPulando, blank_sprite, ammoJetpack, ammoEscavadora, ammoBazuca, ammoMina, ammoDinamite, botao, botaoOn, botaoOff, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, space, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, dash, pl, pr, slash, dott_points, comma, exclamation, interrogation, arrombado, fireball, leftArrow, rightArrow, patoBazucaVermelho, patoBazucaAzul, blank_sprite, blank_sprite, patoAzulPulando, patoVermelhoPulando, patoVermelhoParado, patoAzulParado, blank_sprite, blank_sprite, patoEscavadoraAzul, patoEscavadoraVermelho, patoFogo, background, patoVermelhoJetpack, patoAzulJetpack, backgroundBorrado, botaoOn2, botaoOff2, lvlAddSign, patoOutline, patoOutlinePulando, sidebar, sidebarAzul, sidebarVermelho, mapSheet, patoPulandoR, patoR, patoFogoR, patoOutlineR, patoOutlinePulandoR, patoVermelhoPulandoR, patoVermelhoParadoR, patoBazucaVermelhoR, patoEscavadoraVermelhoR, patoVermelhoJetpackR, patoBazucaAzulR, patoAzulPulandoR, patoAzulParadoR, patoEscavadoraAzulR, patoAzulJetpackR, jetpack, escavadora, redWins, blueWins, selectedOutline, patoFogoOutline, patoFogoOutlineR]
 
-{- Indices dos sprites:
- 0: grass, 1: water, 2: stone, 3: pato, 4: morto, 5: barril,
- 6: bazuca, 7: sky, 8: dinamite, 9: mina, 10: dirt,
- 11: lava, 12: healthPack, 13: patoPulando, 14: patoCaindo,
- 15-19: ammo packs, 20-22: botoes menu, 23-68: fontes,
- 69: fireball, 70-71: setas, 72: patoBazucaVermelho, 73: patoBazucaAzul,
- 74: patoAzulCaindo, 75: patoVermelhoCaindo, 76: patoAzulPulando,
- 77: patoVermelhoPulando, 78: patoVermelhoParado, 79: patoAzulParado,
- 80: PatoMachudadoAzul, 81: PatoMachudadoVermelho,
- 82: patoEscavadoraAzul, 83: patoEscavadoraVermelho, 84: patoFogo, 85: background, 
- 86: patoVermelhoJetpack, 87: patoAzulJetpack, 88: backgroundBorrado
-  89-90: botoes menu 2, 91: lvlAddSign, 92-94: patoOutline, patoOutlinePulando,
-  95-97: sidebar, sidebarAzul, sidebarVermelho, 98: mapSheet,
-  99-103: pato normal Right, 104-108: pato vermelho Right,
-  109-112: pato Azul Right, 113: jetpack, 114: escavadora
-  115: redWins, 116: blueWins
+{- Indices dos sprites (corrigidos para corresponder à lista `tiles`):
+  0: grass
+  1: water
+  2: stone
+  3: pato
+  4: morto
+  5: barril
+  6: bazuca
+  7: sky
+  8: dinamite
+  9: mina
+  10: dirt
+  11: lava
+  12: healthPack
+  13: patoPulando
+  14: (blank_sprite)
+  15: ammoJetpack
+  16: ammoEscavadora
+  17: ammoBazuca
+  18: ammoMina
+  19: ammoDinamite
+  20: botao
+  21: botaoOn
+  22: botaoOff
+  23-68: fontes
+  69: fireball
+  70: leftArrow
+  71: rightArrow
+  72: patoBazucaVermelho
+  73: patoBazucaAzul
+  74: (blank_sprite)
+  75: (blank_sprite)
+  76: patoAzulPulando
+  77: patoVermelhoPulando
+  78: patoVermelhoParado
+  79: patoAzulParado
+  80: (blank_sprite)
+  81: (blank_sprite)
+  82: patoEscavadoraAzul
+  83: patoEscavadoraVermelho
+  84: patoFogo
+  85: background
+  86: patoVermelhoJetpack
+  87: patoAzulJetpack
+  88: backgroundBorrado
+  89: botaoOn2
+  90: botaoOff2
+  91: lvlAddSign
+  92: patoOutline
+  93: patoOutlinePulando
+  94: sidebar
+  95: sidebarAzul
+  96: sidebarVermelho
+  97: mapSheet
+  98: patoPulandoR
+  99: patoR
+  100: patoFogoR
+  101: patoOutlineR
+  102: patoOutlinePulandoR
+  103: patoVermelhoPulandoR
+  104: patoVermelhoParadoR
+  105: patoBazucaVermelhoR
+  106: patoEscavadoraVermelhoR
+  107: patoVermelhoJetpackR
+  108: patoBazucaAzulR
+  109: patoAzulPulandoR
+  110: patoAzulParadoR
+  111: patoEscavadoraAzulR
+  112: patoAzulJetpackR
+  113: jetpack
+  114: escavadora
+  115: redWins
+  116: blueWins
+  117: selectedOutline
+  118: patoFogoOutline
+  119: patoFogoOutlineR
 -}
 
   -- let temanatal = [grass, water, stone, pato, morto, barril, bazuca, sky, dinamite, mina, dirt, lava, healthPack, patoPulando, patoCaindo, ammoJetpack, ammoEscavadora, ammoBazuca, ammoMina, ammoDinamite, botao, botaoOn, botaoOff, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, space, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, dash, pl, pr, slash, dott_points, comma, exclamation, interrogation]

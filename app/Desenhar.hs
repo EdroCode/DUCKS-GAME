@@ -236,24 +236,26 @@ drawGameOver p equipa =
     Pictures
         [ bg
         , Pictures
-            [Translate (-200) 100 $ Scale 0.8 0.8 $ Color (equipaCor equipa) $
-                drawWord p (equipaStr equipa ++ " Ganha!")
-            ]
-        , Pictures
-            [ Translate (70) (-50) $ Color white $ rectangleSolid 580 20
-            , Translate (-200) (-50) $ Scale 0.4 0.4 $ Color (greyN 0.7) $
+            [ Translate (70) (-100) $ Scale 0.6 0.6 $ p !! 90
+            , Translate (-200) (-100) $ Scale 0.4 0.4 $ Color (greyN 0.7) $
                 drawWord p "Pressiona ESC para retornar ao menu"
             ]
         ]
   where
     bg = case equipa of
-      Red -> Pictures [Translate 0 0 $ Scale 1 1 $ p !! 115, Translate (125) 100 $ Color white $ rectangleSolid 720 60]
-      Blue -> Pictures [Translate 0 0 $ Scale 1 1 $ p !! 116, Translate (70) 100 $ Color white $ rectangleSolid 580 60]
+      Red -> Pictures
+        [ Translate 0 0 $ Scale 1 1 $ p !! 115
+        , Translate (80) 200 $ p !! 20
+        , Translate (-110) 250 $ Scale 0.7 0.7 $ drawWord p "Equipa Vermelha"
+        , Translate (-50) 200 $ Scale 1.5 1.5 $ Color black $ drawWord p "Ganha!"
+        ]
+      Blue -> Pictures
+        [ Translate 0 0 $ Scale 1 1 $ p !! 116
+        , Translate (80) 200 $ p !! 20
+        , Translate (-70) 250 $ Scale 0.7 0.7 $ drawWord p "Equipa Azul"
+        , Translate (-50) 200 $ Scale 1.5 1.5 $ Color black $ drawWord p "Ganha!"
+        ]
 
-    equipaStr Red = "Equipa Vermelha"
-    equipaStr Blue = "Equipa Azul"
-    equipaCor Red = red
-    equipaCor Blue = blue
 
 drawMCT :: [Picture] -> EstadoDLC -> Int -> Int -> Int -> Int -> Bool -> Maybe Int -> MinhocaDLC -> Picture
 drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet esc baz mina dina flame burn equipa _) = Pictures
@@ -869,6 +871,17 @@ bazucaDir p dir = case dir of
     Nordeste -> Rotate 315 (p !! 6)
     Noroeste -> Rotate 225 (p !! 6)
 
+fireballDir :: [Picture] -> Direcao -> Picture
+fireballDir p dir = case dir of
+    Este -> p !! 69
+    Oeste -> Rotate 180 (p !! 69)
+    Norte -> Rotate 270 (p !! 69)
+    Sul -> Rotate 90 (p !! 69)
+    Sudeste -> Rotate 45 (p !! 69)
+    Sudoeste -> Rotate 135 (p !! 69)
+    Nordeste -> Rotate 315 (p !! 69)
+    Noroeste -> Rotate 225 (p !! 69)
+
 -- | Desenha as minhocas com sprites diferentes baseado na última jogada
 drawMinhocas :: [Picture] -> [Minhoca] -> Mapa -> Maybe NumMinhoca -> Maybe Jogada -> Picture
 drawMinhocas p ms mapa numMinhoca jogada = Pictures $ map drawM (zip [0..] ms)
@@ -976,7 +989,7 @@ drawObjetosDLC p objs mapa = Pictures $ map drawO objs
       BazucaDLC -> bazucaDir p (direcaoDisparoDLC o)
       MinaDLC -> p !! 9
       DinamiteDLC -> p !! 8
-      FlameTrower -> p !! 69
+      FlameTrower -> fireballDir p (direcaoDisparoDLC o)
       _ -> Color black $ circleSolid (cellSize * 0.4)
       where (x,y) = converteMapaDLC mapa (DataDLC.posicaoObjeto o)
 
