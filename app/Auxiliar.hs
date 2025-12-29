@@ -327,3 +327,5 @@ substituirLista :: Int -> a -> [a] -> [a]
 substituirLista _ _ [] = []
 substituirLista 0 x (_:t) = x : t
 substituirLista i x (h:t) = h : substituirLista (i - 1) x t
+
+

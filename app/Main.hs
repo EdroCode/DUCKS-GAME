@@ -70,23 +70,41 @@ main = do
   Just patoFogo <- loadJuicy (path ++ "PatoFogo.png")
   Just patoOutline   <- loadJuicy (path ++"PatoOutline.png")
   Just patoOutlinePulando   <- loadJuicy (path ++"PatoOutlinePulando.png")
-
-
+  
+  -- Pato normal Right
+  Just patoPulandoR <- loadJuicy (path ++ "PatoPulandoRight.png")
+  Just patoR   <- loadJuicy (path ++"PatoParadoRight.png")
+  Just patoFogoR <- loadJuicy (path ++ "PatoFogoRight.png")
+  Just patoOutlineR   <- loadJuicy (path ++"PatoOutlineRight.png")
+  Just patoOutlinePulandoR   <- loadJuicy (path ++"PatoOutlinePulandoRight.png")
+  
   -- Pato vermelho
-
   Just patoVermelhoPulando <- loadJuicy (path ++ "PatoVermelhoPulando.png")
   Just patoVermelhoParado <- loadJuicy (path ++ "PatoVermelhoParado.png")
   Just patoBazucaVermelho <- loadJuicy (path ++ "PatoBazucaVermelho.png")
   Just patoEscavadoraVermelho <- loadJuicy (path ++ "PatoEscavadoraVermelho.png")
   Just patoVermelhoJetpack <- loadJuicy (path ++ "PatoVermelhoJetpack.png")
-
-
+  
+  -- Pato vermelho Right
+  Just patoVermelhoPulandoR <- loadJuicy (path ++ "PatoVermelhoPulandoRight.png")
+  Just patoVermelhoParadoR <- loadJuicy (path ++ "PatoVermelhoParadoRight.png")
+  Just patoBazucaVermelhoR <- loadJuicy (path ++ "PatoBazucaVermelhoRight.png")
+  Just patoEscavadoraVermelhoR <- loadJuicy (path ++ "PatoEscavadoraVermelhoRight.png")
+  Just patoVermelhoJetpackR <- loadJuicy (path ++ "PatoVermelhoJetpackRight.png")
+  
   -- Pato Azul
   Just patoBazucaAzul <- loadJuicy (path ++ "PatoBazucaAzul.png")
   Just patoAzulPulando <- loadJuicy (path ++ "PatoAzulPulando.png")
   Just patoAzulParado <- loadJuicy (path ++ "PatoAzulParado.png")
   Just patoEscavadoraAzul <- loadJuicy (path ++ "PatoEscavadoraAzul.png")
   Just patoAzulJetpack <- loadJuicy (path ++ "PatoAzulJetpack.png")
+  
+  -- Pato Azul Right
+  Just patoBazucaAzulR <- loadJuicy (path ++ "PatoBazucaAzulRight.png")
+  Just patoAzulPulandoR <- loadJuicy (path ++ "PatoAzulPulandoRight.png")
+  Just patoAzulParadoR <- loadJuicy (path ++ "PatoAzulParadoRight.png")
+  Just patoEscavadoraAzulR <- loadJuicy (path ++ "PatoEscavadoraAzulRight.png")
+  Just patoAzulJetpackR <- loadJuicy (path ++ "PatoAzulJetpackRight.png")
 
   Just mapSheet <- loadJuicy (path ++ "MapSheet.png")
   -- * Fontes
@@ -151,7 +169,7 @@ main = do
   Just blank_sprite <- loadJuicy (path ++ "WormArcher.png") -- * Usado apenas para encher espacos para evitar conflitos apos major change
 
 
-  let tiles = [grass, water, stone, pato, morto, barril, bazuca, sky, dinamite, mina, dirt, lava, healthPack, patoPulando, blank_sprite, ammoJetpack, ammoEscavadora, ammoBazuca, ammoMina, ammoDinamite, botao, botaoOn, botaoOff, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, space, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, dash, pl, pr, slash, dott_points, comma, exclamation, interrogation, arrombado, fireball, leftArrow, rightArrow, patoBazucaVermelho, patoBazucaAzul, blank_sprite, blank_sprite, patoAzulPulando, patoVermelhoPulando, patoVermelhoParado, patoAzulParado, blank_sprite, blank_sprite, patoEscavadoraAzul, patoEscavadoraVermelho, patoFogo, background, patoVermelhoJetpack, patoAzulJetpack, backgroundBorrado, botaoOn2, botaoOff2, lvlAddSign, patoOutline, patoOutlinePulando, sidebar, sidebarAzul, sidebarVermelho, mapSheet]
+  let tiles = [grass, water, stone, pato, morto, barril, bazuca, sky, dinamite, mina, dirt, lava, healthPack, patoPulando, blank_sprite, ammoJetpack, ammoEscavadora, ammoBazuca, ammoMina, ammoDinamite, botao, botaoOn, botaoOff, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, space, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, dash, pl, pr, slash, dott_points, comma, exclamation, interrogation, arrombado, fireball, leftArrow, rightArrow, patoBazucaVermelho, patoBazucaAzul, blank_sprite, blank_sprite, patoAzulPulando, patoVermelhoPulando, patoVermelhoParado, patoAzulParado, blank_sprite, blank_sprite, patoEscavadoraAzul, patoEscavadoraVermelho, patoFogo, background, patoVermelhoJetpack, patoAzulJetpack, backgroundBorrado, botaoOn2, botaoOff2, lvlAddSign, patoOutline, patoOutlinePulando, sidebar, sidebarAzul, sidebarVermelho, mapSheet, patoPulandoR, patoR, patoFogoR, patoOutlineR, patoOutlinePulandoR, patoVermelhoPulandoR, patoVermelhoParadoR, patoBazucaVermelhoR, patoEscavadoraVermelhoR, patoVermelhoJetpackR, patoBazucaAzulR, patoAzulPulandoR, patoAzulParadoR, patoEscavadoraAzulR, patoAzulJetpackR]
 
 {- Indices dos sprites:
  0: grass, 1: water, 2: stone, 3: pato, 4: morto, 5: barril,

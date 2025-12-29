@@ -542,7 +542,7 @@ drawGame p est numMinhoca jogada = Pictures [p !! 88, sidebar, world]
             ]
 
 drawPvPGame :: [Picture] -> EstadoDLC -> JogadaDLC -> Picture
-drawPvPGame p est _ =
+drawPvPGame p est jogada =
   Pictures [p !! 88, p!!97, sidebar, world]
   where
     mapa = mapaEstadoDLC est
@@ -685,8 +685,9 @@ drawPvPGame p est _ =
           Pictures
             [ drawMapaDLC p mapa
             , drawObjetosDLC p objs mapa
-            , drawMinhocasStatic p ms mapa
+            , drawMinhocasDLC p ms mapa (Just 0) jogada est
             ]
+
 
 converteMapa :: Mapa -> Posicao -> (Float, Float)
 converteMapa mapa (r,c) = (x,y)
@@ -918,34 +919,51 @@ drawObjetosDLC p objs mapa = Pictures $ map drawO objs
       where (x,y) = converteMapaDLC mapa (DataDLC.posicaoObjeto hp)
 
 getSpriteParaAcaoDLC :: MinhocaDLC -> JogadaDLC -> [Picture] -> EstadoDLC -> Picture
-getSpriteParaAcaoDLC minhoca (DataDLC.Move _) p e
-  | burningCounter minhoca > 0 = p !! 82
-  | eMinhocaVivaDLC minhoca = let
-      pos = case posicaoMinhocaDLC minhoca of Just a -> a
-    in case equipaMinhoca minhoca of
-      Just Red -> if EfetuaJogada.estaNoSolo pos (mapaEstadoDLC e) (minhocasEstadoDLC e) then p !! 78 else p !! 77
-      Just Blue -> if EfetuaJogada.estaNoSolo pos (mapaEstadoDLC e) (minhocasEstadoDLC e) then p !! 79 else p !! 76
-      _ -> p !! 3
+getSpriteParaAcaoDLC minhoca (DataDLC.Move dir) p e
+  | burningCounter minhoca > 0 =
+      if getXWayDLC dir == Oeste then p !! 84 else p !! 100
 
-getSpriteParaAcaoDLC minhoca (DataDLC.Dispara arma _) p e 
-  | burningCounter minhoca > 0 = p !! 82
-  | eMinhocaVivaDLC minhoca = let
-      pos = case posicaoMinhocaDLC minhoca of Just a -> a
-    in case equipaMinhoca minhoca of
-      Just Red -> case arma of
+  | eMinhocaVivaDLC minhoca =
+      let pos = case posicaoMinhocaDLC minhoca of Just a -> a
+      in case equipaMinhoca minhoca of
 
-        JetpackDLC -> p !! 86
-        EscavadoraDLC -> p !! 83
-        BazucaDLC -> p !! 72
-        _ -> if EfetuaJogada.estaNoSolo pos (mapaEstadoDLC e) (minhocasEstadoDLC e) then p !! 80 else p !! 79
+        Just Red ->
+          if EfetuaJogada.estaNoSolo pos (mapaEstadoDLC e) (minhocasEstadoDLC e)
+            then if getXWayDLC dir == Oeste then p !! 78 else p !! 104
+            else if getXWayDLC dir == Oeste then p !! 77 else p !! 103
 
-      Just Blue -> case arma of
+        Just Blue ->
+          if EfetuaJogada.estaNoSolo pos (mapaEstadoDLC e) (minhocasEstadoDLC e)
+            then if getXWayDLC dir == Oeste then p !! 79 else p !! 110
+            else if getXWayDLC dir == Oeste then p !! 76 else p !! 109
 
-        JetpackDLC -> p !! 87
-        EscavadoraDLC -> p !! 82
-        BazucaDLC -> p !! 73
-        _ -> if EfetuaJogada.estaNoSolo pos (mapaEstadoDLC e) (minhocasEstadoDLC e) then p !! 80 else p !! 79
+        _ ->
+          if getXWayDLC dir == Oeste then p !! 3 else p !! 98
 
+getSpriteParaAcaoDLC minhoca (DataDLC.Dispara arma _) p e
+  | burningCounter minhoca > 0 = p !! 84
+
+  | eMinhocaVivaDLC minhoca =
+      let pos = case posicaoMinhocaDLC minhoca of Just a -> a
+      in case equipaMinhoca minhoca of
+
+        Just Red -> case arma of
+          JetpackDLC     -> p !! 86
+          EscavadoraDLC  -> p !! 83
+          BazucaDLC      -> p !! 72
+          _ ->
+            if EfetuaJogada.estaNoSolo pos (mapaEstadoDLC e) (minhocasEstadoDLC e)
+              then p !! 78
+              else p !! 77
+
+        Just Blue -> case arma of
+          JetpackDLC     -> p !! 87
+          EscavadoraDLC  -> p !! 82
+          BazucaDLC      -> p !! 73
+          _ ->
+            if EfetuaJogada.estaNoSolo pos (mapaEstadoDLC e) (minhocasEstadoDLC e)
+              then p !! 79
+              else p !! 76
 
 
 converteMapaDLC :: MapaDLC -> Posicao -> (Float, Float)
@@ -991,3 +1009,13 @@ extrairPosicao str = case words str of
     ["Just", pos] -> pos
     ["Nothing"] -> "N/A"
     _ -> "N/A"
+
+-- | Extrai a componente horizontal (Este/Oeste) de uma direção
+getXWayDLC :: Direcao -> Direcao
+getXWayDLC d = case d of
+  Noroeste  -> Oeste
+  Sudoeste  -> Oeste
+  Nordeste  -> Este
+  Sudeste   -> Este
+  _         -> Este
+
