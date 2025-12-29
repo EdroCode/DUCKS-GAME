@@ -39,7 +39,7 @@ desenha :: [Picture] -> Worms -> IO Picture
 desenha p (Menu sel) = return $ drawMenu p sel
 desenha p (BotSimulation est _ _ (numMinhoca, jogada)) = return $ drawGame p est (Just numMinhoca) (Just jogada)
 desenha p (PVP est _ _ jogada) = return $ drawPvPGame p est jogada
-desenha p (MapCreatorTool e b a secSel thirdSel edit char worm) = return $ (drawMCT p e b a secSel thirdSel edit char worm)
+desenha p (MapCreatorTool e b a secSel thirdSel edit char worm disp) = return $ (drawMCT p e b a secSel thirdSel edit char worm disp)
 desenha p (LevelSelector i estImp) = return $ (drawLvlSelector p i estImp)
 desenha p (Quit sel) = return $ drawQuitConfirm p sel
 desenha p (Help pagina) = return $ drawHelp p pagina
@@ -255,8 +255,8 @@ drawGameOver p equipa =
     equipaCor Red = red
     equipaCor Blue = blue
 
-drawMCT :: [Picture] -> EstadoDLC -> Int -> Int -> Int -> Int -> Bool -> Maybe Int -> MinhocaDLC -> Picture
-drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet esc baz mina dina flame burn equipa _) = Pictures
+drawMCT :: [Picture] -> EstadoDLC -> Int -> Int -> Int -> Int -> Bool -> Maybe Int -> MinhocaDLC -> ObjetoDLC -> Picture
+drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet esc baz mina dina flame burn equipa _) (DisparoDLC pos dir tip tempoR dono) = Pictures
   [ Translate (-440) 330 $ Scale 0.5 0.5 $ Color black $ drawWord p "Bem vindo ao criador de mapas", sidebar, world]
   where
     mapa = mapaEstadoDLC e
@@ -309,7 +309,7 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
 
     drawDisparoSelector y = Pictures
       [ if blocoSelecionado == 3
-          then Color (makeColor 0.3 0.6 1.0 0.3) $ Translate (-750) y $ rectangleSolid 280 70
+          then  if editMode then Color red $ Translate (-750) y $ rectangleSolid 280 70 else Color (makeColor 0.3 0.6 1.0 0.3) $ Translate (-750) y $ rectangleSolid 280 70
           else Blank
       , Translate (-880) y $ Scale 0.6 0.6 $ Color black $ drawWord p (show (selectedIdx + 1))
       , Translate (-850) (y + 5) $ Scale 0.6 0.6 $ Color black $ drawWord p "Disparos"
@@ -317,6 +317,43 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
       , Translate (-850) (y - 30) $ Scale 0.5 0.5 $ Color (greyN 0.5) $ drawWord p "<"
       , Translate (-650) (y - 30) $ Scale 0.5 0.5 $ Color (greyN 0.5) $ drawWord p ">"
       , Translate (-825) (y - 30) $ Scale 0.5 0.5 $ Color (greyN 0.5) $ drawWord p selectedName
+      , (if blocoSelecionado == 3 then Pictures
+          [
+            if thirdSel == 0
+              then Color editColor $
+                  Translate (-940) (y - 60) $
+                  rectangleSolid 50 30
+              else Blank
+          , Translate (-940) (y - 60) $
+              Scale 0.6 0.6 $
+                Color black $
+                  drawWord p ("Dir:" ++ show dir)
+          ] else Blank)
+      , if blocoSelecionado == 3 then Pictures
+          [
+            if thirdSel == 1
+              then Color editColor $
+                  Translate (-940) (y  - 120) $
+                  rectangleSolid 50 30
+              else Blank
+          , Translate (-940) (y - 120) $
+              Scale 0.6 0.6 $
+                Color black $
+                  drawWord p ("Tempo:" ++ show tempoR)
+          ] else Blank
+      , if blocoSelecionado == 3 then Pictures
+          [
+            if thirdSel == 2
+              then Color editColor $
+                  Translate (-940) (y - 180) $
+                  rectangleSolid 50 30
+              else Blank
+          , Translate (-940) (y - 180) $
+              Scale 0.6 0.6 $
+                Color black $
+                  drawWord p ("Dono:" ++ show dono)
+          ] else Blank
+
       ]
       where
         (selectedIdx, selectedName, selectedPic) = if blocoSelecionado == 3 then disparos !! secSel else head disparos
@@ -327,6 +364,9 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
     weaponTextOffset :: Float
     weaponTextOffset = 150
 
+
+
+
     drawPersonagens y (idx, nome, pic) = Pictures
       [ if idx == blocoSelecionado
           then Color (makeColor 0.3 0.6 1.0 0.3) $ Translate (-750) y $ rectangleSolid 280 70
@@ -334,7 +374,6 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
       , Translate (-880) y $ Scale 0.6 0.6 $ Color black $ drawWord p (show (idx + 1))
       , Translate (-850) (y + 5) $ Scale 0.6 0.6 $ Color black $ drawWord p nome
       , Translate (-700) y $ Scale 2 2 $ pic
-
       , Translate (-900) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 2
       , Translate (-830) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 2
       , Translate (-760) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 6
@@ -454,6 +493,8 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
 
           ]
 
+
+
     sidebar = Pictures
       [ Translate (-750) 80 $ p !! 94
       , Translate (-870) 360 $ Scale 1 1 $ Color black $ drawWord p infoMapa
@@ -480,10 +521,10 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
       , Translate (-900) (-600) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "Enter - Editar valor"
       , Translate (-900) (-630) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "Backspace/Delete - Eliminar valor"
 
-      --, Translate (-200) (-630) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p ("1sel > " ++ show mode) -- ? debug
-      --, Translate (0) (-630) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p ("-  2sel > " ++ show secSel) -- ? debug
-      --, Translate (200) (-630) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p ("-  3sel > " ++ show thirdSel) -- ? debug
-      --, Translate (400) (-630) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p ("-  io > " ++ show char) -- ? debug
+      , Translate (-200) (-680) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p ("1sel (a) > " ++ show mode) -- ? debug
+      , Translate (0) (-680) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p ("     -  2sel (l)> " ++ show secSel) -- ? debug
+      , Translate (200) (-680) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p ("                  -  3sel (t)> " ++ show thirdSel) -- ? debug
+      , Translate (-200) (-780) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p ("                  -  b" ++ show blocoSelecionado) -- ? debug
 
       ]
 
