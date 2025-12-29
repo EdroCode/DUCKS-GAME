@@ -125,12 +125,10 @@ drawHelp p pagina = Pictures
       , Translate (-800) 200 $ Scale 1 1 $ Color black $ drawWord p "Setas: Navegar entre opcoes"
       , Translate (-800) 140 $ Scale 1 1 $ Color black $ drawWord p "Enter: Selecionar opcao"
       , Translate (-800) 80 $ Scale 1 1 $ Color black $ drawWord p "ESC: Voltar/Sair"
-      , Translate (-800) (-50) $ Scale 1.5 1.5 $ Color (greyN 0.4) $ drawWord p "Opcoes disponiveis:"
-      , Translate (-800) (-100) $ Scale 1 1 $ Color black $ drawWord p "- Bot Simulation"
-      , Translate (-800) (-140) $ Scale 1 1 $ Color black $ drawWord p "- Player vs Player"
-      , Translate (-800) (-180) $ Scale 1 1 $ Color black $ drawWord p "- MAP Creator Tool"
-      , Translate (-800) (-220) $ Scale 1 1 $ Color black $ drawWord p "- Help"
-      , Translate (-800) (-260) $ Scale 1 1 $ Color black $ drawWord p "- Quit"
+      , Translate (-800) (-100) $ Scale 0.9 0.9 $ Color black $ drawWord p "Para evitar qualquer nuances durante a gameplay é "
+      , Translate (-800) (-180) $ Scale 0.9 0.9 $ Color black $ drawWord p "recomendado a leitura do ficheiro "
+      , Translate (-800) (-260) $ Scale 0.9 0.9 $ Color black $ drawWord p "- GUIA COMPLETO DE COMANDOS.txt -"
+
       ]
     
     conteudoPagina 1 = Pictures 
@@ -233,9 +231,10 @@ drawGameOver p equipa =
     equipaCor Red = red
     equipaCor Blue = blue
 
+
 drawMCT :: [Picture] -> EstadoDLC -> Int -> Int -> Int -> Int -> Bool -> Maybe Int -> MinhocaDLC -> Picture
 drawMCT p e blocoSelecionado mode secSel thirdSel editMode char (MinhocaDLC pos vida jet esc baz mina dina flame burn equipa) = Pictures
-  [ Translate (-440) 330 $ Scale 0.5 0.5 $ Color black $ drawWord p "Bem vindo ao criador de mapas", sidebar, world]
+  [ p !! 88, Translate (-440) 330 $ Scale 0.5 0.5 $ Color black $ drawWord p "Bem vindo ao criador de mapas", p!!97, sidebar, world]
   where
     mapa = mapaEstadoDLC e
     objs = objetosEstadoDLC e
@@ -467,23 +466,27 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode char (MinhocaDLC pos 
 
     linha = length mapa
     cols = if null mapa then 0 else length (head mapa)
-    largura = fromIntegral cols * cellSize
-    altura  = fromIntegral linha * cellSize
-    sidebarWidth = 300
-    usableWidth  = janelaLargura - sidebarWidth
-    usableHeight = janelaAltura
-
-    sx = if largura > 0 then usableWidth / largura else 1
-    sy = if altura > 0 then usableHeight / altura else 1
-    scaleFactor = min (min sx sy) 2.0
+    
+    larguraMapa = fromIntegral cols * cellSize
+    alturaMapa  = fromIntegral linha * cellSize
+    
+    sidebarWidth = 1000
+    maxWorldWidth  = janelaLargura - sidebarWidth
+    maxWorldHeight = janelaAltura - 400
+    
+    scaleX = if larguraMapa > 0 then maxWorldWidth / larguraMapa else 1
+    scaleY = if alturaMapa > 0 then maxWorldHeight / alturaMapa else 1
+    
+    scaleFactor = min (min scaleX scaleY) 2.0
 
     editColor = if editMode == False then makeColor 0.3 0.6 1.0 0.3 else red
 
     world =
-      Translate (sidebarWidth / 2) 0 $
+      Translate 50 0 $
         Scale scaleFactor scaleFactor $
           Pictures
-            [ drawMapaDLC p mapa
+            [ Color (greyN 0.3) $ rectangleWire larguraMapa alturaMapa
+            , drawMapaDLC p mapa
             , drawObjetosDLC p objs mapa
             , drawMinhocasStatic p ms mapa
             ]
@@ -511,20 +514,24 @@ drawGame p est numMinhoca jogada = Pictures [p !! 88, sidebar, world]
       , Translate (-900) 180 $ Scale 0.3 0.3 $ Color black $ drawWord p ("Total minhocas: " ++ show totalMinhocas)
       , Translate (-900) 140 $ Scale 0.3 0.3 $ Color (dark red) $ drawWord p ("Objetos: " ++ show totalObjetos)
       ]
-
+    
+    
     linha = length mapa
     cols = if null mapa then 0 else length (head mapa)
-    largura = fromIntegral cols * cellSize
-    altura  = fromIntegral linha * cellSize
-    sidebarWidth = 300
-    usableWidth  = janelaLargura - sidebarWidth
-    usableHeight = janelaAltura
+    
+    larguraMapa = fromIntegral cols * cellSize
+    alturaMapa  = fromIntegral linha * cellSize
+    
+    sidebarWidth = 200
+    maxWorldWidth  = janelaLargura - sidebarWidth
+    maxWorldHeight = janelaAltura - 400
+    
+    scaleX = if larguraMapa > 0 then maxWorldWidth / larguraMapa else 1
+    scaleY = if alturaMapa > 0 then maxWorldHeight / alturaMapa else 1
+    
+    scaleFactor = min (min scaleX scaleY) 2.0
 
-
-    sx = if largura > 0 then usableWidth / largura else 1
-    sy = if altura > 0 then usableHeight / altura else 1
-    scaleFactor = min (min sx sy) 2.0
-
+   
     world =
       Translate (sidebarWidth / 2) 0 $
         Scale scaleFactor scaleFactor $
@@ -550,7 +557,6 @@ drawPvPGame p est jogada =
     totalMinhocas = length ms
     totalObjetos  = length objs
 
-    gameWindowPos = (-400)
 
     selectedSprite :: Picture
     selectedSprite =
@@ -659,26 +665,28 @@ drawPvPGame p est jogada =
 
     linha = length mapa
     cols = if null mapa then 0 else length (head mapa)
-    largura = fromIntegral cols * cellSize
-    altura  = fromIntegral linha * cellSize
-    sidebarWidth = 300
-    usableWidth  = janelaLargura - sidebarWidth
-    usableHeight = janelaAltura
+    
+    larguraMapa = fromIntegral cols * cellSize
+    alturaMapa  = fromIntegral linha * cellSize
+    
+    sidebarWidth = 1000
+    maxWorldWidth  = janelaLargura - sidebarWidth
+    maxWorldHeight = janelaAltura - 400
+    
+    scaleX = if larguraMapa > 0 then maxWorldWidth / larguraMapa else 1
+    scaleY = if alturaMapa > 0 then maxWorldHeight / alturaMapa else 1
+    
+    scaleFactor = min (min scaleX scaleY) 2.0
 
-
-    sx = if largura > 0 then usableWidth / largura else 1
-    sy = if altura > 0 then usableHeight / altura else 1
-    scaleFactor = min (min sx sy) 2.0
 
     world =
-      Translate 500 0 $
+      Translate 50 0 $
         Scale scaleFactor scaleFactor $
           Pictures
             [ drawMapaDLC p mapa
             , drawObjetosDLC p objs mapa
-            , drawMinhocasDLC p ms mapa (Just 0) jogada est
+            , drawMinhocasStatic p ms mapa
             ]
-
 
 converteMapa :: Mapa -> Posicao -> (Float, Float)
 converteMapa mapa (r,c) = (x,y)
