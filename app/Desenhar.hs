@@ -99,11 +99,11 @@ drawHelp pagina = Pictures
   
 
   , if pagina > 0 
-      then Translate (-200) (-450) $ Scale 0.3 0.3 $ Color (makeColor 0.2 0.4 0.8 1.0) $ Text "< Anterior"
+      then Translate (-280) (-450) $ Scale 0.3 0.3 $ Color (makeColor 0.2 0.4 0.8 1.0) $ Text "< Anterior"
       else Blank
   
   , if pagina < totalPaginas - 1
-      then Translate (100) (-450) $ Scale 0.3 0.3 $ Color (makeColor 0.2 0.4 0.8 1.0) $ Text "Proximo >"
+      then Translate (300) (-450) $ Scale 0.3 0.3 $ Color (makeColor 0.2 0.4 0.8 1.0) $ Text "Proximo >"
       else Blank
   
   , Translate (-450) (-500) $ Scale 0.25 0.25 $ Color (greyN 0.5) $ Text "Use Setas Esq/Dir para navegar | ESC para voltar ao menu"
@@ -198,23 +198,26 @@ drawHelp pagina = Pictures
 -- | Desenha o selector de níveis como uma lista vertical
 drawLvlSelector :: [Picture] -> Int -> [EstadoDLC] -> Picture
 drawLvlSelector p selected estadosImportados = Pictures
-  ([p !! 88] ++ (zipWith drawNivel [0..] estadosImportados))
+  [ Pictures $ zipWith drawNivel [0..] estadosImportados
+  ]
   where
     drawNivel :: Int -> EstadoDLC -> Picture
-    drawNivel idx estado = Translate 0 y $ Pictures
-      [ Scale 1 1 $ (if idx == selected then p !! 89 else p !! 90)
-      , Translate (x - largura/4) 0 $ Scale 0.7 0.7 $ drawWord p ("Level " ++ show (idx + 1))
-      , Translate (x + largura/4 - 100) 0 $ Scale 0.6 0.6 $ Color black $ drawWord p infoMapa
-      , Translate (x - 20) (-140) $ Scale 0.9 0.9 $ p !! 91
-      
+    drawNivel idx estado = Pictures
+      [ 
+        p !! 88
+      ,
+        Color (if idx == selected then makeColor 0.3 0.6 1 0.5 else greyN 0.5) $
+          Translate x y $ rectangleSolid largura altura
+      , Translate (x - largura/4) y $ Scale 0.7 0.7 $ drawWord p ("Level " ++ show (idx + 1))
+      , Translate (x + largura/4 - 100) y $ Scale 0.5 0.5 $ Color black $ drawWord p infoMapa
       ]
       where
         mapa = mapaEstadoDLC estado
         infoMapa = show (length mapa) ++ "x" ++ show (if null mapa then 0 else length (head mapa))
         largura = 1000
         altura  = 50
-        espaco  = 90
-        x = 20
+        espaco  = 10
+        x = 0 + 20
         y = 300 - fromIntegral idx * (altura + espaco)
   
   
@@ -242,7 +245,7 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode char (MinhocaDLC pos 
 
     infoMapa = show (length mapa) ++ "x" ++ show (if null mapa then 0 else length (head mapa))
 
-    blocos = [(0, "Terra", head p), (1, "Agua", p !! 1), (2, "Pedra", p !! 2), (3, "Ar", p !! 7), (4, "Lava", p !! 11) ]
+    blocos = [(0, "Terra", Scale 0.66 0.66 $ p !! 0), (1, "Agua", p !! 1), (2, "Pedra", p !! 2), (3, "Ar", p !! 7), (4, "Lava", p !! 11) ]
     
     staticObjects = [(0, "Barril", p !! 5), (1, "Health Pack", p !! 12)]
     ammoPacks = [(2, "Jetpack", p !! 15), (2, "Escavadora", p !! 16), (2, "Bazuca", p !! 17), (2, "Mina", p !! 18), (2, "Dinamite", p !! 19)]
@@ -432,8 +435,7 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode char (MinhocaDLC pos 
           ]
         
     sidebar = Pictures
-      [ Color (greyN 0.9) $ Translate (-750) 0 $ rectangleSolid 300 900
-      , Color white $ Translate (-750) 380 $ rectangleSolid 280 80
+      [ Translate (-750) 80 $ p !! 94
       , Translate (-870) 360 $ Scale 1 1 $ Color black $ drawWord p infoMapa
       , Color (greyN 0.7) $ Translate (-750) 320 $ rectangleSolid 280 2
       , Translate (-900) 280 $ Scale 0.6 0.6 $ Color (greyN 0.3) $ drawWord p "Blocos:"
@@ -552,11 +554,19 @@ drawPvPGame p est jogada =
 
     gameWindowPos = (-400)
 
+    selectedSprite :: Picture
+    selectedSprite =
+      let idx = minhocaSelecionada est
+      in if idx >= 0 && idx < length ms
+         then case equipaMinhoca (ms !! idx) of
+                Just Blue -> p !! 95
+                Just Red -> p !! 96
+                _ -> p !! 95
+         else p !! 95
+
     sidebar =
       Pictures
-        ( [ Color (greyN 0.9)
-              $ Translate (-750) 0
-              $ rectangleSolid (1000 - gameWindowPos) 900
+        ( [ Translate (-750) 0 $ Scale 1.1 1.1 $ selectedSprite
           , Translate (-900) 300 $ Scale 0.6 0.6 $ Color black $ drawWord p infoMapa
           , Translate (-900) 260 $ Scale 0.6 0.6 $ Color (dark green)
               $ drawWord p ("Minhocas vivas: " ++ show minhocasVivas)
@@ -573,24 +583,24 @@ drawPvPGame p est jogada =
         )
 
 
-    minhocasSidebar :: [Picture]
-    minhocasSidebar =
-      zipWith drawMinhocaBar [0 ..] ms
-
-    minhocaSpacing :: Float
-    minhocaSpacing = 240
-
     weaponOffset :: Float
     weaponOffset = 120
+
+    minhocasSidebar :: [Picture]
+    minhocasSidebar =
+      let minhocaAtualIndex = minhocaSelecionada est
+      in if minhocaAtualIndex >= 0 && minhocaAtualIndex < length ms
+         then [drawMinhocaBar minhocaAtualIndex (ms !! minhocaAtualIndex)]
+         else []
 
     drawMinhocaBar :: Int -> MinhocaDLC -> Picture
     drawMinhocaBar i m =
       Pictures
-          [ -- Nome / índice
+          [  -- Nome / índice
             Translate (-800) y $
             Scale 0.6 0.6 $
-            Color (if (armaSelecionada est == Nothing && minhocaSelecionada est == i) then dark red else black) $
-                  drawWord p (show i)
+            Color (if armaSelecionada est == Nothing then dark red else black) $
+                  drawWord p ("Player " ++ show i)
           -- Ícone vida
           , Translate (-900) (y - 20) $ Scale 2.5 2.5 $ p !! 3
           , Translate (-800) (y - 30) $
@@ -627,31 +637,27 @@ drawPvPGame p est jogada =
           -- Textos das armas (abaixo das imagens)
           , Translate (-938) (y - weaponOffset - 60) $
             Scale 0.6 0.6 $
-            Color (if armaSelecionada est == Just JetpackDLC && minhocaSelecionada est == i then dark red else black) $
+            Color (if armaSelecionada est == Just JetpackDLC then dark red else black) $
                   drawWord p (show (jetpackMinhocaDLC m) ++ " ")
           , Translate (-848) (y - weaponOffset - 60) $
             Scale 0.6 0.6 $
-            Color (if armaSelecionada est == Just EscavadoraDLC && minhocaSelecionada est == i then dark red else black) $
+            Color (if armaSelecionada est == Just EscavadoraDLC then dark red else black) $
                   drawWord p (show (escavadoraMinhocaDLC m) ++ " ")
           , Translate (-758) (y - weaponOffset - 60) $
             Scale 0.6 0.6 $
-            Color (if armaSelecionada est == Just BazucaDLC && minhocaSelecionada est == i then dark red else black) $
+            Color (if armaSelecionada est == Just BazucaDLC then dark red else black) $
                   drawWord p (show (bazucaMinhocaDLC m) ++ " ")
           , Translate (-668) (y - weaponOffset - 60) $
             Scale 0.6 0.6 $
-            Color (if armaSelecionada est == Just MinaDLC && minhocaSelecionada est == i then dark red else black) $
+            Color (if armaSelecionada est == Just MinaDLC then dark red else black) $
                   drawWord p (show (minaMinhocaDLC m) ++ " ")
           , Translate (-578) (y - weaponOffset - 60) $
             Scale 0.6 0.6 $
-            Color (if armaSelecionada est == Just DinamiteDLC && minhocaSelecionada est == i then dark red else black) $
+            Color (if armaSelecionada est == Just DinamiteDLC then dark red else black) $
                   drawWord p (show (dinamiteMinhocaDLC m) ++ " ")
-          -- Barra horizontal divisória (no final de cada personagem)
-          , Translate (-750) (y - weaponOffset - 90) $
-            Color (greyN 0.4) $
-            rectangleSolid 400 3
           ]
         where
-          y   = 55 - fromIntegral i * minhocaSpacing
+          y = 55
 
     linha = length mapa
     cols = if null mapa then 0 else length (head mapa)
