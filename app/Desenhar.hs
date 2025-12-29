@@ -12,7 +12,6 @@ import DataDLC
 import Auxiliar (getMinhocasValidasDLC, eMinhocaVivaDLC)
 import EfetuaJogada
 import Data.Char (toLower)
-import GHC.IO.Handle.Types (HandleType(ReadHandle))
 
 
 

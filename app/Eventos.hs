@@ -13,7 +13,6 @@ import EfetuaJogada
 import Auxiliar (getMinhocasValidasDLC, eMinhocaVivaDLC)
 import System.Directory (doesFileExist)
 import Text.Read (readMaybe)
-import DataDLC (MinhocaDLC(ultimaDirecaoHorizontal))
 
 
 
@@ -577,7 +576,7 @@ adicionaMinhocaDLC e pos =
 
         minhocasFiltradas = filter (\m -> posicaoMinhocaDLC m /= Just pos) minhocasAtuais
         -- Cria nova minhoca
-        novaMinhoca = MinhocaDLC {posicaoMinhocaDLC = Just pos, vidaMinhocaDLC = VivaDLC 100, jetpackMinhocaDLC = 100, escavadoraMinhocaDLC = 100, bazucaMinhocaDLC=100, minaMinhocaDLC = 100, dinamiteMinhocaDLC=100,flameMinhocaDLC = 100, burningCounter = 0, equipaMinhoca = Nothing}
+        novaMinhoca = MinhocaDLC {posicaoMinhocaDLC = Just pos, vidaMinhocaDLC = VivaDLC 100, jetpackMinhocaDLC = 100, escavadoraMinhocaDLC = 100, bazucaMinhocaDLC=100, minaMinhocaDLC = 100, dinamiteMinhocaDLC=100,flameMinhocaDLC = 100, burningCounter = 0, equipaMinhoca = Nothing, ultimaDirecaoHorizontal = Oeste}
     in e { minhocasEstadoDLC = minhocasFiltradas ++ [novaMinhoca] }  -- ! isto tem valores defaults que tem de ser mudados
 
 removeObjetoDLC :: EstadoDLC -> Posicao -> EstadoDLC
