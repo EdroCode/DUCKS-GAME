@@ -40,7 +40,7 @@ desenha p (Menu sel) = return $ drawMenu p sel
 desenha p (BotSimulation est _ _ (numMinhoca, jogada)) = return $ drawGame p est (Just numMinhoca) (Just jogada)
 desenha p (PVP est _ _ jogada) = return $ drawPvPGame p est jogada
 desenha p (MapCreatorTool e b a secSel thirdSel edit char worm) = return $ (drawMCT p e b a secSel thirdSel edit char worm)
-desenha p (LevelSelector id estImp) = return $ (drawLvlSelector p id estImp)
+desenha p (LevelSelector i estImp) = return $ (drawLvlSelector p i estImp)
 desenha p Quit = return $ Translate (-900) 0 $ Scale 1.9 1.9 $ drawWord p "Aperte ESC para confirmar saida."
 desenha p (Help pagina) = return $ drawHelp p pagina
 desenha p (GameOver team) = return $ drawGameOver p team
@@ -233,7 +233,7 @@ drawGameOver p equipa =
 
 
 drawMCT :: [Picture] -> EstadoDLC -> Int -> Int -> Int -> Int -> Bool -> Maybe Int -> MinhocaDLC -> Picture
-drawMCT p e blocoSelecionado mode secSel thirdSel editMode char (MinhocaDLC pos vida jet esc baz mina dina flame burn equipa) = Pictures
+drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet esc baz mina dina flame burn equipa) = Pictures
   [ p !! 88, Translate (-440) 330 $ Scale 0.5 0.5 $ Color black $ drawWord p "Bem vindo ao criador de mapas", p!!97, sidebar, world]
   where
     mapa = mapaEstadoDLC e
@@ -245,8 +245,8 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode char (MinhocaDLC pos 
     blocos = [(0, "Terra", Scale 0.66 0.66 $ p !! 0), (1, "Agua", p !! 1), (2, "Pedra", p !! 2), (3, "Ar", p !! 7), (4, "Lava", p !! 11) ]
     
     staticObjects = [(0, "Barril", p !! 5), (1, "Health Pack", p !! 12)]
-    ammoPacks = [(2, "Jetpack", p !! 15), (2, "Escavadora", p !! 16), (2, "Bazuca", p !! 17), (2, "Mina", p !! 18), (2, "Dinamite", p !! 19)]
-    disparos = [(3, "Bazuca", p !! 6), (3, "Mina", p !! 9), (3, "Dinamite", p !! 8), (3, "FireBall", p !! 69)]
+    ammoPacks = [(2 :: Int, "Jetpack", p !! 15), (2, "Escavadora", p !! 16), (2, "Bazuca", p !! 17), (2, "Mina", p !! 18), (2, "Dinamite", p !! 19)]
+    disparos = [(3 :: Int, "Bazuca", p !! 6), (3, "Mina", p !! 9), (3, "Dinamite", p !! 8), (3, "FireBall", p !! 69)]
     
     personagens = [(0, "Pato", p !! 3)]
 
@@ -542,7 +542,7 @@ drawGame p est numMinhoca jogada = Pictures [p !! 88, sidebar, world]
             ]
 
 drawPvPGame :: [Picture] -> EstadoDLC -> JogadaDLC -> Picture
-drawPvPGame p est jogada =
+drawPvPGame p est _ =
   Pictures [p !! 88, p!!97, sidebar, world]
   where
     mapa = mapaEstadoDLC est
@@ -918,7 +918,7 @@ drawObjetosDLC p objs mapa = Pictures $ map drawO objs
       where (x,y) = converteMapaDLC mapa (DataDLC.posicaoObjeto hp)
 
 getSpriteParaAcaoDLC :: MinhocaDLC -> JogadaDLC -> [Picture] -> EstadoDLC -> Picture
-getSpriteParaAcaoDLC minhoca (DataDLC.Move dir) p e
+getSpriteParaAcaoDLC minhoca (DataDLC.Move _) p e
   | burningCounter minhoca > 0 = p !! 82
   | eMinhocaVivaDLC minhoca = let
       pos = case posicaoMinhocaDLC minhoca of Just a -> a
@@ -962,7 +962,7 @@ converteMapaDLC mapa (r,c) = (x,y)
     -- | Desenha as minhocas com sprites diferentes baseado na última jogada
 -- | Desenha as minhocas com sprites diferentes baseado na última jogada
 drawMinhocasDLC :: [Picture] -> [MinhocaDLC] -> MapaDLC -> Maybe NumMinhoca -> JogadaDLC -> EstadoDLC -> Picture
-drawMinhocasDLC p ms mapa numMinhoca jogada e = Pictures $ map drawM (zip [0..] ms)
+drawMinhocasDLC p ms mapa _ jogada e = Pictures $ map drawM (zip [0..] ms)
   where
     drawM (i,m) = case posicaoMinhocaDLC m of
       Nothing -> Blank

@@ -1,6 +1,7 @@
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 {-# HLINT ignore "Use /=" #-}
 {-# HLINT ignore "Use isJust" #-}
+{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 {-|
 Module      : EfetuaJogada
 Description : Efetuar jogadas.
