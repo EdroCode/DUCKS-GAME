@@ -417,7 +417,7 @@ aplicaDanos danos estado = estado {
               if posAfetado pos ds
                 then BarrilDLC pos True
                 else obj
-            _ -> objg
+            _ -> obj
       in objAtualizado : atualizaObjetos danos resto
       where
 
