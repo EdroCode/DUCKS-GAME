@@ -2,7 +2,7 @@
 module Worms where
 
 import Labs2025(VidaMinhoca(Viva, Morta), TipoArma(Dinamite, Mina, Jetpack, Escavadora, Bazuca), Direcao(Norte,Este,Oeste,Sul,Nordeste,Noroeste,Sudoeste,Sudeste),tempoDisparo,donoDisparo,direcaoDisparo, posicaoBarril, tipoDisparo, explodeBarril, posicaoDisparo,Mapa, Objeto(Barril, Disparo),Estado,Posicao, Terreno(Agua, Ar, Terra, Pedra),Estado(Estado), Minhoca (Minhoca), Jogada, NumMinhoca, NumObjeto, minhocasEstado, objetosEstado, mapaEstado, posicaoMinhoca, vidaMinhoca, jetpackMinhoca, escavadoraMinhoca, bazucaMinhoca, minaMinhoca, dinamiteMinhoca)
-import DataDLC( JogadaDLC,TerrenoDLC(ArDLC, TerraDLC, PedraDLC, AguaDLC), Team(Blue,Red), EstadoDLC, jetpackMinhocaDLC, escavadoraMinhocaDLC, bazucaMinhocaDLC, minaMinhocaDLC, dinamiteMinhocaDLC,mapaEstadoDLC, objetosEstadoDLC, minhocasEstadoDLC,posicaoHP,armaSelecionada,minhocaSelecionada,curaHP, equipaMinhoca, burningCounter, Matriz, fireDamage, VidaMinhocaDLC(MortaDLC, VivaDLC), MapaDLC,EstadoDLC(EstadoDLC), MinhocaDLC (MinhocaDLC, flameMinhocaDLC, ultimaDirecaoHorizontal), ObjetoDLC (AmmoPack, posicaoAP, ammoGiven, ammoType), TerrenoDLC(Lava, AguaDLC, ArDLC, TerraDLC, PedraDLC), posicaoMinhocaDLC, vidaMinhocaDLC, burningCounter, posicaoDisparoDLC, direcaoDisparoDLC, tempoDisparoDLC, tipoDisparoDLC, donoDisparoDLC, posicaoBarrilDLC, explodeBarrilDLC, ObjetoDLC, ObjetoDLC(DisparoDLC, BarrilDLC, HealthPack), TipoArmaDLC(MinaDLC, BazucaDLC, DinamiteDLC, FlameTrower))
+import DataDLC( JogadaDLC,TerrenoDLC(ArDLC, TerraDLC, PedraDLC, AguaDLC), Team(Blue,Red), EstadoDLC, jetpackMinhocaDLC, escavadoraMinhocaDLC, bazucaMinhocaDLC, minaMinhocaDLC, dinamiteMinhocaDLC,mapaEstadoDLC, objetosEstadoDLC, minhocasEstadoDLC,posicaoHP,armaSelecionada,minhocaSelecionada,curaHP, equipaMinhoca, burningCounter, Matriz, fireDamage, VidaMinhocaDLC(MortaDLC, VivaDLC), MapaDLC,EstadoDLC(EstadoDLC), MinhocaDLC (MinhocaDLC, flameMinhocaDLC, ultimaDirecaoHorizontal),  TerrenoDLC(Lava, AguaDLC, ArDLC, TerraDLC, PedraDLC), posicaoMinhocaDLC, vidaMinhocaDLC, burningCounter, posicaoDisparoDLC, direcaoDisparoDLC, tempoDisparoDLC, tipoDisparoDLC, donoDisparoDLC, posicaoBarrilDLC, explodeBarrilDLC, ObjetoDLC(DisparoDLC, BarrilDLC, HealthPack,AmmoPack, posicaoAP, ammoGiven, ammoType), TipoArmaDLC(MinaDLC, BazucaDLC, DinamiteDLC, FlameTrower))
 
 
 -- | Estado usado pela interface Gloss: pode estar no menu, a jogar ou em estado de saída.
@@ -10,7 +10,7 @@ data Worms
     = Menu Int          
     | BotSimulation Estado Float Int (NumMinhoca, Jogada)    
     | PVP EstadoDLC Float Int JogadaDLC
-    | MapCreatorTool EstadoDLC Int Int Int Int Bool (Maybe Int) MinhocaDLC 
+    | MapCreatorTool EstadoDLC Int Int Int Int Bool (Maybe Int) MinhocaDLC ObjetoDLC
     | MapSelector
     | LevelSelector Int [EstadoDLC]
     | Help Int          
