@@ -830,8 +830,8 @@ bazucaDir :: [Picture] -> Direcao -> Picture
 bazucaDir p dir = case dir of
     Este -> p !! 6
     Oeste -> Rotate 180 (p !! 6)
-    Norte -> Rotate 90 (p !! 6)
-    Sul -> Rotate 270 (p !! 6)
+    Norte -> Rotate 270 (p !! 6)
+    Sul -> Rotate 90 (p !! 6)
     Sudeste -> Rotate 45 (p !! 6)
     Sudoeste -> Rotate 135 (p !! 6)
     Nordeste -> Rotate 315 (p !! 6)
