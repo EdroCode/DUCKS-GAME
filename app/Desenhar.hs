@@ -7,7 +7,7 @@ import Worms
 import Labs2025
 import Tarefa0_2025
 import Tarefa2
-import Tarefa4 (getMinhocasValidas)
+import Tarefa4 (getMinhocasValidas, getXWay)
 import DataDLC
 import Auxiliar (getMinhocasValidasDLC, eMinhocaVivaDLC)
 import EfetuaJogada
@@ -855,22 +855,47 @@ drawMinhocas p ms mapa numMinhoca jogada = Pictures $ map drawM (zip [0..] ms)
 getSpriteParaAcao :: Minhoca -> Maybe Jogada -> [Picture] -> Bool -> Mapa -> Posicao -> Picture
 getSpriteParaAcao _ Nothing p _ _ _ = p !! 3  -- Idle
 
-getSpriteParaAcao _ (Just (Labs2025.Move dir)) p isActiveMinhoca mapa pos
-  | isActiveMinhoca && not (Tarefa2.estaNoSolo pos mapa) =
-      if length p > 14 then p !! 14 else p !! 3  -- Caindo 
-  | isActiveMinhoca && dir `elem` [Norte, Nordeste, Noroeste] =
-      if length p > 13 then p !! 13 else p !! 3  -- Pulando 
-  | isActiveMinhoca =  p !! 3  -- Andando 
-  | otherwise = p !! 3  -- Idle 
+getSpriteParaAcao minhoca (Just (Labs2025.Move dir)) p isActiveMinhoca mapa _
 
-getSpriteParaAcao _ (Just (Labs2025.Dispara arma _)) p isActiveMinhoca _ _
-  | not isActiveMinhoca = p !! 3  -- Idle 
-  | otherwise = case arma of
-      Bazuca -> p !! 3
-      Jetpack ->  p !! 3
-      Escavadora -> p !! 3
-      Dinamite -> p !! 3
-      Mina -> p !! 3
+  | eMinhocaViva minhoca =
+      let pos = case posicaoMinhoca minhoca of Just a -> a
+          estaNoChao = Tarefa2.estaNoSolo pos mapa
+          direcaoHorizontal = getXWay dir
+      in if isActiveMinhoca then
+        case direcaoHorizontal of
+            Este -> if estaNoChao then p !! 99 else p !! 98
+            _ ->  if estaNoChao then p !! 3 else p !! 13
+        else if estaNoChao then p !! 3 else p !! 13
+
+
+getSpriteParaAcao minhoca (Just (Labs2025.Dispara arma direcaoDisparo)) p isActiveMinhoca mapa _
+  = let
+        pos = case posicaoMinhoca minhoca of Just a -> a
+        estaNoChao = Tarefa2.estaNoSolo pos mapa
+        direcaoHorizontal = getXWay direcaoDisparo
+    in 
+      if isActiveMinhoca 
+        then
+          case direcaoHorizontal of
+          
+          Este ->
+
+            case arma of
+              Bazuca -> p !! 99
+              Jetpack ->  p !! 99
+              Escavadora -> p !! 99
+              Dinamite -> p !! 99
+              Mina -> p !! 99
+
+          Oeste -> 
+          
+            case arma of
+              Bazuca -> p !! 3
+              Jetpack ->  p !! 3
+              Escavadora -> p !! 3
+              Dinamite -> p !! 3
+              Mina -> p !! 3
+      else if estaNoChao then p !! 3 else p !! 13  
 
 
 
