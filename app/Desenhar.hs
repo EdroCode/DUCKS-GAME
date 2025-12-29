@@ -40,7 +40,7 @@ desenha p (Menu sel) = return $ drawMenu p sel
 desenha p (BotSimulation est _ _ (numMinhoca, jogada)) = return $ drawGame p est (Just numMinhoca) (Just jogada)
 desenha p (PVP est _ _ jogada) = return $ drawPvPGame p est jogada
 desenha p (MapCreatorTool e b a secSel thirdSel edit char worm) = return $ (drawMCT p e b a secSel thirdSel edit char worm)
-desenha p (LevelSelector id estImp) = return $ (drawLvlSelector p id estImp)
+desenha p (LevelSelector i estImp) = return $ (drawLvlSelector p i estImp)
 desenha p (Quit sel) = return $ drawQuitConfirm p sel
 desenha p (Help pagina) = return $ drawHelp p pagina
 desenha p (GameOver team) = return $ drawGameOver p team
@@ -256,7 +256,7 @@ drawGameOver p equipa =
     equipaCor Blue = blue
 
 drawMCT :: [Picture] -> EstadoDLC -> Int -> Int -> Int -> Int -> Bool -> Maybe Int -> MinhocaDLC -> Picture
-drawMCT p e blocoSelecionado mode secSel thirdSel editMode char (MinhocaDLC pos vida jet esc baz mina dina flame burn equipa) = Pictures
+drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet esc baz mina dina flame burn equipa _) = Pictures
   [ Translate (-440) 330 $ Scale 0.5 0.5 $ Color black $ drawWord p "Bem vindo ao criador de mapas", sidebar, world]
   where
     mapa = mapaEstadoDLC e
@@ -268,8 +268,8 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode char (MinhocaDLC pos 
     blocos = [(0, "Terra", Scale 0.66 0.66 $ p !! 0), (1, "Agua", p !! 1), (2, "Pedra", p !! 2), (3, "Ar", p !! 7), (4, "Lava", p !! 11) ]
     
     staticObjects = [(0, "Barril", p !! 5), (1, "Health Pack", p !! 12)]
-    ammoPacks = [(2, "Jetpack", p !! 15), (2, "Escavadora", p !! 16), (2, "Bazuca", p !! 17), (2, "Mina", p !! 18), (2, "Dinamite", p !! 19)]
-    disparos = [(3, "Bazuca", p !! 6), (3, "Mina", p !! 9), (3, "Dinamite", p !! 8), (3, "FireBall", p !! 69)]
+    ammoPacks = [(2 :: Int, "Jetpack", p !! 15), (2, "Escavadora", p !! 16), (2, "Bazuca", p !! 17), (2, "Mina", p !! 18), (2, "Dinamite", p !! 19)]
+    disparos = [(3 :: Int, "Bazuca", p !! 6), (3, "Mina", p !! 9), (3, "Dinamite", p !! 8), (3, "FireBall", p !! 69)]
     
     personagens = [(0, "Pato", p !! 3)]
 
@@ -940,52 +940,89 @@ drawObjetosDLC p objs mapa = Pictures $ map drawO objs
       where (x,y) = converteMapaDLC mapa (DataDLC.posicaoObjeto hp)
 
 getSpriteParaAcaoDLC :: MinhocaDLC -> JogadaDLC -> [Picture] -> EstadoDLC -> Picture
-getSpriteParaAcaoDLC minhoca (DataDLC.Move dir) p e
+getSpriteParaAcaoDLC minhoca (DataDLC.Move _) p e
   | burningCounter minhoca > 0 =
-      if getXWayDLC dir == Oeste then p !! 84 else p !! 100
-
+      case ultimaDirecaoHorizontal minhoca of
+        Oeste -> p !! 84  
+        Este  -> p !! 100 
+        
   | eMinhocaVivaDLC minhoca =
       let pos = case posicaoMinhocaDLC minhoca of Just a -> a
+          estaNoChao = EfetuaJogada.estaNoSolo pos (mapaEstadoDLC e) (minhocasEstadoDLC e)
+          direcaoHorizontal = ultimaDirecaoHorizontal minhoca
       in case equipaMinhoca minhoca of
 
         Just Red ->
-          if EfetuaJogada.estaNoSolo pos (mapaEstadoDLC e) (minhocasEstadoDLC e)
-            then if getXWayDLC dir == Oeste then p !! 78 else p !! 104
-            else if getXWayDLC dir == Oeste then p !! 77 else p !! 103
+          case direcaoHorizontal of
+            Este -> 
+              if estaNoChao then p !! 104 else p !! 103
+            _ ->  
+              if estaNoChao then p !! 78 else p !! 77
 
         Just Blue ->
-          if EfetuaJogada.estaNoSolo pos (mapaEstadoDLC e) (minhocasEstadoDLC e)
-            then if getXWayDLC dir == Oeste then p !! 79 else p !! 110
-            else if getXWayDLC dir == Oeste then p !! 76 else p !! 109
+          case direcaoHorizontal of
+            Este ->
+              if estaNoChao then p !! 110 else p !! 109
+            _ ->
+              if estaNoChao then p !! 79 else p !! 76
 
         _ ->
-          if getXWayDLC dir == Oeste then p !! 3 else p !! 98
+          case direcaoHorizontal of
+            Este -> p !! 98
+            _ -> p !! 3
 
 getSpriteParaAcaoDLC minhoca (DataDLC.Dispara arma _) p e
-  | burningCounter minhoca > 0 = p !! 84
-
+  | burningCounter minhoca > 0 = 
+      case ultimaDirecaoHorizontal minhoca of
+        Oeste -> p !! 84
+        Este  -> p !! 100
+        
   | eMinhocaVivaDLC minhoca =
       let pos = case posicaoMinhocaDLC minhoca of Just a -> a
+          estaNoChao = EfetuaJogada.estaNoSolo pos (mapaEstadoDLC e) (minhocasEstadoDLC e)
+          direcaoHorizontal = ultimaDirecaoHorizontal minhoca
       in case equipaMinhoca minhoca of
 
         Just Red -> case arma of
-          JetpackDLC     -> p !! 86
-          EscavadoraDLC  -> p !! 83
-          BazucaDLC      -> p !! 72
+          JetpackDLC     -> 
+            case direcaoHorizontal of
+              Este -> p !! 109
+              _ -> p !! 86
+          EscavadoraDLC  -> 
+            case direcaoHorizontal of
+              Este -> p !! 107
+              _ -> p !! 83
+          BazucaDLC      -> 
+            case direcaoHorizontal of
+              Este -> p !! 105
+              _ -> p !! 72
           _ ->
-            if EfetuaJogada.estaNoSolo pos (mapaEstadoDLC e) (minhocasEstadoDLC e)
-              then p !! 78
-              else p !! 77
+            case direcaoHorizontal of
+              Este -> if estaNoChao then p !! 101 else p !! 102
+              _ -> if estaNoChao then p !! 78 else p !! 77
 
         Just Blue -> case arma of
-          JetpackDLC     -> p !! 87
-          EscavadoraDLC  -> p !! 82
-          BazucaDLC      -> p !! 73
+          JetpackDLC     -> 
+            case direcaoHorizontal of
+              Este -> p !! 110
+              _ -> p !! 87
+          EscavadoraDLC  -> 
+            case direcaoHorizontal of
+              Este -> p !! 108
+              _ -> p !! 82
+          BazucaDLC      -> 
+            case direcaoHorizontal of
+              Este -> p !! 106
+              _ -> p !! 73
           _ ->
-            if EfetuaJogada.estaNoSolo pos (mapaEstadoDLC e) (minhocasEstadoDLC e)
-              then p !! 79
-              else p !! 76
+            case direcaoHorizontal of
+              Este -> if estaNoChao then p !! 103 else p !! 104
+              _ -> if estaNoChao then p !! 79 else p !! 76
 
+        _ ->
+          case direcaoHorizontal of
+            Este -> p !! 98
+            _ -> p !! 3
 
 converteMapaDLC :: MapaDLC -> Posicao -> (Float, Float)
 converteMapaDLC mapa (r,c) = (x,y)
@@ -1008,7 +1045,11 @@ drawMinhocasDLC p ms mapa _ jogada e = Pictures $ map drawM (zip [0..] ms)
       Just s -> Translate x y $ Pictures
         [ sprite
         , if i == minhocaSelecionada e
-            then if EfetuaJogada.estaNoSolo s mapa ms then Scale 1 1 $ p !! 92 else Scale 1 1 $ p !! 93
+            then if eMinhocaVivaDLC m
+              then case ultimaDirecaoHorizontal m of
+                Oeste -> if EfetuaJogada.estaNoSolo s mapa ms then Scale 1 1 $ p !! 92 else Scale 1 1 $ p !! 93
+                Este -> if EfetuaJogada.estaNoSolo s mapa ms then Scale 1 1 $ p !! 101 else Scale 1 1 $ p !! 102
+              else Blank
             else Blank
         ]
         where
@@ -1031,11 +1072,3 @@ extrairPosicao str = case words str of
     ["Nothing"] -> "N/A"
     _ -> "N/A"
 
--- | Extrai a componente horizontal (Este/Oeste) de uma direção
-getXWayDLC :: Direcao -> Direcao
-getXWayDLC d = case d of
-  Noroeste  -> Oeste
-  Sudoeste  -> Oeste
-  Nordeste  -> Este
-  Sudeste   -> Este
-  _         -> Este

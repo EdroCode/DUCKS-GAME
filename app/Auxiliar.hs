@@ -329,3 +329,13 @@ substituirLista 0 x (_:t) = x : t
 substituirLista i x (h:t) = h : substituirLista (i - 1) x t
 
 
+-- | Extrai a componente horizontal (Este/Oeste) de uma direção
+getXWayDLC :: Direcao -> Maybe Direcao
+getXWayDLC d = case d of
+  Oeste     -> Just Oeste
+  Este      -> Just Este
+  Noroeste  -> Just Oeste
+  Sudoeste  -> Just Oeste
+  Nordeste  -> Just Este
+  Sudeste   -> Just Este
+  _         -> Nothing 

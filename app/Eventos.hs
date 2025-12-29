@@ -13,6 +13,7 @@ import EfetuaJogada
 import Auxiliar (getMinhocasValidasDLC, eMinhocaVivaDLC)
 import System.Directory (doesFileExist)
 import Text.Read (readMaybe)
+import DataDLC (MinhocaDLC(ultimaDirecaoHorizontal))
 
 
 
@@ -37,6 +38,8 @@ minhocaDefault = MinhocaDLC
     , burningCounter = 0
 
     , equipaMinhoca = Just Blue
+
+    , ultimaDirecaoHorizontal = Oeste
     }
 
 -- | Função principal que reage aos eventos do usuário e atualiza o estado do jogo

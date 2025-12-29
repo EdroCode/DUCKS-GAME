@@ -51,6 +51,8 @@ data MinhocaDLC = MinhocaDLC
     , burningCounter :: Int -- o Default dado por terrenos de lava é 5 mas pode variar, default flametrower é 2
     -- | Equipa da Minhoca (default é Nothing)
     , equipaMinhoca :: Maybe Team
+    -- | Ultima direção salva da minhoca
+    , ultimaDirecaoHorizontal :: Direcao
     }
     deriving (Eq,Ord,Show,Read)
 
