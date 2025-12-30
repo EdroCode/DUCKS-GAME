@@ -1129,7 +1129,7 @@ getSpriteParaAcaoDLC minhoca (DataDLC.Move _) p e
 
   | eMinhocaVivaDLC minhoca =
       let pos = case posicaoMinhocaDLC minhoca of Just a -> a
-          estaNoChao = EfetuaJogada.estaNoSolo pos (mapaEstadoDLC e) (minhocasEstadoDLC e)
+          estaNoChao = EfetuaJogada.estaNoSolo pos (mapaEstadoDLC e) (minhocasEstadoDLC e) (objetosEstadoDLC e)
           direcaoHorizontal = ultimaDirecaoHorizontal minhoca
       in case equipaMinhoca minhoca of
 
@@ -1160,7 +1160,7 @@ getSpriteParaAcaoDLC minhoca (DataDLC.Dispara arma _) p e
 
   | eMinhocaVivaDLC minhoca =
       let pos = case posicaoMinhocaDLC minhoca of Just a -> a
-          estaNoChao = EfetuaJogada.estaNoSolo pos (mapaEstadoDLC e) (minhocasEstadoDLC e)
+          estaNoChao = EfetuaJogada.estaNoSolo pos (mapaEstadoDLC e) (minhocasEstadoDLC e) (objetosEstadoDLC e)
           direcaoHorizontal = ultimaDirecaoHorizontal minhoca
       in case equipaMinhoca minhoca of
 
@@ -1229,10 +1229,10 @@ drawMinhocasDLC p ms mapa _ jogada e = Pictures $ map drawM (zip [0..] ms)
         , if (i == minhocaSelecionada e) && eMinhocaVivaDLC m then (case ultimaDirecaoHorizontal m of
                 Oeste -> if burningCounter m > 0
                   then p !! 118
-                  else if EfetuaJogada.estaNoSolo s mapa ms then Scale 1 1 $ p !! 92 else Scale 1 1 $ p !! 93
+                  else if EfetuaJogada.estaNoSolo s mapa ms (objetosEstadoDLC e) then Scale 1 1 $ p !! 92 else Scale 1 1 $ p !! 93
                 Este -> if burningCounter m > 0
                   then p !! 119
-                  else if EfetuaJogada.estaNoSolo s mapa ms then Scale 1 1 $ p !! 101 else Scale 1 1 $ p !! 102) else Blank
+                  else if EfetuaJogada.estaNoSolo s mapa ms (objetosEstadoDLC e) then Scale 1 1 $ p !! 101 else Scale 1 1 $ p !! 102) else Blank
         ]
         where
           (x,y) = converteMapaDLC mapa s

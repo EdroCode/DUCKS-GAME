@@ -642,15 +642,6 @@ podeMover est i =
                 Nothing -> False
                 Just pos -> Tarefa2.estaNoSolo pos (mapaEstado est)
 
--- | Verifica se a minhoca pode se mover (está no solo)
-podeMoverDLC :: EstadoDLC -> NumMinhoca -> Bool
-podeMoverDLC est i =
-    case encontraIndiceLista i (minhocasEstadoDLC est) of
-        Nothing -> False
-        Just minhoca ->
-            case posicaoMinhocaDLC minhoca of
-                Nothing -> False
-                Just pos -> EfetuaJogada.estaNoSolo pos (mapaEstadoDLC est) (minhocasEstadoDLC est)
 
 
 handleAction :: Key -> EstadoDLC -> (EstadoDLC, JogadaDLC)
@@ -667,10 +658,9 @@ handleAction key est =
             in (novoEst, DataDLC.Dispara arma dir)
 
         Nothing ->
-            if podeMoverDLC est i
-            then let novoEst = EfetuaJogada.efetuaJogada i (DataDLC.Move dir) est
+            let novoEst = EfetuaJogada.efetuaJogada i (DataDLC.Move dir) est
                  in (novoEst, DataDLC.Move dir)
-            else (est, DataDLC.Move dir)
+           
 
 
 -- * DLC

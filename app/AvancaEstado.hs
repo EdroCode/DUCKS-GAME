@@ -57,7 +57,7 @@ avancaMinhoca e _ minhoca=
     Nothing -> minhoca
     Just pos ->
       let
-        posicaoTentativa = if estaNoSolo pos mapa( minhocasEstadoDLC e) || existeMinhocaViva (movePosicao Sul pos) (minhocasEstadoDLC e)
+        posicaoTentativa = if estaNoSolo pos mapa( minhocasEstadoDLC e) (objetosEstadoDLC e) || existeMinhocaViva (movePosicao Sul pos) (minhocasEstadoDLC e)
                               then pos
                               else movePosicao Sul pos
 
@@ -169,7 +169,7 @@ avancaObjeto e _ o = case o of
   BarrilDLC posBarril explode ->
     if not explode
       then
-        if not (estaNoSolo posBarril mapa minhocas) || estaEmAgua posBarril mapa || estaEmLava posBarril mapa -- esta no ar ou em agua
+        if not (estaNoSolo posBarril mapa minhocas objetos) || estaEmAgua posBarril mapa || estaEmLava posBarril mapa -- esta no ar ou em agua
           then Left (BarrilDLC { posicaoBarrilDLC = posBarril, explodeBarrilDLC = True })
           else Left o
       else Right (calculaExplosao posBarril 5)
@@ -177,7 +177,7 @@ avancaObjeto e _ o = case o of
   HealthPack pos _ -> let 
                         novaPos = movePosicao Sul pos
                       in if ePosicaoEstadoLivre novaPos e then Left o {posicaoHP = novaPos} else if ePosicaoEstadoLivre pos e then Left o else Right []
-  AmmoPack pos _ _ -> if ePosicaoEstadoLivre pos e && estaNoSolo pos mapa minhocas then Left o else Right []
+  AmmoPack pos _ _ -> if ePosicaoEstadoLivre pos e && estaNoSolo pos mapa minhocas objetos then Left o else Right []
 
 
   DisparoDLC pos dir tipo tempo dono -> case tipo of
@@ -206,14 +206,14 @@ avancaObjeto e _ o = case o of
                 Nothing -> Nothing
             in
               if ePosicaoMatrizValida pos mapa
-                then if not (estaNoSolo pos mapa minhocas) || estaEmAgua pos mapa
+                then if not (estaNoSolo pos mapa minhocas objetos) || estaEmAgua pos mapa
                   then
                     if dir == Sul
                       then Left (DisparoDLC { posicaoDisparoDLC = movePosicao dir pos, direcaoDisparoDLC = Norte, tipoDisparoDLC = tipo, tempoDisparoDLC = tempoNovo, donoDisparoDLC = dono })
                       else Left (DisparoDLC { posicaoDisparoDLC = movePosicao Sul pos, direcaoDisparoDLC = Norte, tipoDisparoDLC = tipo, tempoDisparoDLC = tempoNovo, donoDisparoDLC = dono })
                   else Left (DisparoDLC { posicaoDisparoDLC = pos, direcaoDisparoDLC = Norte, tipoDisparoDLC = tipo, tempoDisparoDLC = tempoNovo, donoDisparoDLC = dono })
                 else Right [] -- o objeto é eliminado
-          Nothing -> let novaPos = if estaEmAgua pos mapa || not (estaNoSolo pos mapa minhocas)
+          Nothing -> let novaPos = if estaEmAgua pos mapa || not (estaNoSolo pos mapa minhocas objetos)
                             then movePosicao Sul pos
                             else pos
 
@@ -231,7 +231,7 @@ avancaObjeto e _ o = case o of
           Just _ ->
             let tempoNovo = case tempo of Just t  -> Just (t - 1)
             
-            in if estaNoSolo pos mapa minhocas
+            in if estaNoSolo pos mapa minhocas objetos
               then 
                 -- Se está no solo, mantém a posição
                 Left (DisparoDLC { posicaoDisparoDLC = pos, direcaoDisparoDLC = dir, tipoDisparoDLC = tipo, tempoDisparoDLC = tempoNovo, donoDisparoDLC = dono })
@@ -251,7 +251,7 @@ avancaObjeto e _ o = case o of
   where
     mapa = mapaEstadoDLC e
     minhocas = minhocasEstadoDLC e
-
+    objetos = objetosEstadoDLC e
 
       -- todo podera ser otimizado com a funcao auxiliar da tarefa0
 
