@@ -109,7 +109,8 @@ reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (MapCreatorTool {}) = retur
 reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (BotSimulation {}) = return $ Menu 0
 reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (Menu 0) = return $ Quit 1
 
--- Quit confirmation UI input handling
+
+
 reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (Quit _) = return $ Menu 0
 reageEventos (EventKey (SpecialKey KeyLeft) Down _ _) (Quit sel) = return $ Quit (max 0 (sel - 1))
 reageEventos (EventKey (SpecialKey KeyRight) Down _ _) (Quit sel) = return $ Quit (min 1 (sel + 1))
@@ -119,7 +120,6 @@ reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (Quit sel)
 
 
 -- * LVL SELECTOR
-
 reageEventos (EventKey (Char 'i') Down _ _) (LevelSelector i ei) = do
     existe <- doesFileExist "estado.txt"
     if not existe
@@ -131,18 +131,16 @@ reageEventos (EventKey (Char 'i') Down _ _) (LevelSelector i ei) = do
                 Just estado -> return (LevelSelector i (ei ++ [estado]))
 
 reageEventos (EventKey (SpecialKey KeyDown) Down _ _) (LevelSelector i ei) = -- * Down
-    return $ LevelSelector (i + 1) ei
+    return $ LevelSelector (min (i + 1) (length ei - 1)) ei  
 
 reageEventos (EventKey (SpecialKey KeyUp) Down _ _) (LevelSelector i ei) = -- * Up
-    return $ LevelSelector (if (i - 1) > 0 then (i - 1) else 0) ei
+    return $ LevelSelector (max (i - 1) 0) ei  
 
 reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (LevelSelector i ei)
-        | i == 0  = return $ PVP flatWorld 0 0 (DataDLC.Move Sul)
-        | i == 1  = return $ PVP flatWorld 0 0 (DataDLC.Move Sul)
-        | otherwise = return $ LevelSelector i ei
+    | i >= 0 && i < length ei = return $ PVP (ei !! i) 0 0 (DataDLC.Move Sul) 
+    | otherwise = return $ LevelSelector i ei  
 
 reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (LevelSelector _ _) = return $ Menu 0
-
 -- * PVP MODE INPUTS
 
 reageEventos (EventKey (SpecialKey KeyF1) Down _ _) (PVP _ _ _ _) = exitSuccess

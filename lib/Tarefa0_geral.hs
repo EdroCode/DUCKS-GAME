@@ -35,7 +35,6 @@ type Dimensao = (Int,Int)
 data Direcao = Norte | Nordeste | Este | Sudeste | Sul | Sudoeste | Oeste | Noroeste
     deriving (Eq,Ord,Show,Read,Enum)
 
--- * Funções não-recursivas.
 
 -- | Verifica se o indice pertence à lista.
 eIndiceListaValido :: Int -> [a] -> Bool

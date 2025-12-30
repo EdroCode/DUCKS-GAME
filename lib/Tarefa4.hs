@@ -4,6 +4,12 @@ Module      : Tarefa4
 Description : Táctica automatizada para o jogo.
 
 Módulo para a realização da Tarefa 4 de LI1\/LP1 em 2025\/26.
+
+Este Bot utiliza diversos processos, e algoritmos, para conseguir obter a melhor jogada em certas situações.
+
+Flow Map do Bot:
+
+<https://www.mermaidchart.com/d/cd496e3a-b7e6-4575-86e8-b9b239f77e1d>
 -}
 module Tarefa4 where
 
@@ -13,13 +19,14 @@ import Labs2025
 import Tarefa2
 import Tarefa3
 import Tarefa0_2025 (ePosicaoEstadoLivre, existeMinhoca, existeBarril, verificaVida, encontraQuantidadeArmaMinhoca, ehDisparo, existeBarril, eMinhocaViva, ePosicaoMapaLivre, eTerrenoDestrutivel)
-import Text.ParserCombinators.ReadP (look)
-import Data.Maybe (fromMaybe, fromJust)
+import Data.Maybe (fromJust)
 import Data.List
-import Foreign.Marshal (moveArray)
-import Data.Semigroup (Min(getMin))
 
 -- * Função Principal
+
+
+
+
 
 {-| Gera uma sequência de jogadas com base num estado inicial.
 
@@ -195,7 +202,7 @@ jogadaTatica ticks e =
         blocoNegro = getPosInv mapa posBlocoInv
 
         (podeSaltar, dirSalto) = canBungeJump mapa pos
-        (voidDisponivel, dirVoid) = canFollowVoid mapa pos
+        
 
       in
         case blocoAgua of
@@ -257,9 +264,9 @@ jogadaTatica ticks e =
 
     -- | Fase de disparo: escolhe a melhor posição para disparar com a 'Bazuca'
     shootPhase :: Estado -> Int -> Minhoca -> (NumMinhoca, Jogada)
-    shootPhase e i minhoca =  (i, Dispara Bazuca (getDir8 pos melhorPosicao))
+    shootPhase est i minhoca =  (i, Dispara Bazuca (getDir8 pos melhorPosicao))
       where
-        m = mapaEstado e
+        m = mapaEstado est
         pos = case posicaoMinhoca minhoca of 
                 Just a -> a
                 
@@ -268,19 +275,19 @@ jogadaTatica ticks e =
         melhorPosicao = maximoPorDano danosComPosicao
 
         calculaDanoTotal :: Mapa -> Posicao -> Int
-        calculaDanoTotal m pos = 
-            let danos = calculaExplosao pos 5
-                danosTerreno = filtraDanoTerreno danos m
+        calculaDanoTotal mp poss = 
+            let danos = calculaExplosao poss 5
+                danosTerreno = filtraDanoTerreno danos mp
             in somaDanos danosTerreno
 
         filtraDanoTerreno :: Danos -> Mapa -> Danos
         filtraDanoTerreno [] _ = []
-        filtraDanoTerreno ((posDano, dmg):t) mapa = 
-            case encontraPosicaoMatriz posDano mapa of
+        filtraDanoTerreno ((posDano, dmg):t) mp = 
+            case encontraPosicaoMatriz posDano mp of
                 Just peca -> if eTerrenoDestrutivel peca 
-                            then (posDano, dmg) : filtraDanoTerreno t mapa 
-                            else filtraDanoTerreno t mapa
-                Nothing -> filtraDanoTerreno t mapa
+                            then (posDano, dmg) : filtraDanoTerreno t mp 
+                            else filtraDanoTerreno t mp
+                Nothing -> filtraDanoTerreno t mp
 
         somaDanos :: Danos -> Int
         somaDanos = sum . map snd
@@ -785,8 +792,8 @@ canFollowVoid mapa pos
         let (_, dX) = getDimensoesMatriz mapa
             todasColunas = [0..dX-1]
             semPosicaoAtual = filter (/= x) todasColunas
-            posicoes = map (\coluna -> (y, coluna)) semPosicaoAtual
-        in posicoes
+            posicoesD = map (\coluna -> (y, coluna)) semPosicaoAtual
+        in posicoesD
 
 -- * Funções Auxiliares Gerais
 
@@ -886,75 +893,3 @@ getXWay d = case d of
   Sudeste   -> Este
   _         -> Este
 
--- * Estados de Teste
-
-mapa1 :: Mapa
-mapa1 = [[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
-        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
-        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
-        ,[Terra,Terra,Terra,Ar,Pedra,Agua,Agua,Agua,Agua,Agua]
-        ,[Terra,Terra,Terra,Terra,Pedra,Pedra,Agua,Agua,Agua,Agua]
-        ,[Terra,Terra,Terra,Terra,Terra,Pedra,Pedra,Pedra,Agua,Agua]
-        ]
-
-acaba :: Estado
-acaba = Estado { mapaEstado =
-        [[Ar,Ar,Ar,Ar,Ar]
-        ,[Ar,Ar,Ar,Ar,Ar]
-        ,[Ar,Ar,Ar,Ar,Ar]]
-    , objetosEstado =
-        []
-    , minhocasEstado =
-        [Minhoca {posicaoMinhoca = Just (1,1), vidaMinhoca = Viva 30, jetpackMinhoca = 1, escavadoraMinhoca = 0, bazucaMinhoca = 0, minaMinhoca = 1, dinamiteMinhoca = 0}
-        ,Minhoca {posicaoMinhoca = Just (1,3), vidaMinhoca = Viva 100, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 1}
-        ]
-    }
-
-ola :: Estado
-ola = Estado
-    { mapaEstado =
-        [[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
-        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
-        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
-        ,[Terra,Terra,Terra,Ar,Pedra,Agua,Agua,Agua,Agua,Agua]
-        ,[Terra,Terra,Terra,Terra,Pedra,Pedra,Agua,Agua,Agua,Agua]
-        ,[Terra,Terra,Terra,Terra,Terra,Pedra,Pedra,Pedra,Agua,Agua]
-        ]
-    , objetosEstado =
-        []
-    , minhocasEstado =
-        [Minhoca {posicaoMinhoca = Just (2,1), vidaMinhoca = Viva 70, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 1}
-        ,Minhoca {posicaoMinhoca = Just (1,4), vidaMinhoca = Viva 50, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 1}
-        ]
-    }
-
-map1 :: Mapa
-map1 = [[Ar,Ar,Ar,Pedra,Ar,Ar,Terra,Ar,Ar,Pedra,Ar,Ar,Ar,Ar]
-        ,[Ar,Ar,Ar,Ar,Pedra,Ar,Terra,Ar,Pedra,Ar,Ar,Ar,Ar,Ar]
-        ,[Ar,Ar,Ar,Ar,Ar,Pedra,Terra,Pedra,Ar,Ar,Ar,Ar,Ar,Ar]
-        ,[Terra,Terra,Terra,Terra,Terra,Terra,Ar,Terra,Terra,Terra,Terra,Terra,Terra,Terra]
-        ,[Ar,Ar,Ar,Ar,Ar,Pedra,Terra,Pedra,Ar,Ar,Ar,Ar,Ar,Ar]
-        ,[Ar,Ar,Ar,Ar,Pedra,Ar,Terra,Ar,Pedra,Ar,Ar,Ar,Ar,Ar]
-        ,[Ar,Ar,Ar,Pedra,Ar,Ar,Terra,Ar,Ar,Pedra,Ar,Ar,Ar,Ar]
-        ,[Ar,Ar,Pedra,Ar,Ar,Ar,Terra,Ar,Ar,Ar,Pedra,Ar,Ar,Ar]
-        ]
-
-e2 :: Estado
-e2 = Estado
-    { mapaEstado =
-        [[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
-        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
-        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
-        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
-        ,[Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar,Ar]
-        ,[Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra]
-        ,[Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra]
-        ,[Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra,Terra]
-        ]
-    , objetosEstado =
-        []
-    , minhocasEstado =
-        [Minhoca {posicaoMinhoca = Just (4,1), vidaMinhoca = Viva 30, jetpackMinhoca = 1, escavadoraMinhoca = 0, bazucaMinhoca = 0, minaMinhoca = 1, dinamiteMinhoca = 0}
-        ,Minhoca {posicaoMinhoca = Just (4,9), vidaMinhoca = Viva 100, jetpackMinhoca = 1, escavadoraMinhoca = 1, bazucaMinhoca = 1, minaMinhoca = 1, dinamiteMinhoca = 1}
-        ]
-    }

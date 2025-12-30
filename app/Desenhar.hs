@@ -519,30 +519,27 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
 
     linha = length mapa
     cols = if null mapa then 0 else length (head mapa)
+    largura = fromIntegral cols * cellSize
+    altura  = fromIntegral linha * cellSize
+    sidebarWidth = 300
+    usableWidth  = janelaLargura - sidebarWidth
+    usableHeight = janelaAltura
 
-    larguraMapa = fromIntegral cols * cellSize
-    alturaMapa  = fromIntegral linha * cellSize
-
-    sidebarWidth = 1000
-    maxWorldWidth  = janelaLargura - sidebarWidth
-    maxWorldHeight = janelaAltura - 400
-
-    scaleX = if larguraMapa > 0 then maxWorldWidth / larguraMapa else 1
-    scaleY = if alturaMapa > 0 then maxWorldHeight / alturaMapa else 1
-
-    scaleFactor = min (min scaleX scaleY) 2.0
+    sx = if largura > 0 then usableWidth / largura else 1
+    sy = if altura > 0 then usableHeight / altura else 1
+    scaleFactor = min (min sx sy) 2.0
 
     editColor = if editMode == False then makeColor 0.3 0.6 1.0 0.3 else red
 
     world =
-      Translate 50 0 $
+      Translate (sidebarWidth / 2) 0 $
         Scale scaleFactor scaleFactor $
           Pictures
-            [ Color (greyN 0.3) $ rectangleWire larguraMapa alturaMapa
-            , drawMapaDLC p mapa
+            [ drawMapaDLC p mapa
             , drawObjetosDLC p objs mapa
             , drawMinhocasStatic p ms mapa
             ]
+
 
 {-
 
