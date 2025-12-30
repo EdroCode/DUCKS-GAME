@@ -51,10 +51,10 @@ drawQuitConfirm p sel = Pictures
   [ p !! 88
   , Translate 50 350 $ Scale 1 1 $ p !! 89
   , Translate (-400) 350 $ Scale 1.2 1.2 $ Color black $ drawWord p "Deseja sair do jogo?"
-  , Translate (-300) (-50) $ Scale 1 1 $ (if sel==0 then p !! 21 else p !! 22)
-  , Translate (300) (-50) $ Scale 1 1 $ (if sel==1 then p !! 21 else p !! 22)
+  , Translate (-300) (-50) $ Scale 1 1 (if sel==0 then p !! 21 else p !! 22)
+  , Translate 300 (-50) $ Scale 1 1 (if sel==1 then p !! 21 else p !! 22)
   , Translate (-460) (-50) $ Scale 1 1 $ drawWord p "Confirmar"
-  , Translate (150) (-50) $ Scale 1 1 $ drawWord p "Cancelar"
+  , Translate 150 (-50) $ Scale 1 1 $ drawWord p "Cancelar"
   ]
 
 -- | Menu principal com seletor expandido (centralizado para 1920x1080)
@@ -90,13 +90,6 @@ drawMenu p sel = Pictures
   , Translate (- 50) (-200) $ Scale 0.6 0.6 $ Color (if sel==4 then red else black) $ drawWord p "Quit"
   ]
 
-getDescription :: Int -> String
-getDescription 0 = "Assista bots jogarem automaticamente"
-getDescription 1 = "Modo local para dois jogadores"
-getDescription 2 = "Crie os seus mapas"
-getDescription 3 = "Veja os controles e instruções"
-getDescription 4 = "Sair do jogo"
-getDescription _ = ""
 
 drawHelp :: [Picture] -> Int -> Picture
 drawHelp p pagina = Pictures
@@ -261,7 +254,7 @@ drawMCT :: [Picture] -> EstadoDLC -> Int -> Int -> Int -> Int -> Bool -> Maybe I
 drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet esc baz mina dina flame burn equipa _) (DisparoDLC _ dir _ tempoR dono) = Pictures
   [ p !! 88
   , Translate (-50) 50 $ p !! 97
-  , Translate (-440) 330 $ Scale 0.5 0.5 $ Color black $ drawWord p "Bem vindo ao criador de mapas", sidebar, world]
+  , sidebar, world]
   where
     mapa = mapaEstadoDLC e
     objs = objetosEstadoDLC e
@@ -275,7 +268,17 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
     ammoPacks = [(2 :: Int, "Jetpack", p !! 15), (2, "Escavadora", p !! 16), (2, "Bazuca", p !! 17), (2, "Mina", p !! 18), (2, "Dinamite", p !! 19)]
     disparos = [(3 :: Int, "Bazuca", p !! 6), (3, "Mina", p !! 9), (3, "Dinamite", p !! 8), (3, "FireBall", p !! 69)]
 
-    personagens = [(0, "Pato", p !! 3)]
+    personagens = [(0, "Pato", selectedSprite)]
+
+    selectedSprite :: Picture
+    selectedSprite =
+       case equipa of
+                Just Blue -> p !! 79
+                Just Red -> p !! 78
+                _ -> p !! 3
+
+
+
 
     drawBloco y (idx, nome, pic) = Pictures
       [ if idx == blocoSelecionado
@@ -317,7 +320,7 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
           else Blank
       , Translate (-880) y $ Scale 0.6 0.6 $ Color black $ drawWord p (show (selectedIdx + 1))
       , Translate (-850) (y + 5) $ Scale 0.6 0.6 $ Color black $ drawWord p "Disparos"
-      , Translate (-600) y $ Scale 2 2 $ selectedPic
+      , Translate (-600) y $ Scale 2 2 selectedPic
       , Translate (-850) (y - 30) $ Scale 0.5 0.5 $ Color (greyN 0.5) $ drawWord p "<"
       , Translate (-650) (y - 30) $ Scale 0.5 0.5 $ Color (greyN 0.5) $ drawWord p ">"
       , Translate (-825) (y - 30) $ Scale 0.5 0.5 $ Color (greyN 0.5) $ drawWord p selectedName
@@ -378,8 +381,8 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
       , Translate (-880) y $ Scale 0.6 0.6 $ Color black $ drawWord p (show (idx + 1))
       , Translate (-850) (y + 5) $ Scale 0.6 0.6 $ Color black $ drawWord p nome
       , Translate (-700) y $ Scale 2 2 $ pic
-      , Translate (-900) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 2
-      , Translate (-830) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 2
+      , Translate (-900) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 113
+      , Translate (-830) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 114
       , Translate (-760) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 6
       , Translate (-690) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 9
       , Translate (-620) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 8
@@ -501,17 +504,23 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
 
     sidebar = Pictures
       [ Translate (-750) 50 $ p !! 94
-      , Translate (-870) 360 $ Scale 1 1 $ Color black $ drawWord p infoMapa
+      , Translate (-900) 360 $ Scale 1 1 $ Color black $ drawWord p ("Mapa:" ++ infoMapa)
       , Color (greyN 0.7) $ Translate (-750) 320 $ rectangleSolid 280 2
-      , Translate (-900) 280 $ Scale 0.6 0.6 $ Color (greyN 0.3) $ drawWord p "Blocos:"
+      , Translate (-920) 280 $ Scale 0.6 0.6 $ Color (greyN 0.3) $ drawWord p (case mode of
+        0 -> "Blocos:"
+        1 -> "Objetos:"
+        2 -> "Personagens:"
+        
+        
+        )
 
       , case mode of
-          0 -> Pictures $ zipWith drawBloco [240, 150, 60, -30, -120] blocos
+          0 -> Pictures $ zipWith drawBloco [210, 120, 30, -60, -150] blocos
           1 -> Pictures $
-                 zipWith drawObjeto [240, 150] staticObjects ++
-                 [drawAmmoPackSelector 60] ++
-                 [drawDisparoSelector (-50)]
-          2 -> Pictures $ zipWith drawPersonagens [240] personagens
+                 zipWith drawObjeto [210, 120] staticObjects ++
+                 [drawAmmoPackSelector 30] ++
+                 [drawDisparoSelector (-60)]
+          2 -> Pictures $ zipWith drawPersonagens [210] personagens
 
 
 
@@ -529,7 +538,7 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
     sy = if altura > 0 then usableHeight / altura else 1
     scaleFactor = min (min sx sy) 2.0
 
-    editColor = if editMode == False then makeColor 0.3 0.6 1.0 0.3 else red
+    editColor = if editMode then red else makeColor 0.3 0.6 1.0 0.3
 
     world =
       Translate (sidebarWidth / 2) 0 $
@@ -670,7 +679,7 @@ drawPvPGame p est jogada =
 
     sidebar =
       Pictures
-        ( [ Translate (-750) 0 $ Scale 1.1 1.1 $ selectedSprite
+        ( [ Translate (-750) 0 $ Scale 1.1 1.1 selectedSprite
           , Translate (-900) 300 $ Scale 0.6 0.6 $ Color black $ drawWord p infoMapa
           , Translate (-900) 260 $ Scale 0.6 0.6 $ Color (dark green)
               $ drawWord p ("Minhocas vivas: " ++ show minhocasVivas)
@@ -933,10 +942,6 @@ drawLetters p c =
 
 
 
-
-
-
-
 bazucaDir :: [Picture] -> Direcao -> Picture
 bazucaDir p dir = case dir of
     Este -> p !! 6
@@ -1034,9 +1039,9 @@ drawMinhocasStatic p minhocas mapa = Pictures $ map drawM minhocas
             sprite = case vidaMinhocaDLC m of
               MortaDLC -> p !! 4
               VivaDLC _ -> case equipaMinhoca m of
-                Just Blue -> p !! 78
-                Just Red -> p !! 79
-                _ -> p !! 3
+                Just Blue -> p !! 79
+                Just Red -> p !! 78
+                Nothing -> p !! 3
 
         in Translate x y $ Pictures [sprite]
 
@@ -1182,7 +1187,8 @@ converteMapaDLC mapa (r,c) = (x,y)
     top = altura / 2 - cellSize / 2
     x = left + fromIntegral c * cellSize
     y = top - fromIntegral r * cellSize
-    -- | Desenha as minhocas com sprites diferentes baseado na última jogada
+
+
 -- | Desenha as minhocas com sprites diferentes baseado na última jogada
 drawMinhocasDLC :: [Picture] -> [MinhocaDLC] -> MapaDLC -> Maybe NumMinhoca -> JogadaDLC -> EstadoDLC -> Picture
 drawMinhocasDLC p ms mapa _ jogada e = Pictures $ map drawM (zip [0..] ms)
@@ -1205,14 +1211,14 @@ drawMinhocasDLC p ms mapa _ jogada e = Pictures $ map drawM (zip [0..] ms)
             then p !! 4  -- Morto
             else getSpriteParaAcaoDLC m jogada p e
 
--- Função para extrair apenas o valor da vida
+-- | Função para extrair apenas o valor da vida
 extrairVida :: String -> String
 extrairVida str = case words str of
     ["VivaDLC", hp] -> hp
     ["MortaDLC", hp] -> hp
     _ -> "N/A"
 
--- Função para extrair a posição
+-- | Função para extrair a posição
 extrairPosicao :: String -> String
 extrairPosicao str = case words str of
     ["Just", pos] -> pos
