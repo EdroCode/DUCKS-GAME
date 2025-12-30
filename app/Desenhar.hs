@@ -100,8 +100,8 @@ getDescription _ = ""
 
 drawHelp :: [Picture] -> Int -> Picture
 drawHelp p pagina = Pictures
-  [
-    Translate (-800) 450 $ Scale 2 2 $ Color black $ drawWord p (titulosPaginas !! pagina)
+  [ p !! 88
+  , Translate (-800) 450 $ Scale 2 2 $ Color black $ drawWord p (titulosPaginas !! pagina)
 
 
   , conteudoPagina pagina
@@ -259,7 +259,9 @@ drawGameOver p equipa =
 
 drawMCT :: [Picture] -> EstadoDLC -> Int -> Int -> Int -> Int -> Bool -> Maybe Int -> MinhocaDLC -> ObjetoDLC -> Picture
 drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet esc baz mina dina flame burn equipa _) (DisparoDLC pos dir tip tempoR dono) = Pictures
-  [ Translate (-440) 330 $ Scale 0.5 0.5 $ Color black $ drawWord p "Bem vindo ao criador de mapas", sidebar, world]
+  [ p !! 88
+  , Translate (-50) 50 $ p !! 97
+  , Translate (-440) 330 $ Scale 0.5 0.5 $ Color black $ drawWord p "Bem vindo ao criador de mapas", sidebar, world]
   where
     mapa = mapaEstadoDLC e
     objs = objetosEstadoDLC e
@@ -498,7 +500,7 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
 
 
     sidebar = Pictures
-      [ Translate (-750) 80 $ p !! 94
+      [ Translate (-750) 50 $ p !! 94
       , Translate (-870) 360 $ Scale 1 1 $ Color black $ drawWord p infoMapa
       , Color (greyN 0.7) $ Translate (-750) 320 $ rectangleSolid 280 2
       , Translate (-900) 280 $ Scale 0.6 0.6 $ Color (greyN 0.3) $ drawWord p "Blocos:"
@@ -511,22 +513,7 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
                  [drawDisparoSelector (-50)]
           2 -> Pictures $ zipWith drawPersonagens [240] personagens
 
-      , Translate (-900) (-330) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "L - Adicionar linha"
-      , Translate (-900) (-360) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "C - Adicionar coluna"
-      , Translate (-900) (-390) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "M - Remover coluna"
-      , Translate (-900) (-420) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "N - Remover linha"
-      , Translate (-900) (-450) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "1 - Selecionar bloco"
-      , Translate (-900) (-480) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "LMB - Colocar bloco/objeto/personagem"
-      , Translate (-900) (-510) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "RMB - Remover (Modo Selecionado)"
-      , Translate (-900) (-540) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "E - Exportar estado"
-      , Translate (-900) (-570) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "< > - Navegar"
-      , Translate (-900) (-600) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "Enter - Editar valor"
-      , Translate (-900) (-630) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "Backspace/Delete - Eliminar valor"
 
-      , Translate (-200) (-680) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p ("1sel (a) > " ++ show mode) -- ? debug
-      , Translate (0) (-680) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p ("     -  2sel (l)> " ++ show secSel) -- ? debug
-      , Translate (200) (-680) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p ("                  -  3sel (t)> " ++ show thirdSel) -- ? debug
-      , Translate (-200) (-780) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p ("                  -  b" ++ show blocoSelecionado) -- ? debug
 
       ]
 
@@ -557,6 +544,26 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
             , drawMinhocasStatic p ms mapa
             ]
 
+{-
+
+      , Translate (-900) (-330) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "L - Adicionar linha"
+      , Translate (-900) (-360) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "C - Adicionar coluna"
+      , Translate (-900) (-390) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "M - Remover coluna"
+      , Translate (-900) (-420) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "N - Remover linha"
+      , Translate (-900) (-450) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "1 - Selecionar bloco"
+      , Translate (-900) (-480) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "LMB - Colocar bloco/objeto/personagem"
+      , Translate (-900) (-510) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "RMB - Remover (Modo Selecionado)"
+      , Translate (-900) (-540) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "E - Exportar estado"
+      , Translate (-900) (-570) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "< > - Navegar"
+      , Translate (-900) (-600) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "Enter - Editar valor"
+      , Translate (-900) (-630) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p "Backspace/Delete - Eliminar valor"
+
+      , Translate (-200) (-680) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p ("1sel (a) > " ++ show mode) -- ? debug
+      , Translate (0) (-680) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p ("     -  2sel (l)> " ++ show secSel) -- ? debug
+      , Translate (200) (-680) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p ("                  -  3sel (t)> " ++ show thirdSel) -- ? debug
+      , Translate (-200) (-780) $ Scale 0.6 0.6 $ Color (greyN 0.5) $ drawWord p ("                  -  b" ++ show blocoSelecionado) -- ? debug
+-}
+
 cellSize :: Float
 cellSize = 32
 
@@ -573,12 +580,44 @@ drawGame p est numMinhoca jogada = Pictures [p !! 88, sidebar, world]
     totalObjetos = length objs
 
     sidebar = Pictures
-      [ Color (greyN 0.9) $ Translate (-750) 0 $ rectangleSolid 300 900
-      , Translate (-900) 300 $ Scale 0.3 0.3 $ Color black $ drawWord p infoMapa
-      , Translate (-900) 260 $ Scale 0.3 0.3 $ Color (dark green) $ drawWord p ("Minhocas vivas: " ++ show minhocasVivas)
-      , Translate (-900) 220 $ Scale 0.3 0.3 $ Color (dark red) $ drawWord p ("Minhocas mortas: " ++ show (totalMinhocas - minhocasVivas))
-      , Translate (-900) 180 $ Scale 0.3 0.3 $ Color black $ drawWord p ("Total minhocas: " ++ show totalMinhocas)
-      , Translate (-900) 140 $ Scale 0.3 0.3 $ Color (dark red) $ drawWord p ("Objetos: " ++ show totalObjetos)
+      ( [ Translate (-50) 0 $ Scale 1.05 1 $ p !! 97
+        , Translate (-750) 0 $ Scale 1.1 1.1 $ selectedSprite
+        , Color (greyN 0.9) $ Translate (-750) 0 $ p !! 94
+        , Translate (-950) 300 $ Scale 0.6 0.6 $ Color black $ drawWord p infoMapa
+        , Translate (-950) 260 $ Scale 0.6 0.6 $ Color (dark green) $ drawWord p ("Minhocas vivas: " ++ show minhocasVivas)
+        , Translate (-950) 220 $ Scale 0.6 0.6 $ Color (dark red) $ drawWord p ("Minhocas mortas: " ++ show (totalMinhocas - minhocasVivas))
+        , Translate (-950) 180 $ Scale 0.6 0.6 $ Color black $ drawWord p ("Total minhocas: " ++ show totalMinhocas)
+        , Translate (-950) 140 $ Scale 0.6 0.6 $ Color (dark red) $ drawWord p ("Objetos: " ++ show totalObjetos)
+        ] ++ minhocasSidebar)
+
+    selectedSprite :: Picture
+    selectedSprite = case numMinhoca of
+      Just idx | idx >= 0 && idx < length ms ->
+        let m = ms !! idx in
+        case posicaoMinhoca m of
+          Just s -> getSpriteParaAcao m jogada p True mapa s
+          Nothing -> p !! 3
+      _ -> p !! 3
+
+    minhocasSidebar :: [Picture]
+    minhocasSidebar = case numMinhoca of
+      Just idx | idx >= 0 && idx < length ms -> [drawMinhocaBar idx (ms !! idx)]
+      _ -> []
+
+    drawMinhocaBar :: Int -> Minhoca -> Picture
+    drawMinhocaBar i m = Pictures
+      [ Translate (-900) 40 $ Scale 0.6 0.6 $ drawWord p ("Player " ++ show i)
+      , Translate (-900) 0 $ Scale 2 2 $ (if vidaMinhoca m == Morta then p !! 4 else p !! 3)
+      , Translate (-930) (-80) $ Scale 1.5 1.5 $ p !! 113 -- jetpack
+      , Translate (-840) (-80) $ Scale 1.5 1.5 $ p !! 114 -- escavadora
+      , Translate (-750) (-80) $ Scale 1.5 1.5 $ p !! 6   -- bazuca
+      , Translate (-660) (-80) $ Scale 1.5 1.5 $ p !! 9   -- mina
+      , Translate (-570) (-80) $ Scale 1.5 1.5 $ p !! 8   -- dinamite
+      , Translate (-930) (-130) $ Scale 0.6 0.6 $ drawWord p (show (jetpackMinhoca m))
+      , Translate (-840) (-130) $ Scale 0.6 0.6 $ drawWord p (show (escavadoraMinhoca m))
+      , Translate (-750) (-130) $ Scale 0.6 0.6 $ drawWord p (show (bazucaMinhoca m))
+      , Translate (-660) (-130) $ Scale 0.6 0.6 $ drawWord p (show (minaMinhoca m))
+      , Translate (-570) (-130) $ Scale 0.6 0.6 $ drawWord p (show (dinamiteMinhoca m))
       ]
 
     linha = length mapa
@@ -598,7 +637,7 @@ drawGame p est numMinhoca jogada = Pictures [p !! 88, sidebar, world]
 
 
     world =
-      Translate (sidebarWidth / 2) 0 $
+      Translate (sidebarWidth / 2 + 100) 0 $
         Scale scaleFactor scaleFactor $
           Pictures
             [ drawMapa p mapa
