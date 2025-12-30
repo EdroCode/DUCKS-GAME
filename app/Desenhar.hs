@@ -1245,9 +1245,9 @@ drawMinhocasDLC p ms mapa _ jogada e = Pictures $ map drawM (zip [0..] ms)
 drawDanosDLC :: [Picture] -> EstadoDLC -> Picture
 drawDanosDLC p e = Pictures $ map drawDano (concat $ danosEstado e)
   where
-    drawDano (pos, dano) = 
+    drawDano (pos, _) = 
       let (x, y) = converteMapaDLC (mapaEstadoDLC e) pos
-      in Translate x y $ p !! 115
+      in Translate x y $ p !! 124
 
 -- | Função para extrair apenas o valor da vida
 extrairVida :: String -> String

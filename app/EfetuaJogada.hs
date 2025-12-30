@@ -212,7 +212,7 @@ efetuaJogada n (Move direcao) e = if vidaMinhocaDLC minhoca /= MortaDLC && posic
                             -- * minhoca estudada
                             minhoca = case encontraIndiceLista n minhocas of Just m -> m
                             pos = case posicaoMinhocaDLC minhoca of Just a -> a
-                            hp = case vidaMinhocaDLC minhoca of VivaDLC a -> a
+                            _ = case vidaMinhocaDLC minhoca of VivaDLC a -> a
 
                             minhocas = minhocasEstadoDLC e
                             mapa = mapaEstadoDLC e
@@ -229,20 +229,7 @@ efetuaJogada n (Move direcao) e = if vidaMinhocaDLC minhoca /= MortaDLC && posic
                             minhocaFinal = -- * Nova pos n é opaca
                                 if ePosicaoMatrizValida novaPos mapa
                                     then if ePosicaoEstadoLivre novaPos e
-                        
-                                        then case existeObjeto novaPos objetos of
-                                            Just (HealthPack p cura) -> minhoca { posicaoMinhocaDLC = Just p, vidaMinhocaDLC = VivaDLC (hp + cura) , ultimaDirecaoHorizontal = novaDirecaoHorizontal}
-                                            Just (AmmoPack p ammo JetpackDLC) -> minhoca { posicaoMinhocaDLC = Just p,  jetpackMinhocaDLC = jetpackMinhocaDLC minhoca + ammo, ultimaDirecaoHorizontal = novaDirecaoHorizontal}
-                                            Just (AmmoPack p ammo EscavadoraDLC) -> minhoca { posicaoMinhocaDLC = Just p,  escavadoraMinhocaDLC = escavadoraMinhocaDLC minhoca + ammo, ultimaDirecaoHorizontal = novaDirecaoHorizontal}
-                                            Just (AmmoPack p ammo BazucaDLC) -> minhoca { posicaoMinhocaDLC = Just p,  bazucaMinhocaDLC = bazucaMinhocaDLC minhoca + ammo, ultimaDirecaoHorizontal = novaDirecaoHorizontal}
-                                            Just (AmmoPack p ammo MinaDLC) -> minhoca { posicaoMinhocaDLC = Just p,  minaMinhocaDLC = minaMinhocaDLC minhoca + ammo, ultimaDirecaoHorizontal = novaDirecaoHorizontal}
-                                            Just (AmmoPack p ammo DinamiteDLC) -> minhoca { posicaoMinhocaDLC = Just p,  dinamiteMinhocaDLC = dinamiteMinhocaDLC minhoca + ammo, ultimaDirecaoHorizontal = novaDirecaoHorizontal}
-
-
-
-
-                                            _ -> minhoca { posicaoMinhocaDLC = Just novaPos, ultimaDirecaoHorizontal = novaDirecaoHorizontal }
-                                        
+                                        then minhoca { posicaoMinhocaDLC = Just novaPos, ultimaDirecaoHorizontal = novaDirecaoHorizontal }
                                         else minhoca
                                 else minhoca { posicaoMinhocaDLC = Nothing, vidaMinhocaDLC = MortaDLC, ultimaDirecaoHorizontal = novaDirecaoHorizontal }
 

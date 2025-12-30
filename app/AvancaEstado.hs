@@ -74,7 +74,7 @@ avancaMinhoca e _ minhoca=
                   Just Lava -> minhoca { posicaoMinhocaDLC = Just posicaoTentativa, vidaMinhocaDLC = MortaDLC, burningCounter = 0 }
                   Just ArDLC   -> minhoca { posicaoMinhocaDLC = Just posicaoTentativa, vidaMinhocaDLC = MortaDLC, burningCounter = 0 }
                   _         -> minhoca { posicaoMinhocaDLC = Just posicaoTentativa, vidaMinhocaDLC = MortaDLC, burningCounter = 0 }
-                VivaDLC v -> case existeObjeto posicaoTentativa objetos of
+                VivaDLC v -> case existeObjeto pos objetos of
                   Just (DisparoDLC _ _ tipo _ _)  -> if tipo == FlameTrower then minhoca { posicaoMinhocaDLC = Just posicaoTentativa, vidaMinhocaDLC = VivaDLC (v-fireDamage), burningCounter = 2}
                     else case terreno of
                     Just AguaDLC -> minhoca { posicaoMinhocaDLC = Just posicaoTentativa, vidaMinhocaDLC =  MortaDLC, burningCounter = 0}
@@ -194,7 +194,7 @@ avancaObjeto e _ o = case o of
             tempoNovo = case tempo of
               Just t  -> Just (t - 1)
               Nothing -> Nothing
-        in (if ePosicaoEstadoLivre pos e && ePosicaoMatrizValida posNova mapa then Left (DisparoDLC{posicaoDisparoDLC = posNova, direcaoDisparoDLC = dir, tipoDisparoDLC = tipo, tempoDisparoDLC = tempoNovo, donoDisparoDLC = dono}) else Right [])
+        in (if ePosicaoMapaLivre (movePosicao dir pos) mapa && ePosicaoMatrizValida posNova mapa then Left (DisparoDLC{posicaoDisparoDLC = posNova, direcaoDisparoDLC = dir, tipoDisparoDLC = tipo, tempoDisparoDLC = tempoNovo, donoDisparoDLC = dono}) else Right  (calculaExplosao (movePosicao dir pos) 1))
 
       MinaDLC ->
         case tempo of
