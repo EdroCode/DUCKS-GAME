@@ -342,3 +342,11 @@ getXWayDLC d = case d of
   Nordeste  -> Just Este
   Sudeste   -> Just Este
   _         -> Nothing
+
+-- | Devolve as posicoes ao redor do personagem
+posicoes8Axis :: Posicao -> [Posicao]
+posicoes8Axis pos =
+  map (\d -> movePosicao d pos)
+      [ Norte, Sul, Este, Oeste
+      , Nordeste, Noroeste, Sudeste, Sudoeste
+      ]

@@ -161,11 +161,15 @@ efetuaJogada n (Dispara arma direcao) e = if indiceValido n e && vidaMinhoca min
                                                                     Jetpack    -> (Just pos, vidaMinhoca minhoca)
                                                                     Escavadora -> (Just novaPos, vidaMinhoca minhoca)
                                                                     _          -> (posicaoMinhoca minhoca, vidaMinhoca minhoca)
-
+                                                            Just Ar ->
+                                                                case arma of
+                                                                    Jetpack    ->  if ePosicaoEstadoLivre novaPos e then (Just novaPos, vidaMinhoca minhoca) else (Just pos, vidaMinhoca minhoca)
+                                                                    Escavadora -> if ePosicaoEstadoLivre novaPos e && estaNoSolo pos mapa then (Just novaPos, vidaMinhoca minhoca) else (Just pos, vidaMinhoca minhoca)
+                                                                    _          -> (posicaoMinhoca minhoca, vidaMinhoca minhoca)
                                                             _ ->
                                                                 case arma of
                                                                     Jetpack    ->  if ePosicaoEstadoLivre novaPos e then (Just novaPos, vidaMinhoca minhoca) else (Just pos, vidaMinhoca minhoca)
-                                                                    Escavadora -> if ePosicaoEstadoLivre novaPos e then (Just novaPos, vidaMinhoca minhoca) else (Just pos, vidaMinhoca minhoca)
+                                                                    Escavadora -> if ePosicaoEstadoLivre novaPos e && estaNoSolo pos mapa then (Just novaPos, vidaMinhoca minhoca) else (Just pos, vidaMinhoca minhoca)
                                                                     _          -> (posicaoMinhoca minhoca, vidaMinhoca minhoca)
 
                                                 in atualizaMunicao minhoca

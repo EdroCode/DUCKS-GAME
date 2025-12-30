@@ -115,8 +115,8 @@ efetuaJogada n (Dispara arma direcao) e = if indiceValido n e && vidaMinhocaDLC 
 
                                             minhoca = case encontraIndiceLista n minhocas of Just m -> m
                                             pos = case posicaoMinhocaDLC minhoca of Just a -> a
-
-                                            -- -------------
+                                            
+                                            outrasMinhocas = filter (/= minhoca) minhocas
 
                                             minhocas = minhocasEstadoDLC e
                                             mapa = mapaEstadoDLC e
@@ -171,7 +171,9 @@ efetuaJogada n (Dispara arma direcao) e = if indiceValido n e && vidaMinhocaDLC 
                                                             _ ->
                                                                 case arma of
                                                                     JetpackDLC    ->  if ePosicaoEstadoLivre novaPos e then (Just novaPos, vidaMinhocaDLC minhoca) else (Just pos, vidaMinhocaDLC minhoca)
-                                                                    EscavadoraDLC -> if ePosicaoEstadoLivre novaPos e then (Just novaPos, vidaMinhocaDLC minhoca) else (Just pos, vidaMinhocaDLC minhoca)
+                                                                    EscavadoraDLC -> if estaNoSolo pos mapa minhocas && ePosicaoEstadoLivre novaPos e && (novaPos `elem` posicoes8Axis pos || existeBarril novaPos objetos) 
+                                                                        then (Just novaPos, vidaMinhocaDLC minhoca) 
+                                                                        else (Just pos, vidaMinhocaDLC minhoca)
                                                                     _          -> (posicaoMinhocaDLC minhoca, vidaMinhocaDLC minhoca)
 
                                                 in atualizaMunicao minhoca
@@ -279,3 +281,4 @@ estaNoSolo pos mapa minhocas = case encontraPosicaoMatriz (movePosicao Sul pos) 
         Nothing -> False
         Just blocoAtual -> (eTerrenoOpaco blocoInferior || existeMinhocaViva (movePosicao Sul pos) minhocas) 
                            && not (eTerrenoOpaco blocoAtual)
+
