@@ -679,18 +679,19 @@ drawPvPGame p est jogada =
 
     sidebar =
       Pictures
-        ( [ Translate (-750) 0 $ Scale 1.1 1.1 selectedSprite
-          , Translate (-900) 300 $ Scale 0.6 0.6 $ Color black $ drawWord p infoMapa
-          , Translate (-900) 260 $ Scale 0.6 0.6 $ Color (dark green)
+        ( [ Translate (-750) 0 $ Scale 1 1 selectedSprite
+          , Translate (-920) 300 $ Scale 0.9 0.9 $ Color black $ drawWord p infoMapa
+          , Translate (-920) 260 $ Scale 0.6 0.6 $ Color (dark green)
               $ drawWord p ("Minhocas vivas: " ++ show minhocasVivas)
-          , Translate (-900) 220 $ Scale 0.6 0.6 $ Color (dark red)
+          , Translate (-920) 220 $ Scale 0.6 0.6 $ Color (dark red)
               $ drawWord p ("Minhocas mortas: " ++ show (totalMinhocas - minhocasVivas))
-          , Translate (-900) 180 $ Scale 0.6 0.6 $ Color black
+          , Translate (-920) 180 $ Scale 0.6 0.6 $ Color black
               $ drawWord p ("Total minhocas: " ++ show totalMinhocas)
-          , Translate (-900) 140 $ Scale 0.6 0.6 $ Color black
+          , Translate (-920) 140 $ Scale 0.6 0.6 $ Color black
               $ drawWord p ("Objetos: " ++ show totalObjetos)
-          , Translate (-900) 110 $ Scale 0.6 0.6 $ Color black
-              $ drawWord p "---------"
+          , Translate (-770) 100 $
+            Color black $
+            rectangleSolid 560 2
           ]
           ++ minhocasSidebar
         )
@@ -952,7 +953,6 @@ drawLetters p c =
     '<' -> p !! 70
     '>' -> p !! 71
     _ -> Blank
-
 
 
 
@@ -1252,6 +1252,7 @@ drawDanosDLC p e = Pictures $ map drawDano $ filter dentroDoMapa (concat $ danos
     drawDano (pos, _) = 
       let (x, y) = converteMapaDLC mapa pos
       in Translate x y $ p !! 124
+
 
 -- | Função para extrair apenas o valor da vida
 extrairVida :: String -> String
