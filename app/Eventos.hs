@@ -86,7 +86,7 @@ reageEventos (EventKey (SpecialKey KeyRight) Down _ _) (Menu sel)
 -- Seleção de opção no menu
 reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (Menu sel)
         | sel == 0  = return $ BotSimulation novoEstado 0 0 (0, Labs2025.Move Sul)
-        | sel == 1  = return $ LevelSelector 0 [level1, level2, level2]
+        | sel == 1  = return $ LevelSelector 0 [level1, level2, level3]
         | sel == 2  = return $ MapCreatorTool baseEstado 0 0 0 0 False Nothing minhocaDefault disparoDefault
         | sel == 3  = return $ Help 0
         | sel == 4  = return $ Quit 1
