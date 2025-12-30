@@ -262,7 +262,7 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
 
     infoMapa = show (length mapa) ++ "x" ++ show (if null mapa then 0 else length (head mapa))
 
-    blocos = [(0, "Terra", Scale 0.66 0.66 $ p !! 0), (1, "Agua", p !! 1), (2, "Pedra", p !! 2), (3, "Ar", p !! 7), (4, "Lava", p !! 11) ]
+    blocos = [(0, "Terra", Scale 0.66 0.66 $ p !! 0), (1, "Agua", p !! 1), (2, "Pedra", p !! 2), (3, "Ar", p !! 7), (4, "Lava", p !! 11), (5, "Gelo", p !! 120) ]
 
     staticObjects = [(0, "Barril", p !! 5), (1, "Health Pack", p !! 12)]
     ammoPacks = [(2 :: Int, "Jetpack", p !! 15), (2, "Escavadora", p !! 16), (2, "Bazuca", p !! 17), (2, "Mina", p !! 18), (2, "Dinamite", p !! 19)]
@@ -515,7 +515,7 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
         )
 
       , case mode of
-          0 -> Pictures $ zipWith drawBloco [210, 120, 30, -60, -150] blocos
+          0 -> Pictures $ zipWith drawBloco [210, 120, 30, -60, -150, -240] blocos
           1 -> Pictures $
                  zipWith drawObjeto [210, 120] staticObjects ++
                  [drawAmmoPackSelector 30] ++

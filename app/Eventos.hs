@@ -86,8 +86,8 @@ reageEventos (EventKey (SpecialKey KeyRight) Down _ _) (Menu sel)
 -- Seleção de opção no menu
 reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (Menu sel)
         | sel == 0  = return $ BotSimulation novoEstado 0 0 (0, Labs2025.Move Sul)
-        | sel == 1  = return $ LevelSelector 0 [flatWorld]
-        | sel == 2  = return $ MapCreatorTool flatWorld 0 0 0 0 False Nothing minhocaDefault disparoDefault
+        | sel == 1  = return $ LevelSelector 0 [level1, level2, level2]
+        | sel == 2  = return $ MapCreatorTool baseEstado 0 0 0 0 False Nothing minhocaDefault disparoDefault
         | sel == 3  = return $ Help 0
         | sel == 4  = return $ Quit 1
         | otherwise = return $ Menu sel
@@ -441,7 +441,7 @@ reageEventos (EventKey (MouseButton RightButton) Down _ mousePos) (MapCreatorToo
 reageEventos (EventKey (SpecialKey KeyUp) Down _ _) (MapCreatorTool e b a _ _ False c w d) = -- * UP
     let
         x = case a of
-            0 -> 4
+            0 -> 5
             1 -> 3
             2 -> 0
             _ -> 0 -- !
@@ -452,7 +452,19 @@ reageEventos (EventKey (SpecialKey KeyUp) Down _ _) (MapCreatorTool e b a _ _ Fa
 reageEventos (EventKey (SpecialKey KeyDown) Down _ _) (MapCreatorTool e b a _ _ False c w d) = -- * DOWN
     let
         x = case a of
-            0 -> 4
+            0 -> 5
+            1 -> 3
+            2 -> 0
+            _ -> 0 -- !
+        novob = if b >= x then 0 else b + 1
+
+    in return $ MapCreatorTool e novob a 0 0 False c w d
+
+
+reageEventos (EventKey (Char '2') Down _ _) (MapCreatorTool e b a _ _ False c w d) = -- * DOWN V2
+    let
+        x = case a of
+            0 -> 5
             1 -> 3
             2 -> 0
             _ -> 0 -- !
@@ -602,6 +614,7 @@ getBlocoFromIndex 1 = AguaDLC
 getBlocoFromIndex 2 = PedraDLC
 getBlocoFromIndex 3 = ArDLC
 getBlocoFromIndex 4 = Lava
+getBlocoFromIndex 5 = Gelo
 getBlocoFromIndex _ = ArDLC
 
 
