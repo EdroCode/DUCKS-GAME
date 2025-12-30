@@ -4,6 +4,7 @@ import Labs2025(Ticks, NumMinhoca, Direcao, Posicao)
 
 
 
+
 -- | Uma matriz é um conjunto de elementos a duas dimensões.
 --
 -- Em notação matemática, é geralmente representada por:
@@ -15,6 +16,9 @@ type Matriz a = [[a]]
 -- | A dimensão de uma matrix dada como um par (/número de linhas/,/número de colunhas/).
 type Dimensao = (Int,Int)
 
+
+type Dano = Int
+type Danos = [(Posicao,Dano)]
 
 
 data Team = Red | Blue 
@@ -140,6 +144,8 @@ data EstadoDLC = EstadoDLC
     , armaSelecionada :: Maybe TipoArmaDLC
     -- | O indice da minhoca selecionada
     , minhocaSelecionada :: NumMinhoca
+    -- | Lista de Danos que ocorreram num dado tick
+    , danosEstado :: [Danos]
     }
     deriving (Eq,Ord,Show,Read)
 

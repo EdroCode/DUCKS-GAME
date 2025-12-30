@@ -160,6 +160,7 @@ reageEventos (EventKey (Char '1') Down _ _) (PVP est acc tick _) =
             , objetosEstadoDLC = objetosEstadoDLC est
             , armaSelecionada = Nothing
             , minhocaSelecionada = proximoIndiceValido
+            , danosEstado = danosEstado est
         }
 
     in
@@ -186,6 +187,7 @@ reageEventos (EventKey (Char '2') Down _ _) (PVP est acc tick _) =
             , objetosEstadoDLC = objetosEstadoDLC est
             , armaSelecionada = novaArma
             , minhocaSelecionada = minhocaSelecionada est
+            , danosEstado = danosEstado est
         }
 
     in

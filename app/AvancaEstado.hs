@@ -11,14 +11,10 @@ module AvancaEstado where
 
 import Data.Either
 import EfetuaJogada
-import DataDLC( posicaoObjeto,TerrenoDLC(ArDLC, AguaDLC, Lava), fireDamage, VidaMinhocaDLC(MortaDLC, VivaDLC), MapaDLC,EstadoDLC(EstadoDLC), MinhocaDLC, ObjetoDLC (AmmoPack, posicaoHP), minhocasEstadoDLC, posicaoMinhocaDLC, vidaMinhocaDLC, burningCounter, posicaoDisparoDLC, direcaoDisparoDLC, tempoDisparoDLC, tipoDisparoDLC, donoDisparoDLC, posicaoBarrilDLC, explodeBarrilDLC, ObjetoDLC, ObjetoDLC(DisparoDLC, BarrilDLC, HealthPack), minhocasEstadoDLC, objetosEstadoDLC, mapaEstadoDLC, TipoArmaDLC(MinaDLC, BazucaDLC, DinamiteDLC, FlameTrower))
+import DataDLC(Danos ,posicaoObjeto,TerrenoDLC(ArDLC, AguaDLC, Lava), fireDamage, VidaMinhocaDLC(MortaDLC, VivaDLC), MapaDLC,EstadoDLC(EstadoDLC), MinhocaDLC, ObjetoDLC (AmmoPack, posicaoHP), minhocasEstadoDLC, posicaoMinhocaDLC, vidaMinhocaDLC, burningCounter, posicaoDisparoDLC, direcaoDisparoDLC, tempoDisparoDLC, tipoDisparoDLC, donoDisparoDLC, posicaoBarrilDLC, explodeBarrilDLC, ObjetoDLC, ObjetoDLC(DisparoDLC, BarrilDLC, HealthPack), minhocasEstadoDLC, objetosEstadoDLC, mapaEstadoDLC, TipoArmaDLC(MinaDLC, BazucaDLC, DinamiteDLC, FlameTrower))
 import Labs2025(NumMinhoca,Posicao, NumObjeto, Direcao(Norte,Este,Oeste,Sul,Nordeste,Noroeste,Sudoeste,Sudeste))
 import Auxiliar
 
-
--- * Tipos Auxiliares
-type Dano = Int
-type Danos = [(Posicao,Dano)]
 
 -- * Função Principal
 
@@ -34,11 +30,11 @@ Funcionamento:
 
 -}
 avancaEstado :: EstadoDLC -> EstadoDLC
-avancaEstado e@(EstadoDLC mapa objetos minhocas armSel mSel) = foldr aplicaDanos e' danoss
+avancaEstado e@(EstadoDLC mapa objetos minhocas armSel mSel _) = foldr aplicaDanos e' danoss
     where
     minhocas' = zipWith (curry (uncurry $ avancaMinhoca e)) [0..] minhocas
     (objetos',danoss) = partitionEithers $ zipWith (curry (uncurry $ avancaObjeto $ e { minhocasEstadoDLC = minhocas' })) [0..] objetos
-    e' = EstadoDLC mapa objetos' minhocas' armSel mSel
+    e' = EstadoDLC mapa objetos' minhocas' armSel mSel danoss
 
 -- * Funções Auxiliares
 

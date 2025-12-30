@@ -827,6 +827,7 @@ drawPvPGame p est jogada =
             [ drawMapaDLC p mapa
             , drawObjetosDLC p objs mapa
             , drawMinhocasDLC p ms mapa (Just 0) jogada est
+            , drawDanosDLC p est
             ]
 
 
@@ -857,7 +858,7 @@ drawMapa p mapa = Pictures $ concatMap drawRow (zip [0..] mapa)
     drawTile r (c, t) = Translate x y $ Pictures [colorTile r c t, Color (greyN 0.6) $ rectangleWire cellSize cellSize]
       where
         (x,y) = converteMapa mapa (r,c)
-        colorTile linha col Ar = p !! 7
+        colorTile _ _ Ar = p !! 7
         colorTile linha col Agua = 
           let aguasAcima = contaAguasAcima mapa linha col
           in case aguasAcima of
@@ -1238,6 +1239,15 @@ drawMinhocasDLC p ms mapa _ jogada e = Pictures $ map drawM (zip [0..] ms)
           sprite = if vidaMinhocaDLC m == MortaDLC
             then p !! 4  -- Morto
             else getSpriteParaAcaoDLC m jogada p e
+
+
+-- | Desenha sprites de explosão nos locais onde houve dano
+drawDanosDLC :: [Picture] -> EstadoDLC -> Picture
+drawDanosDLC p e = Pictures $ map drawDano (concat $ danosEstado e)
+  where
+    drawDano (pos, dano) = 
+      let (x, y) = converteMapaDLC (mapaEstadoDLC e) pos
+      in Translate x y $ p !! 115
 
 -- | Função para extrair apenas o valor da vida
 extrairVida :: String -> String
