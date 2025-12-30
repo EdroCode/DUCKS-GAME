@@ -93,7 +93,7 @@ drawMenu p sel = Pictures
 
 drawHelp :: [Picture] -> Int -> Picture
 drawHelp p pagina = Pictures
-  [ p !! 88
+  [ Translate (-100) 0 $ Scale 1.2 1.2 $ p !! 125
   , Translate (-800) 450 $ Scale 2 2 $ Color black $ drawWord p (titulosPaginas !! pagina)
 
 
