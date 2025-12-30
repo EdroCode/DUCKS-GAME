@@ -842,18 +842,32 @@ converteMapa mapa (r,c) = (x,y)
     x = left + fromIntegral c * cellSize
     y = top - fromIntegral r * cellSize
 
+
+contaAguasAcima :: Mapa -> Int -> Int -> Int
+contaAguasAcima mapa r c
+  | r <= 0 = 0
+  | otherwise = case mapa !! (r-1) !! c of
+      Agua -> 1 + contaAguasAcima mapa (r-1) c
+      _ -> 0
+
 drawMapa :: [Picture] -> Mapa -> Picture
 drawMapa p mapa = Pictures $ concatMap drawRow (zip [0..] mapa)
   where
     drawRow (r, row) = map (drawTile r) (zip [0..] row)
-    drawTile r (c, t) = Translate x y $ Pictures [colorTile t, Color (greyN 0.6) $ rectangleWire cellSize cellSize]
+    drawTile r (c, t) = Translate x y $ Pictures [colorTile r c t, Color (greyN 0.6) $ rectangleWire cellSize cellSize]
       where
         (x,y) = converteMapa mapa (r,c)
-        colorTile Ar = p !! 7
-        colorTile Agua = p !! 1
-        colorTile Terra | r > 0 && (mapa !! (r-1) !! c) == Ar = Scale 0.66 0.66 $ p !! 0
-                        | otherwise = Scale 0.66 0.66 $ p !! 10
-        colorTile Pedra = p !! 2
+        colorTile linha col Ar = p !! 7
+        colorTile linha col Agua = 
+          let aguasAcima = contaAguasAcima mapa linha col
+          in case aguasAcima of
+               0 -> p !! 1
+               1 -> p !! 121
+               2 -> p !! 122
+               _ -> p !! 123
+        colorTile linha col Terra | linha > 0 && (mapa !! (linha-1) !! col) == Ar = Scale 0.66 0.66 $ p !! 0
+                                 | otherwise = Scale 0.66 0.66 $ p !! 10
+        colorTile _ _ Pedra = p !! 2
 
 drawObjetos :: [Picture] -> [Objeto] -> Mapa -> Picture
 drawObjetos p objs mapa = Pictures $ map drawO objs
@@ -1050,21 +1064,33 @@ drawMinhocasStatic p minhocas mapa = Pictures $ map drawM minhocas
 
 -- * DLC
 
+contaAguasAcimaDLC :: MapaDLC -> Int -> Int -> Int
+contaAguasAcimaDLC mapa r c
+  | r <= 0 = 0
+  | otherwise = case mapa !! (r-1) !! c of
+      AguaDLC -> 1 + contaAguasAcimaDLC mapa (r-1) c
+      _ -> 0
+
 drawMapaDLC :: [Picture] -> MapaDLC -> Picture
 drawMapaDLC p mapa = Pictures $ concatMap drawRow (zip [0..] mapa)
   where
     drawRow (r, row) = map (drawTile r) (zip [0..] row)
-    drawTile r (c, t) = Translate x y $ Pictures [colorTile t, Color (greyN 0.6) $ rectangleWire cellSize cellSize]
+    drawTile r (c, t) = Translate x y $ Pictures [colorTile r c t, Color (greyN 0.6) $ rectangleWire cellSize cellSize]
       where
         (x,y) = converteMapaDLC mapa (r,c)
-        colorTile ArDLC = p !! 7
-        colorTile AguaDLC = p !! 1
-        colorTile TerraDLC | r > 0 && (mapa !! (r-1) !! c) == ArDLC = Scale 0.66 0.66 $ p !! 0
-                        | otherwise = Scale 0.66 0.66 $ p !! 10
-        colorTile PedraDLC = p !! 2
-        colorTile Lava = p !! 11
-        colorTile Gelo = p !! 120
-
+        colorTile _ _ ArDLC = p !! 7
+        colorTile linha col AguaDLC = 
+          let aguasAcima = contaAguasAcimaDLC mapa linha col
+          in case aguasAcima of
+               0 -> p !! 1
+               1 -> p !! 121
+               2 -> p !! 122
+               _ -> p !! 123
+        colorTile linha col TerraDLC | linha > 0 && (mapa !! (linha-1) !! col) == ArDLC = Scale 0.66 0.66 $ p !! 0
+                                   | otherwise = Scale 0.66 0.66 $ p !! 10
+        colorTile _ _ PedraDLC = p !! 2
+        colorTile _ _ Lava = p !! 11
+        colorTile _ _ Gelo = p !! 120
 
 drawObjetosDLC :: [Picture] -> [ObjetoDLC] -> MapaDLC -> Picture
 drawObjetosDLC p objs mapa = Pictures $ map drawO objs

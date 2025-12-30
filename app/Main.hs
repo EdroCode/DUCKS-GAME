@@ -39,7 +39,9 @@ main = do
   Just dirt  <- loadJuicy (path ++"Terra.png")
   Just lava <- loadJuicy (path ++ "lava.png")
   Just gelo <- loadJuicy (path ++ "gelo.png")
-
+  Just waterMedium <- loadJuicy (path ++ "waterMedium.png")
+  Just waterDeep <- loadJuicy (path ++ "waterDeep.png")
+  Just waterDeeper <- loadJuicy (path ++ "waterDeeper.png")
 
   Just  morto  <- loadJuicy (path ++"Dead.png")
   Just  barril <- loadJuicy (path ++"Barril.png")
@@ -178,7 +180,7 @@ main = do
   Just selectedOutline <- loadJuicy (path ++ "border.png") -- * Usado apenas para encher espacos para evitar conflitos apos major change
 
 
-  let tiles = [grass, water, stone, pato, morto, barril, bazuca, sky, dinamite, mina, dirt, lava, healthPack, patoPulando, blank_sprite, ammoJetpack, ammoEscavadora, ammoBazuca, ammoMina, ammoDinamite, botao, botaoOn, botaoOff, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, space, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, dash, pl, pr, slash, dott_points, comma, exclamation, interrogation, arrombado, fireball, leftArrow, rightArrow, patoBazucaVermelho, patoBazucaAzul, blank_sprite, blank_sprite, patoAzulPulando, patoVermelhoPulando, patoVermelhoParado, patoAzulParado, blank_sprite, blank_sprite, patoEscavadoraAzul, patoEscavadoraVermelho, patoFogo, background, patoVermelhoJetpack, patoAzulJetpack, backgroundBorrado, botaoOn2, botaoOff2, lvlAddSign, patoOutline, patoOutlinePulando, sidebar, sidebarAzul, sidebarVermelho, mapSheet, patoPulandoR, patoR, patoFogoR, patoOutlineR, patoOutlinePulandoR, patoVermelhoPulandoR, patoVermelhoParadoR, patoBazucaVermelhoR, patoEscavadoraVermelhoR, patoVermelhoJetpackR, patoBazucaAzulR, patoAzulPulandoR, patoAzulParadoR, patoEscavadoraAzulR, patoAzulJetpackR, jetpack, escavadora, redWins, blueWins, selectedOutline, patoFogoOutline, patoFogoOutlineR, gelo]
+  let tiles = [grass, water, stone, pato, morto, barril, bazuca, sky, dinamite, mina, dirt, lava, healthPack, patoPulando, blank_sprite, ammoJetpack, ammoEscavadora, ammoBazuca, ammoMina, ammoDinamite, botao, botaoOn, botaoOff, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, space, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, dash, pl, pr, slash, dott_points, comma, exclamation, interrogation, arrombado, fireball, leftArrow, rightArrow, patoBazucaVermelho, patoBazucaAzul, blank_sprite, blank_sprite, patoAzulPulando, patoVermelhoPulando, patoVermelhoParado, patoAzulParado, blank_sprite, blank_sprite, patoEscavadoraAzul, patoEscavadoraVermelho, patoFogo, background, patoVermelhoJetpack, patoAzulJetpack, backgroundBorrado, botaoOn2, botaoOff2, lvlAddSign, patoOutline, patoOutlinePulando, sidebar, sidebarAzul, sidebarVermelho, mapSheet, patoPulandoR, patoR, patoFogoR, patoOutlineR, patoOutlinePulandoR, patoVermelhoPulandoR, patoVermelhoParadoR, patoBazucaVermelhoR, patoEscavadoraVermelhoR, patoVermelhoJetpackR, patoBazucaAzulR, patoAzulPulandoR, patoAzulParadoR, patoEscavadoraAzulR, patoAzulJetpackR, jetpack, escavadora, redWins, blueWins, selectedOutline, patoFogoOutline, patoFogoOutlineR, gelo, waterMedium, waterDeep, waterDeeper]
 
 {- Indices dos sprites (corrigidos para corresponder à lista `tiles`):
   0: grass
@@ -257,6 +259,9 @@ main = do
   118: patoFogoOutline
   119: patoFogoOutlineR
   120: Gelo
+  121: waterMedium
+  122: waterDeep
+  123: waterDeeper
 -}
 
   -- let temanatal = [grass, water, stone, pato, morto, barril, bazuca, sky, dinamite, mina, dirt, lava, healthPack, patoPulando, patoCaindo, ammoJetpack, ammoEscavadora, ammoBazuca, ammoMina, ammoDinamite, botao, botaoOn, botaoOff, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, space, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, dash, pl, pr, slash, dott_points, comma, exclamation, interrogation]
