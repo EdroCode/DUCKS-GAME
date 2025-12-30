@@ -65,7 +65,7 @@ estadoValido5 = Estado
 
 efetuaJogada :: NumMinhoca -> JogadaDLC -> EstadoDLC -> EstadoDLC
 -- DISPARO - Dispara TIpo Direcao
-efetuaJogada n (Dispara arma direcao) e = if indiceValido n e && vidaMinhocaDLC minhoca /= MortaDLC && temMunicao minhoca arma && not (elem (arma,n) (Auxiliar.listaDonos objetos)) -- Verifica se existe um disparo da mesma arma da mesma minhoca no estado atual
+efetuaJogada n (Dispara arma direcao) e = if indiceValido n e && vidaMinhocaDLC minhoca /= MortaDLC && temMunicao minhoca arma && notElem (arma,n) (Auxiliar.listaDonos objetos) -- Verifica se existe um disparo da mesma arma da mesma minhoca no estado atual
                                                     then case arma of
 
                                                         JetpackDLC -> if ePosicaoMatrizValida novaPos mapa && ePosicaoEstadoLivre novaPos e
@@ -78,7 +78,7 @@ efetuaJogada n (Dispara arma direcao) e = if indiceValido n e && vidaMinhocaDLC 
                                                         EscavadoraDLC -> if ePosicaoMatrizValida novaPos mapa
                                                                 then if not (blocoTargeted == PedraDLC)
                                                                     then if eTerrenoDestrutivel blocoTargeted
-                                                                        then EstadoDLC {mapaEstadoDLC = atualizaPosicaoMatriz novaPos ArDLC mapa ,objetosEstadoDLC = objetos,minhocasEstadoDLC = minhocasFinais, armaSelecionada = Just arma, minhocaSelecionada = minhocaSelecionada e}
+                                                                        then EstadoDLC {mapaEstadoDLC = if blocoTargeted == TerraDLC then atualizaPosicaoMatriz novaPos ArDLC mapa else atualizaPosicaoMatriz novaPos AguaDLC mapa,objetosEstadoDLC = objetos,minhocasEstadoDLC = minhocasFinais, armaSelecionada = Just arma, minhocaSelecionada = minhocaSelecionada e}
                                                                         else EstadoDLC {mapaEstadoDLC = mapa ,objetosEstadoDLC = objetos,minhocasEstadoDLC = minhocasFinais, armaSelecionada = Just arma, minhocaSelecionada = minhocaSelecionada e}
 
                                                                     else EstadoDLC{mapaEstadoDLC=mapa,objetosEstadoDLC=objetos,minhocasEstadoDLC=atualizaIndiceLista n (minhoca{escavadoraMinhocaDLC = escavadoraMinhocaDLC minhoca-1, ultimaDirecaoHorizontal = novaDirecaoHorizontal}) minhocas, armaSelecionada = Just arma, minhocaSelecionada = minhocaSelecionada e}

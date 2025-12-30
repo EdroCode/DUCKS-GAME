@@ -2,7 +2,7 @@
 module Worms where
 
 import Labs2025(VidaMinhoca(Viva, Morta), TipoArma(Dinamite, Mina, Jetpack, Escavadora, Bazuca), Direcao(Norte,Este,Oeste,Sul,Nordeste,Noroeste,Sudoeste,Sudeste),tempoDisparo,donoDisparo,direcaoDisparo, posicaoBarril, tipoDisparo, explodeBarril, posicaoDisparo,Mapa, Objeto(Barril, Disparo),Estado,Posicao, Terreno(Agua, Ar, Terra, Pedra),Estado(Estado), Minhoca (Minhoca), Jogada, NumMinhoca, NumObjeto, minhocasEstado, objetosEstado, mapaEstado, posicaoMinhoca, vidaMinhoca, jetpackMinhoca, escavadoraMinhoca, bazucaMinhoca, minaMinhoca, dinamiteMinhoca)
-import DataDLC( JogadaDLC,TerrenoDLC(ArDLC, TerraDLC, PedraDLC, AguaDLC), Team(Blue,Red), EstadoDLC, jetpackMinhocaDLC, escavadoraMinhocaDLC, bazucaMinhocaDLC, minaMinhocaDLC, dinamiteMinhocaDLC,mapaEstadoDLC, objetosEstadoDLC, minhocasEstadoDLC,posicaoHP,armaSelecionada,minhocaSelecionada,curaHP, equipaMinhoca, burningCounter, Matriz, fireDamage, VidaMinhocaDLC(MortaDLC, VivaDLC), MapaDLC,EstadoDLC(EstadoDLC), MinhocaDLC (MinhocaDLC, flameMinhocaDLC, ultimaDirecaoHorizontal),  TerrenoDLC(Lava, AguaDLC, ArDLC, TerraDLC, PedraDLC), posicaoMinhocaDLC, vidaMinhocaDLC, burningCounter, posicaoDisparoDLC, direcaoDisparoDLC, tempoDisparoDLC, tipoDisparoDLC, donoDisparoDLC, posicaoBarrilDLC, explodeBarrilDLC, ObjetoDLC(DisparoDLC, BarrilDLC, HealthPack,AmmoPack, posicaoAP, ammoGiven, ammoType), TipoArmaDLC(MinaDLC, BazucaDLC, DinamiteDLC, FlameTrower), Dimensao)
+import DataDLC( JogadaDLC,TerrenoDLC(ArDLC, TerraDLC, PedraDLC, AguaDLC, Gelo), Team(Blue,Red), EstadoDLC, jetpackMinhocaDLC, escavadoraMinhocaDLC, bazucaMinhocaDLC, minaMinhocaDLC, dinamiteMinhocaDLC,mapaEstadoDLC, objetosEstadoDLC, minhocasEstadoDLC,posicaoHP,armaSelecionada,minhocaSelecionada,curaHP, equipaMinhoca, burningCounter, Matriz, fireDamage, VidaMinhocaDLC(MortaDLC, VivaDLC), MapaDLC,EstadoDLC(EstadoDLC), MinhocaDLC (MinhocaDLC, flameMinhocaDLC, ultimaDirecaoHorizontal),  TerrenoDLC(Lava, AguaDLC, ArDLC, TerraDLC, PedraDLC), posicaoMinhocaDLC, vidaMinhocaDLC, burningCounter, posicaoDisparoDLC, direcaoDisparoDLC, tempoDisparoDLC, tipoDisparoDLC, donoDisparoDLC, posicaoBarrilDLC, explodeBarrilDLC, ObjetoDLC(DisparoDLC, BarrilDLC, HealthPack,AmmoPack, posicaoAP, ammoGiven, ammoType), TipoArmaDLC(MinaDLC, BazucaDLC, DinamiteDLC, FlameTrower), Dimensao)
 
 
 
@@ -59,7 +59,7 @@ flatWorld = EstadoDLC
         ,[ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC]
         ,[ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC]
         ,[ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC,ArDLC]
-        ,[TerraDLC,AguaDLC,AguaDLC,TerraDLC,TerraDLC,TerraDLC,TerraDLC,TerraDLC,TerraDLC,TerraDLC,Lava,ArDLC,ArDLC,ArDLC]
+        ,[TerraDLC,AguaDLC,AguaDLC,TerraDLC,TerraDLC,TerraDLC,TerraDLC,Gelo,TerraDLC,TerraDLC,Lava,ArDLC,ArDLC,ArDLC]
         ,[TerraDLC,TerraDLC,TerraDLC,TerraDLC,TerraDLC,TerraDLC,TerraDLC,TerraDLC,TerraDLC,TerraDLC,TerraDLC,TerraDLC,TerraDLC,TerraDLC]
         ]
     , objetosEstadoDLC =

@@ -1063,6 +1063,8 @@ drawMapaDLC p mapa = Pictures $ concatMap drawRow (zip [0..] mapa)
                         | otherwise = Scale 0.66 0.66 $ p !! 10
         colorTile PedraDLC = p !! 2
         colorTile Lava = p !! 11
+        colorTile Gelo = p !! 120
+
 
 drawObjetosDLC :: [Picture] -> [ObjetoDLC] -> MapaDLC -> Picture
 drawObjetosDLC p objs mapa = Pictures $ map drawO objs

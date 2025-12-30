@@ -70,6 +70,8 @@ data TerrenoDLC
     | PedraDLC
     -- | Terreno que queima minhocas
     | Lava
+    -- | Terreno que quando destruido, vira água
+    | Gelo
 
     deriving (Eq,Ord,Show,Read,Enum)
 

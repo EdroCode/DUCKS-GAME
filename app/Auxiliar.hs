@@ -1,7 +1,7 @@
 module Auxiliar where
 
 
-import DataDLC( Matriz, Dimensao,VidaMinhocaDLC(VivaDLC, MortaDLC), posicaoObjeto, tipoDisparoDLC,donoDisparoDLC, TerrenoDLC(ArDLC, PedraDLC, TerraDLC), objetosEstadoDLC,TipoArmaDLC(FlameTrower,JetpackDLC, EscavadoraDLC, BazucaDLC, MinaDLC, DinamiteDLC), EstadoDLC(mapaEstadoDLC, objetosEstadoDLC, minhocasEstadoDLC), MapaDLC, ObjetoDLC(BarrilDLC, DisparoDLC), MinhocaDLC(posicaoMinhocaDLC, vidaMinhocaDLC,jetpackMinhocaDLC, escavadoraMinhocaDLC, minaMinhocaDLC, dinamiteMinhocaDLC, bazucaMinhocaDLC, flameMinhocaDLC))
+import DataDLC( Matriz, Dimensao,VidaMinhocaDLC(VivaDLC, MortaDLC), posicaoObjeto, tipoDisparoDLC,donoDisparoDLC, TerrenoDLC(ArDLC, PedraDLC, TerraDLC, Gelo, AguaDLC), objetosEstadoDLC,TipoArmaDLC(FlameTrower,JetpackDLC, EscavadoraDLC, BazucaDLC, MinaDLC, DinamiteDLC), EstadoDLC(mapaEstadoDLC, objetosEstadoDLC, minhocasEstadoDLC), MapaDLC, ObjetoDLC(BarrilDLC, DisparoDLC), MinhocaDLC(posicaoMinhocaDLC, vidaMinhocaDLC,jetpackMinhocaDLC, escavadoraMinhocaDLC, minaMinhocaDLC, dinamiteMinhocaDLC, bazucaMinhocaDLC, flameMinhocaDLC))
 import Labs2025(NumMinhoca,Posicao, Direcao(Norte,Este,Oeste,Sul,Nordeste,Noroeste,Sudoeste,Sudeste))
 
 
@@ -46,13 +46,13 @@ listaDonos (h:t)
 --
 -- __NB:__ Apenas @Terra@ é destrutível.
 eTerrenoDestrutivel :: TerrenoDLC -> Bool
-eTerrenoDestrutivel t = if t == TerraDLC then True else False
+eTerrenoDestrutivel t = t == TerraDLC || t == Gelo
 
 -- | Verifica se um tipo de terreno é opaco, i.e., não permite que objetos ou minhocas se encontrem por cima dele.
 --
 -- __NB:__ Apenas @Terra@ ou @Pedra@ são opacos.
 eTerrenoOpaco :: TerrenoDLC -> Bool
-eTerrenoOpaco t = if t == PedraDLC || t == TerraDLC then True else False
+eTerrenoOpaco t = t == PedraDLC || t == TerraDLC || t == Gelo
 
 -- | Verifica se uma posição do mapa está livre, i.e., pode ser ocupada por um objeto ou minhoca.
 --  
@@ -78,8 +78,11 @@ ePosicaoEstadoLivre pos estado =
 -- __NB__: Só terrenos @Terra@ pode ser destruídos.
 -- Assumo que seja destruir e substituir por Ar
 destroiPosicao :: Posicao -> MapaDLC -> MapaDLC
-destroiPosicao pos mapa = atualizaPosicaoMatriz pos ArDLC mapa
-
+destroiPosicao pos mapa = let ter = encontraPosicaoMatriz pos mapa
+                          in case ter of
+                            Just Gelo -> atualizaPosicaoMatriz pos AguaDLC mapa
+                            Just TerraDLC -> atualizaPosicaoMatriz pos ArDLC mapa
+                            _ -> atualizaPosicaoMatriz pos ArDLC mapa
 -- |Adiciona um novo objeto a um estado.
 --
 -- __NB__: A posição onde é inserido não é relevante.
@@ -92,7 +95,7 @@ adicionaObjeto obj estado = estado {objetosEstadoDLC = obj : objetosEstadoDLC es
 encontraLinhaMapa :: Int -> [TerrenoDLC] -> Bool
 encontraLinhaMapa _ [] = False
 encontraLinhaMapa 0 (h:_) = not (eTerrenoOpaco h)
-encontraLinhaMapa i (_:t) = encontraLinhaMapa (i-1) t 
+encontraLinhaMapa i (_:t) = encontraLinhaMapa (i-1) t
 
 
 -- | Verifica se numa lista de minhocas já existe uma 'MinhocaDLC' na dada 'Posicao'.(Utilizado na função 'ePosicaoEstadoLivre')
@@ -130,7 +133,7 @@ ehDisparo _ = False
 
 -- | Verifica se numa lista de objetos já existe um 'Disparo' feito para uma dada arma('TipoArmaDLC') por uma dada minhoca('NumMinhoca').
 minhocaTemDisparo :: TipoArmaDLC -> NumMinhoca -> [ObjetoDLC] -> Bool
-minhocaTemDisparo _ _ [] = False 
+minhocaTemDisparo _ _ [] = False
 minhocaTemDisparo tipo indiceMinhoca (h:ls) = if i == indiceMinhoca && t == tipo then True else minhocaTemDisparo tipo indiceMinhoca ls
     where
         i = donoDisparoDLC h
@@ -155,7 +158,7 @@ verificaVidaDLC m = case vida of
 
 -- | Verifica se uma minhoca esta viva
 eMinhocaVivaDLC :: MinhocaDLC -> Bool
-eMinhocaVivaDLC m = case vidaMinhocaDLC m of 
+eMinhocaVivaDLC m = case vidaMinhocaDLC m of
                     MortaDLC -> False
                     VivaDLC 0 -> False
                     VivaDLC _ -> True
@@ -231,9 +234,9 @@ rodaPosicaoDirecao (pos, d) = let p = movePosicao d pos
                                     Nordeste -> (p,Este)
                                     Sudeste  -> (p,Sul)
                                     Noroeste -> (p,Oeste)
-                                    Sudoeste -> (p,Sul) 
+                                    Sudoeste -> (p,Sul)
 
-        
+
 
 -- * Funções recursivas.
 
@@ -338,4 +341,4 @@ getXWayDLC d = case d of
   Sudoeste  -> Just Oeste
   Nordeste  -> Just Este
   Sudeste   -> Just Este
-  _         -> Nothing 
+  _         -> Nothing
