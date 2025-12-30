@@ -258,7 +258,7 @@ drawGameOver p equipa =
 
 
 drawMCT :: [Picture] -> EstadoDLC -> Int -> Int -> Int -> Int -> Bool -> Maybe Int -> MinhocaDLC -> ObjetoDLC -> Picture
-drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet esc baz mina dina flame burn equipa _) (DisparoDLC pos dir tip tempoR dono) = Pictures
+drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet esc baz mina dina flame burn equipa _) (DisparoDLC _ dir _ tempoR dono) = Pictures
   [ p !! 88
   , Translate (-50) 50 $ p !! 97
   , Translate (-440) 330 $ Scale 0.5 0.5 $ Color black $ drawWord p "Bem vindo ao criador de mapas", sidebar, world]

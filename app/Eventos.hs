@@ -13,7 +13,6 @@ import EfetuaJogada
 import Auxiliar (getMinhocasValidasDLC, eMinhocaVivaDLC)
 import System.Directory (doesFileExist)
 import Text.Read (readMaybe)
-import Foreign (new)
 import Data.List (elemIndex)
 
 
@@ -505,10 +504,10 @@ reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (MapCreatorTool e b 2 l t
     return $ MapCreatorTool e b 2 l t (not ed) c w d
 
 
-reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (MapCreatorTool e b 1 l t ed c w d) =
+reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (MapCreatorTool e b 1 _ t ed c w d) =
     return $ MapCreatorTool e b 1 3 t (not ed) c w d
 
-reageEventos (EventKey (Char 'e') Down _ _) m@(MapCreatorTool e _ _ _ _ _ _ _ d) = do
+reageEventos (EventKey (Char 'e') Down _ _) m@(MapCreatorTool e _ _ _ _ _ _ _ _) = do
     writeFile "estado.txt" (show e)
     return m
 
