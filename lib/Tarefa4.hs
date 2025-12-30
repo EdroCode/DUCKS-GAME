@@ -5,9 +5,40 @@ Description : Táctica automatizada para o jogo.
 
 Módulo para a realização da Tarefa 4 de LI1\/LP1 em 2025\/26.
 
-Este Bot utiliza diversos processos, e algoritmos, para conseguir obter a melhor jogada em certas situações.
+Este Bot utiliza diversos processos e algoritmos para conseguir obter 
+a melhor jogada em certas situações.
 
-Flow Map do Bot:
+= Lógica do Bot
+
+Este bot implementa uma estratégia em duas fases distintas:
+
+== Fase Normal
+
+O bot seleciona minhocas circularmente e executa a seguinte sequência de prioridades:
+
+    1. __Ataque Direto__: Se deteta inimigos ou barris na linha de visão, dispara a Bazuca
+    2. __Ataque Estratégico__: Se tem Bazuca mas sem alvos visíveis, calcula a posição de impacto com maior dano ao terreno destrutível
+    3. __Escavação__: Se tem Escavadora, remove blocos de terra adjacentes para aumentar o dano total feito.
+    4. __Movimento Inteligente__: Move-se horizontalmente em direção à minhoca inimiga mais próxima
+
+== Fase Suicídio
+
+Quando o tempo está a acabar, o bot tenta maximizar o dano final:
+
+    1. Dispara Mina ou Dinamite no próprio local (Se Tiver)
+    2. Se não tiver explosivos, tenta Bazuca apontada para baixo
+    3. Sem armas, procura outras formas de suicídio:
+        
+        * Move-se para água
+        * Escava terra abaixo
+        * Salta para fora do mapa
+        * Move-se em direção a outras minhocas (O que causa eventos adicionais que podem levar a mais dano)
+
+
+O bot prioriza causar dano contínuo através de ataques estratégicos, mantendo mobilidade 
+com escavação, e termina com uma sequência suicida coordenada para maximizar destruição final.
+
+= Flow Map do Bot
 
 <https://www.mermaidchart.com/d/cd496e3a-b7e6-4575-86e8-b9b239f77e1d>
 -}
@@ -22,11 +53,9 @@ import Tarefa0_2025 (ePosicaoEstadoLivre, existeMinhoca, existeBarril, verificaV
 import Data.Maybe (fromJust)
 import Data.List
 
+
+
 -- * Função Principal
-
-
-
-
 
 {-| Gera uma sequência de jogadas com base num estado inicial.
 
