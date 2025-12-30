@@ -545,8 +545,8 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
         Scale scaleFactor scaleFactor $
           Pictures
             [ drawMapaDLC p mapa
-            , drawObjetosDLC p objs mapa
             , drawMinhocasStatic p ms mapa
+            , drawObjetosDLC p objs mapa
             ]
 
 
@@ -825,8 +825,8 @@ drawPvPGame p est jogada =
         Scale scaleFactor scaleFactor $
           Pictures
             [ drawMapaDLC p mapa
-            , drawObjetosDLC p objs mapa
             , drawMinhocasDLC p ms mapa (Just 0) jogada est
+            , drawObjetosDLC p objs mapa
             , drawDanosDLC p est
             ]
 
@@ -1243,10 +1243,14 @@ drawMinhocasDLC p ms mapa _ jogada e = Pictures $ map drawM (zip [0..] ms)
 
 -- | Desenha sprites de explosão nos locais onde houve dano
 drawDanosDLC :: [Picture] -> EstadoDLC -> Picture
-drawDanosDLC p e = Pictures $ map drawDano (concat $ danosEstado e)
+drawDanosDLC p e = Pictures $ map drawDano $ filter dentroDoMapa (concat $ danosEstado e)
   where
+    mapa = mapaEstadoDLC e
+    
+    dentroDoMapa (pos, _) = ePosicaoMatrizValida pos mapa
+    
     drawDano (pos, _) = 
-      let (x, y) = converteMapaDLC (mapaEstadoDLC e) pos
+      let (x, y) = converteMapaDLC mapa pos
       in Translate x y $ p !! 124
 
 -- | Função para extrair apenas o valor da vida
