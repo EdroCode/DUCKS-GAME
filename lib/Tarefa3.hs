@@ -148,8 +148,6 @@ Funcinamento Geral:
     -Caso contrário, mantém a dinamite na posição atual
   @
 
-
-
 -}
 
 avancaObjeto :: Estado -> NumObjeto -> Objeto -> Either Objeto Danos
@@ -192,16 +190,13 @@ avancaObjeto e _ o = case o of
                       else Left (Disparo { posicaoDisparo = movePosicao Sul pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = tempoNovo, donoDisparo = dono })
                   else Left (Disparo { posicaoDisparo = pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = tempoNovo, donoDisparo = dono })
                 else Right [] -- o objeto é eliminado
-          Nothing -> let novaPos = if estaEmAgua pos mapa || not (estaNoSolo pos mapa)
-                            then movePosicao Sul pos
-                            else pos
-                            
+          Nothing -> let novaPos = if (estaEmAgua pos mapa || not (estaNoSolo pos mapa)) then movePosicao Sul pos else pos
 
-                     in if ePosicaoMatrizValida novaPos mapa
-                      then if existeDonoMinhoca pos dono minhocas
-                        then Left (Disparo { posicaoDisparo = novaPos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = Just 2, donoDisparo = dono })
-                        else Left (Disparo { posicaoDisparo = novaPos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = Nothing, donoDisparo = dono })
-                      else Right []
+           in if ePosicaoMatrizValida novaPos mapa
+            then if existeDonoMinhoca novaPos dono minhocas  
+              then Left (Disparo { posicaoDisparo = novaPos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = Just 2, donoDisparo = dono })
+              else Left (Disparo { posicaoDisparo = novaPos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = Nothing, donoDisparo = dono })
+            else Right []
                     
 
       Dinamite ->
