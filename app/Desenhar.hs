@@ -75,24 +75,28 @@ drawMenu p sel = Pictures
   -- Subtítulo
   , Translate (-210) 290 $ Scale 0.5 0.5 $ drawWord p "Escolha o modo de jogo"
 
-  -- Bot Simulation (esquerda superior)
-  , Translate (-300) 100 $ Scale 1 1 $ (if sel==0 then p !! 21 else p !! 22)
+  -- Bot Simulation 
+  , Translate (-300) 100 $ Scale 1 1 (if sel==0 then p !! 21 else p !! 22)
+  , Translate (-500) 100 $ Scale 1.2 1.2 $ p !! 131
   , Translate (-300- 150) 100 $ Scale 0.6 0.6 $ Color (if sel==0 then red else black) $ drawWord p "Bot Simulation"
 
-  -- Player vs Player (direita superior)
-  , Translate 300 100 $ Scale 1 1 $ (if sel==1 then p !! 21 else p !! 22)
+  -- Player vs Player 
+  , Translate 300 100 $ Scale 1 1 (if sel==1 then p !! 21 else p !! 22)
+  , Translate 100 100 $ Scale 1.2 1.2 $ p !! 132
   , Translate (300- 160) 100 $ Scale 0.6 0.6 $ Color (if sel==1 then red else black) $ drawWord p "Player vs Player"
 
-  -- MAP Creator Tool (esquerda inferior)
-  , Translate (-300) (-50) $ Scale 1 1 $ (if sel==2 then p !! 21 else p !! 22)
+  -- MAP Creator Tool 
+  , Translate (-300) (-50) $ Scale 1 1 (if sel==2 then p !! 21 else p !! 22)
+  , Translate (-500) (-50) $ Scale 1.2 1.2 $ p !! 134
   , Translate (-300- 160) (-50) $ Scale 0.6 0.6 $ Color (if sel==2 then red else black) $ drawWord p "MAP Creator Tool"
 
-  -- Help (direita inferior)
-  , Translate 300 (-50) $ Scale 1 1 $ (if sel==3 then p !! 21 else p !! 22)
+  -- Help 
+  , Translate 300 (-50) $ Scale 1 1 (if sel==3 then p !! 21 else p !! 22)
+  , Translate 210 (-50) $ Scale 1.2 1.2 $ p !! 133
   , Translate (300 - 50) (-50) $ Scale 0.6 0.6 $ Color (if sel==3 then red else black) $ drawWord p "Help"
 
-  -- Quit (centro baixo)
-  , Translate 0 (-200) $ Scale 1 1 $ (if sel==4 then p !! 21 else p !! 22)
+  -- Quit 
+  , Translate 0 (-200) $ Scale 1 1 (if sel==4 then p !! 21 else p !! 22)
   , Translate (- 50) (-200) $ Scale 0.6 0.6 $ Color (if sel==4 then red else black) $ drawWord p "Quit"
   ]
 
