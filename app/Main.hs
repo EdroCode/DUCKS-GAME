@@ -1,3 +1,9 @@
+{-|
+Module      : Main
+Description : Ponto de entrada do jogo Worms.
+
+Módulo principal que inicia o jogo Worms, carregando recursos gráficos e configurando a janela de jogo usando a biblioteca Gloss.
+-}
 module Main where
 
 import Graphics.Gloss

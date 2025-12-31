@@ -1,4 +1,10 @@
 {-# OPTIONS_GHC -Wno-incomplete-patterns #-}
+{-|
+Module      : Desenhar
+Description : Funções para desenhar elementos do jogo.
+
+Módulo que contém funções para desenhar os elementos do jogo Worms usando a biblioteca Gloss.
+-}
 module Desenhar where
 
 import Graphics.Gloss
