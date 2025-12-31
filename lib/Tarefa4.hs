@@ -50,7 +50,7 @@ import Labs2025
 import Tarefa2
 import Tarefa3
 import Tarefa0_2025 (ePosicaoEstadoLivre, existeMinhoca, existeBarril, verificaVida, encontraQuantidadeArmaMinhoca, ehDisparo, existeBarril, eMinhocaViva, ePosicaoMapaLivre, eTerrenoDestrutivel)
-import Data.Maybe (fromJust)
+import Data.Maybe (fromJust, mapMaybe)
 import Data.List
 
 
@@ -218,6 +218,29 @@ jogadaTatica ticks e =
       | gotAmmo minhoca Bazuca = (i, Dispara Bazuca Sul)
       | otherwise = suicidioSemArmas i minhoca
 
+    -- | Verifica se existe um bloco ou barril adjacente com espaço livre acima
+    podeSubirEmBloco :: Mapa -> [Objeto] -> Posicao -> Maybe Direcao
+    podeSubirEmBloco _ objetos pos = 
+      let posicoesAdjacentes = [(Este, movePosicao Este pos), 
+                                (Oeste, movePosicao Oeste pos)]
+          
+          verificaPosicao :: (Direcao, Posicao) -> Maybe Direcao
+          verificaPosicao (dir, p) = 
+            let posAcima = movePosicao Norte p
+                terrenoAtual = encontraPosicaoMatriz p mapa
+                terrenoAcima = encontraPosicaoMatriz posAcima mapa
+                temBarril = existeBarril p (filter (not . ehDisparo) objetos)
+            in case (terrenoAtual, terrenoAcima) of
+              (Just Terra, Just Ar) -> Just dir
+              (Just Pedra, Just Ar) -> Just dir
+              (Just Ar, Just Ar) | temBarril -> Just dir
+              _ -> Nothing
+      in case mapMaybe verificaPosicao posicoesAdjacentes of
+          [] -> Nothing
+          (d:_) -> Just d
+
+
+          
     -- | Estratégia de suicídio quando a minhoca não possui armas
     suicidioSemArmas :: Int -> Minhoca -> (NumMinhoca, Jogada)
     suicidioSemArmas i minhoca =
@@ -232,21 +255,35 @@ jogadaTatica ticks e =
 
         (podeSaltar, dirSalto) = canBungeJump mapa pos
         
+        podePularEmBloco = podeSubirEmBloco mapa (objetosEstado e) pos
 
       in
         case blocoAgua of
-          Just a -> (i, Move (getDir8 pos a))
+          Just a -> 
+            case podePularEmBloco of
+              Just dirBloco -> (i, Move dirBloco)
+              Nothing -> (i, Move (getDir8 pos a))
           Nothing ->
             case blocoTerra of
-              Just b -> (if not (ePosicaoMatrizValida (movePosicao Sul b) mapa) && gotAmmo minhoca Escavadora 
-                then (i, Dispara Escavadora (getDir8 pos b)) 
-                else complexBotMove e (i, minhoca))
+              Just b -> 
+                if not (ePosicaoMatrizValida (movePosicao Sul b) mapa) && gotAmmo minhoca Escavadora 
+                then (i, Dispara Escavadora (getDir8 pos b))
+                else case podePularEmBloco of
+                      Just dirBloco -> (i, Move dirBloco)
+                      Nothing -> complexBotMove e (i, minhoca)
 
-              Nothing -> case blocoNegro of
-                Just posInvalida -> (i, Move (getDir8 pos posInvalida))
-                Nothing -> case (podeSaltar, dirSalto) of
-                  (True, Just d) -> (i, Move d)
-                  _ -> complexBotMove e (i, minhoca)
+              Nothing -> 
+                case blocoNegro of
+                  Just posInvalida -> 
+                    case podePularEmBloco of
+                      Just dirBloco -> (i, Move dirBloco)
+                      Nothing -> (i, Move (getDir8 pos posInvalida))
+                  Nothing -> 
+                    case (podeSaltar, dirSalto) of
+                      (True, Just d) -> (i, Move d)
+                      _ -> case podePularEmBloco of
+                            Just dirBloco -> (i, Move dirBloco)
+                            Nothing -> complexBotMove e (i, minhoca)
 
     -- | Fase de escavação / saída de bloqueio
     digFase :: Int -> Minhoca -> (NumMinhoca, Jogada)
