@@ -1,4 +1,12 @@
 {-# OPTIONS_GHC -Wno-incomplete-uni-patterns #-}
+{-|
+Module      : Eventos
+Description : Manipulação de eventos e interação com o utilizador.
+
+Módulo responsável por gerir todos os eventos de entrada do utilizador (teclado),
+atualizando o estado do jogo conforme as ações realizadas. Inclui navegação em menus,
+criação de mapas, controlo de minhocas e seleção de armas.
+-}
 module Eventos where
 
 import Graphics.Gloss.Interface.Pure.Game
@@ -17,6 +25,20 @@ import Data.List (elemIndex)
 
 
 
+-- * Constantes Default
+
+{-| 'MinhocaDLC' com valores padrão para inicialização.
+
+Valores iniciais:
+
+* Posição: (0,0)
+* Vida: 100
+* Todas as armas: 100 munições
+* Equipa: Blue
+* Direção horizontal: Oeste
+* Contador de queimadura: 0
+
+-}
 minhocaDefault :: MinhocaDLC
 minhocaDefault = MinhocaDLC
     { posicaoMinhocaDLC = Just (0,0)
@@ -42,6 +64,17 @@ minhocaDefault = MinhocaDLC
     , ultimaDirecaoHorizontal = Oeste
     }
 
+{-| 'ObjetoDLC' de tipo 'DisparoDLC' com valores padrão.
+
+Valores iniciais:
+
+* Posição: (0,0)
+* Direção: Oeste
+* Tipo: BazucaDLC
+* Tempo: Nothing
+* Dono: 0
+
+-}
 disparoDefault :: ObjetoDLC
 disparoDefault = DisparoDLC
     {
@@ -58,7 +91,50 @@ disparoDefault = DisparoDLC
 
 
 
--- | Função principal que reage aos eventos do usuário e atualiza o estado do jogo
+-- * Função Principal
+
+{-| Função principal que reage aos eventos do utilizador e atualiza o estado do jogo.
+
+Funcionalidade:
+
+* Processa eventos de teclado ('EventKey')
+* Atualiza estados de menus ('Menu', 'LevelSelector', 'Help')
+* Gere jogadas no modo PvP ('PVP')
+* Controla o editor de mapas ('MapCreatorTool')
+* Gere navegação e seleção de opções
+* Retorna o novo estado do jogo após processar o evento
+
+== __Navegação em Menus:__
+
+No 'Menu' principal:
+
+* Setas direcionais: navegação entre opções
+* Enter: seleção da opção atual
+* ESC: sair do menu (ou retornar)
+
+== __Modo PvP:__
+
+* '1': trocar de minhoca
+* '2': trocar de arma
+* Setas WASD/QEZC: movimento e disparo
+* ESC: voltar ao menu
+
+== __Editor de Mapas:__
+
+* Setas: navegação e seleção
+* Enter: confirmar seleção
+* 'e': exportar estado para ficheiro
+* ESC: voltar ao menu
+
+== __Exemplos de Utilização:__
+
+>>> reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (Menu 0)
+BotSimulation novoEstado 0 0 (0, Move Sul)
+
+>>> reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (PVP _ _ _ _)
+Menu 0
+
+-}
 reageEventos :: Event -> Worms -> IO Worms
 
 reageEventos (EventKey (SpecialKey KeyUp) Down _ _) (Menu sel)
@@ -93,7 +169,7 @@ reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (Menu sel)
         | otherwise = return $ Menu sel
 
 
--- * ESC LOGIC
+-- * Tecla ESC - Lógica de Saída
 
 
 reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (Help _) = return $ Menu 0
@@ -119,6 +195,8 @@ reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (Quit sel)
     | otherwise = return $ Menu 0
 
 
+-- * Seletor de Níveis
+
 reageEventos (EventKey (Char 'i') Down _ _) (LevelSelector i ei) = do
     existe <- doesFileExist "estado.txt"
     if not existe
@@ -140,7 +218,8 @@ reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (LevelSelector i ei)
     | otherwise = return $ LevelSelector i ei
 
 reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (LevelSelector _ _) = return $ Menu 0
--- * PVP MODE INPUTS
+
+-- * Modo PVP - Entradas
 
 reageEventos (EventKey (SpecialKey KeyF1) Down _ _) (PVP _ _ _ _) = exitSuccess
 
@@ -169,7 +248,7 @@ reageEventos (EventKey (Char '1') Down _ _) (PVP est acc tick _) =
 
 
 
--- * Mudar arma minhoca
+-- * Mudar arma da minhoca
 reageEventos (EventKey (Char '2') Down _ _) (PVP est acc tick _) =
 
     let novaArma = case armaSelecionada est of
@@ -194,13 +273,13 @@ reageEventos (EventKey (Char '2') Down _ _) (PVP est acc tick _) =
 
         return $ PVP nEstado acc tick (DataDLC.Move Sul)
 
--- * RESTO DE DOWNS pvp
+-- * Resto das teclas no modo PvP
 reageEventos (EventKey key Down _ _) (PVP est _ _ _) =
     let (novoEst, _) = handleAction key est
         estadoFinal = verificaVitoria novoEst
     in return estadoFinal
 
--- * GAME OVER SCREEN 
+-- * Ecrã de Game Over
 
 reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (GameOver _) =
     return $ Menu 0
@@ -208,12 +287,12 @@ reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (GameOver _) =
 
 
 
--- * MAP CREATOR
+-- * Editor de Mapas (MapCreatorTool)
 
 
 
 -- b -> bloco selecionado (lista vertical)
--- a -> modo (BLocos/Objetos/Personagens)
+-- a -> modo (Blocos/Objetos/Personagens)
 -- l -> Segundo Slider
 -- t -> Terceiro slider
 
@@ -570,8 +649,21 @@ reageEventos _ s = return s
 
 
 
--- * Funções auxiliares
+-- * Funções Auxiliares
 
+{-| Adiciona um 'Objeto' ao 'Estado' numa determinada 'Posicao'.
+
+Funcionalidade:
+
+* Remove qualquer objeto existente na mesma posição
+* Adiciona o novo objeto conforme o índice fornecido
+
+== __Exemplos:__
+
+>>> adicionaObjeto estadoBase 0 (1,1)
+Estado com Barril em (1,1)
+
+-}
 adicionaObjeto :: Estado -> Int -> Posicao -> Estado
 adicionaObjeto e idx pos =
     let novoObjeto = case idx of
@@ -581,6 +673,20 @@ adicionaObjeto e idx pos =
         objetosFiltrados = filter (\obj -> Tarefa0_2025.posicaoObjeto obj /= pos) objetosAtuais
     in e { objetosEstado = objetosFiltrados ++ [novoObjeto] }
 
+{-| Adiciona uma 'Minhoca' ao 'Estado' numa determinada 'Posicao'.
+
+Funcionalidade:
+
+* Remove qualquer minhoca existente na mesma posição
+* Cria uma nova minhoca com valores padrão (100 de vida e munições)
+* Adiciona a nova minhoca à lista de minhocas do estado
+
+== __Exemplos:__
+
+>>> adicionaMinhoca estadoBase (2,3)
+Estado com nova Minhoca em (2,3)
+
+-}
 adicionaMinhoca :: Estado -> Posicao -> Estado
 adicionaMinhoca e pos =
     let minhocasAtuais = minhocasEstado e
@@ -591,7 +697,23 @@ adicionaMinhoca e pos =
 
 
 
--- Função auxiliar para determinar direção baseada na tecla
+{-| Converte uma tecla ('Key') numa 'Direcao'.
+
+Mapeamento de teclas:
+
+* Setas direcionais: 4 direções principais
+* WASD: 4 direções principais
+* QEZC: 4 direções diagonais (Noroeste, Nordeste, Sudoeste, Sudeste)
+
+== __Exemplos:__
+
+>>> keyToDirection (SpecialKey KeyUp)
+Norte
+
+>>> keyToDirection (Char 'q')
+Noroeste
+
+-}
 keyToDirection :: Key -> Direcao
 keyToDirection key = case key of
     SpecialKey KeyUp    -> Norte
@@ -608,6 +730,26 @@ keyToDirection key = case key of
     Char 'c'            -> Sudeste
     _                   -> Sul
 
+{-| Converte um índice ('Int') num tipo de 'TerrenoDLC'.
+
+Mapeamento de índices:
+
+* 0: TerraDLC
+* 1: AguaDLC
+* 2: PedraDLC
+* 3: ArDLC
+* 4: Lava
+* 5: Gelo
+
+== __Exemplos:__
+
+>>> getBlocoFromIndex 0
+TerraDLC
+
+>>> getBlocoFromIndex 4
+Lava
+
+-}
 getBlocoFromIndex :: Int -> TerrenoDLC
 getBlocoFromIndex 0 = TerraDLC
 getBlocoFromIndex 1 = AguaDLC
@@ -620,19 +762,63 @@ getBlocoFromIndex _ = ArDLC
 
 
 
+{-| Atualiza um 'MapaDLC' substituindo o 'TerrenoDLC' numa posição específica.
+
+Funcionalidade:
+
+* Divide o mapa na linha especificada
+* Atualiza a coluna dentro dessa linha
+* Reconstrói o mapa com a alteração
+
+== __Exemplos:__
+
+>>> atualizaMapa mapaBase 2 3 PedraDLC
+MapaDLC com Pedra na posição (2,3)
+
+-}
 atualizaMapa :: MapaDLC -> Int -> Int -> TerrenoDLC -> MapaDLC
 atualizaMapa mapa linha col novoBloco =
     let (antes, linhaAtual:depois) = splitAt linha mapa
         novaLinha = atualizaLinha linhaAtual col novoBloco
     in antes ++ [novaLinha] ++ depois
 
+{-| Atualiza uma linha do mapa substituindo um 'TerrenoDLC' numa coluna específica.
+
+Funcionalidade:
+
+* Divide a linha na coluna especificada
+* Substitui o terreno nessa coluna
+* Reconstrói a linha com a alteração
+
+== __Exemplos:__
+
+>>> atualizaLinha [ArDLC, ArDLC, ArDLC] 1 TerraDLC
+[ArDLC, TerraDLC, ArDLC]
+
+-}
 atualizaLinha :: [TerrenoDLC] -> Int -> TerrenoDLC -> [TerrenoDLC]
 atualizaLinha linha col novoBloco =
     let (antes, _:depois) = splitAt col linha
     in antes ++ [novoBloco] ++ depois
 
 
--- | Verifica se a minhoca pode se mover (está no solo)
+{-| Verifica se a 'Minhoca' pode mover-se (está no solo).
+
+Funcionalidade:
+
+* Verifica se o índice da minhoca é válido
+* Obtém a posição atual da minhoca
+* Usa 'estaNoSolo' para verificar se está apoiada em terreno
+
+== __Exemplos:__
+
+>>> podeMover estadoComMinhocaNoSolo 0
+True
+
+>>> podeMover estadoComMinhocaNoAr 0
+False
+
+-}
 podeMover :: Estado -> NumMinhoca -> Bool
 podeMover est i =
     case encontraIndiceLista i (minhocasEstado est) of
@@ -644,6 +830,23 @@ podeMover est i =
 
 
 
+{-| Processa uma ação do utilizador (tecla pressionada) e atualiza o 'EstadoDLC'.
+
+Funcionalidade:
+
+* Se há arma selecionada: executa disparo na direção da tecla
+* Se não há arma selecionada: executa movimento na direção da tecla
+* Retorna o novo estado e a jogada realizada
+
+== __Exemplos:__
+
+>>> handleAction (SpecialKey KeyUp) estadoComArmaSelecionada
+(novoEstado, Dispara JetpackDLC Norte)
+
+>>> handleAction (Char 'w') estadoSemArmaSelecionada
+(novoEstado, Move Norte)
+
+-}
 handleAction :: Key -> EstadoDLC -> (EstadoDLC, JogadaDLC)
 handleAction key est =
     let
@@ -663,8 +866,29 @@ handleAction key est =
            
 
 
--- * DLC
+-- * Funções Auxiliares DLC
 
+{-| Adiciona um 'ObjetoDLC' ao 'EstadoDLC' numa determinada 'Posicao'.
+
+Funcionalidade:
+
+* Remove qualquer objeto existente na mesma posição
+* Cria novo objeto conforme índices fornecidos:
+    * 0: BarrilDLC
+    * 1: HealthPack
+    * 2: AmmoPack (tipo depende de secSel)
+    * 3: DisparoDLC (tipo depende de secSel)
+* Adiciona o novo objeto à lista de objetos
+
+== __Exemplos:__
+
+>>> adicionaObjetoDLC estadoBase 0 (1,1) 0 disparoDefault
+EstadoDLC com BarrilDLC em (1,1)
+
+>>> adicionaObjetoDLC estadoBase 2 (2,2) 3 disparoDefault
+EstadoDLC com AmmoPack de MinaDLC em (2,2)
+
+-}
 adicionaObjetoDLC :: EstadoDLC -> Int -> Posicao -> Int -> ObjetoDLC -> EstadoDLC
 adicionaObjetoDLC e idx pos secSel obj =
     let novoObjeto = case idx of
@@ -687,6 +911,21 @@ adicionaObjetoDLC e idx pos secSel obj =
         objetosFiltrados = filter (\objeto -> DataDLC.posicaoObjeto objeto /= pos) objetosAtuais
     in e { objetosEstadoDLC = objetosFiltrados ++ [novoObjeto] }
 
+{-| Adiciona uma 'MinhocaDLC' ao 'EstadoDLC' numa determinada 'Posicao'.
+
+Funcionalidade:
+
+* Remove qualquer minhoca existente na mesma posição
+* Cria nova minhoca com os atributos da minhoca fornecida
+* Define a última direção horizontal como Oeste
+* Adiciona a nova minhoca à lista de minhocas
+
+== __Exemplos:__
+
+>>> adicionaMinhocaDLC estadoBase (3,3) minhocaDefault
+EstadoDLC com nova MinhocaDLC em (3,3)
+
+-}
 adicionaMinhocaDLC :: EstadoDLC -> Posicao -> MinhocaDLC -> EstadoDLC
 adicionaMinhocaDLC e pos minhoca =
     let minhocasAtuais = minhocasEstadoDLC e
@@ -710,12 +949,38 @@ adicionaMinhocaDLC e pos minhoca =
 
     in e { minhocasEstadoDLC = minhocasFiltradas ++ [novaMinhoca] }  -- ! isto tem valores defaults que tem de ser mudados
 
+{-| Remove um 'ObjetoDLC' do 'EstadoDLC' numa determinada 'Posicao'.
+
+Funcionalidade:
+
+* Filtra a lista de objetos removendo o objeto na posição especificada
+* Retorna o estado atualizado sem o objeto
+
+== __Exemplos:__
+
+>>> removeObjetoDLC estadoComObjeto (1,1)
+EstadoDLC sem objeto em (1,1)
+
+-}
 removeObjetoDLC :: EstadoDLC -> Posicao -> EstadoDLC
 removeObjetoDLC e pos =
     let objetosAtuais = objetosEstadoDLC e
         objetosFiltrados = filter (\obj -> DataDLC.posicaoObjeto obj /= pos) objetosAtuais
     in e { objetosEstadoDLC = objetosFiltrados }
 
+{-| Remove uma 'MinhocaDLC' do 'EstadoDLC' numa determinada 'Posicao'.
+
+Funcionalidade:
+
+* Filtra a lista de minhocas removendo a minhoca na posição especificada
+* Retorna o estado atualizado sem a minhoca
+
+== __Exemplos:__
+
+>>> removeMinhocaDLC estadoComMinhoca (2,2)
+EstadoDLC sem minhoca em (2,2)
+
+-}
 removeMinhocaDLC :: EstadoDLC -> Posicao -> EstadoDLC
 removeMinhocaDLC e pos =
     let minhocasAtuais = minhocasEstadoDLC e
@@ -723,6 +988,24 @@ removeMinhocaDLC e pos =
     in e { minhocasEstadoDLC = minhocasFiltradas }
 
 
+{-| Encontra o próximo índice de uma 'MinhocaDLC' viva após o índice atual.
+
+Funcionalidade:
+
+* Filtra apenas minhocas vivas
+* Procura o próximo índice válido maior que o atual
+* Se não encontrar, retorna ao primeiro índice válido
+* Se não houver minhocas vivas, retorna 0
+
+== __Exemplos:__
+
+>>> encontraProximoIndiceValido 0 [minhocaViva1, minhocaMorta, minhocaViva2]
+2
+
+>>> encontraProximoIndiceValido 2 [minhocaViva1, minhocaMorta, minhocaViva2]
+0
+
+-}
 encontraProximoIndiceValido :: Int -> [MinhocaDLC] -> Int
 encontraProximoIndiceValido atual minhocas =
     let indicesValidos = [i | (i, m) <- zip [0..] minhocas, eMinhocaVivaDLC m]
@@ -735,6 +1018,26 @@ encontraProximoIndiceValido atual minhocas =
               then head indicesValidos
               else head proximosIndices
 
+{-| Verifica as condições de vitória no modo PvP.
+
+Funcionalidade:
+
+* Conta minhocas vivas de cada equipa (Red e Blue)
+* Retorna 'GameOver' com a equipa vencedora se:
+    * Todas as minhocas Red morreram (Blue vence)
+    * Todas as minhocas Blue morreram (Red vence)
+    * Ambas as equipas morreram (empate, Red por padrão)
+* Retorna 'PVP' com o estado atual se o jogo continua
+
+== __Exemplos:__
+
+>>> verificaVitoria estadoComApenasBlueViva
+GameOver Blue
+
+>>> verificaVitoria estadoComAmbosVivos
+PVP estadoAtual 0 0 (Move Sul)
+
+-}
 verificaVitoria :: EstadoDLC -> Worms
 verificaVitoria est =
     let minhocasVivas = getMinhocasValidasDLC (minhocasEstadoDLC est)
@@ -748,5 +1051,21 @@ verificaVitoria est =
 
 
 
+{-| Converte um 'Char' para 'Int'.
+
+Funcionalidade:
+
+* Lê o caractere como string unitária
+* Converte para Int usando read
+
+== __Exemplos:__
+
+>>> charParaInt '5'
+5
+
+>>> charParaInt '0'
+0
+
+-}
 charParaInt :: Char -> Int
 charParaInt c = read [c] :: Int

@@ -1,4 +1,10 @@
 {-# OPTIONS_GHC -Wno-unused-imports #-}
+{-|
+Module      : Worms
+Description : Definição do estado do jogo Worms.
+
+Módulo que define o estado do jogo Worms, incluindo tipos de dados para representar o estado do jogo, minhocas, terrenos e objetos.
+-}
 module Worms where
 
 import Labs2025(VidaMinhoca(Viva, Morta), TipoArma(Dinamite, Mina, Jetpack, Escavadora, Bazuca), Direcao(Norte,Este,Oeste,Sul,Nordeste,Noroeste,Sudoeste,Sudeste),tempoDisparo,donoDisparo,direcaoDisparo, posicaoBarril, tipoDisparo, explodeBarril, posicaoDisparo,Mapa, Objeto(Barril, Disparo),Estado,Posicao, Terreno(Agua, Ar, Terra, Pedra),Estado(Estado), Minhoca (Minhoca), Jogada, NumMinhoca, NumObjeto, minhocasEstado, objetosEstado, mapaEstado, posicaoMinhoca, vidaMinhoca, jetpackMinhoca, escavadoraMinhoca, bazucaMinhoca, minaMinhoca, dinamiteMinhoca)

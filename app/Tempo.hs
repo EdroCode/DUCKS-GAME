@@ -1,3 +1,9 @@
+{-|
+Module      : Tempo
+Description : Gestão temporal do jogo.
+
+Módulo para a gestão do avanço temporal no jogo Worms usando a biblioteca Gloss.
+-}
 module Tempo where
 
 import Worms ( Worms(..) )
@@ -22,11 +28,57 @@ import Auxiliar ( getMinhocasValidasDLC )
 
 type Segundos = Float
 
--- | Intervalo entre passos automático.
+-- | Intervalo de tempo entre cada passo automático do jogo (em segundos).
+--
+-- __NB:__ Define a velocidade base de simulação. Valores menores aumentam a velocidade do jogo.
 intervalo :: Segundos
 intervalo = 1
 
--- | Função que avança o tempo no estado do jogo no Gloss.
+-- * Função Principal
+
+{-| Função principal que avança o tempo no estado do jogo no Gloss.
+
+Funcionamento:
+
+* Acumula o tempo decorrido desde o último tick
+* Calcula quantos passos devem ser executados
+* Aplica as mecânicas específicas de cada modo de jogo
+* Atualiza o estado visual para renderização
+
+Para cada modo de jogo:
+
+== __Bot Simulation:__
+
+* Gera jogadas táticas com 'jogadaTatica'
+* Aplica jogadas ao estado com 'efetuaJogada' e 'avancaEstado'
+* Mantém histórico da última jogada executada
+
+== __Player vs Player (PVP):__
+
+* Verifica condições de vitória por equipa
+* Congela dinamites no chão antes de avançar o estado
+* Aplica física e danos com 'avancaEstado'
+* Retorna ecrã de Game Over quando uma equipa vence
+
+== __Outros Modos:__
+
+* Menu, Help, Quit, LevelSelector: Mantêm o estado inalterado
+* MapCreatorTool: Preserva todas as configurações do editor
+
+==__Exemplo de Utilização:__
+
+@
+-- No loop principal do Gloss
+playIO janela fundo fr estadoInicial desenha reageEventos reageTempo
+@
+
+>>> reageTempo 0.5 (BotSimulation estado 0.3 5 ultimaJogada)
+BotSimulation novoEstado 0.8 5 novaJogada
+
+>>> reageTempo 1.2 (PVP estado 0.8 10 jogada)
+PVP estadoAvancado 0.0 10 jogada
+
+-}
 reageTempo :: Segundos -> Worms -> IO Worms
 reageTempo _ m@Menu{} = return m
 reageTempo _ (Help p) = return (Help p)
@@ -74,7 +126,30 @@ reageTempo _ MapSelector = return MapSelector
 reageTempo _ (GameOver team) = return (GameOver team)
 
 
+-- * Funções Auxiliares
 
+{-| Congela dinamites que estão no chão para prevenir movimento indesejado.
+
+Funcionamento:
+
+* Percorre todos os objetos do estado
+* Identifica disparos do tipo 'DinamiteDLC'
+* Verifica se a dinamite está apoiada em terreno sólido
+* Mantém a dinamite na mesma posição se estiver no chão
+
+Esta função resolve um problema de física onde dinamites no chão
+poderiam ser afetadas pela gravidade durante 'avancaEstado'.
+
+==__Exemplos:__
+
+@
+estadoComDinamite = EstadoDLC mapa [DisparoDLC (2,3) Norte DinamiteDLC (Just 2) 0] minhocas Nothing 0 []
+@
+
+>>> congelaDinamitesNoChao estadoComDinamite
+EstadoDLC mapa [DisparoDLC (2,3) Norte DinamiteDLC (Just 2) 0] minhocas Nothing 0 []
+
+-}
 congelaDinamitesNoChao :: EstadoDLC -> EstadoDLC
 congelaDinamitesNoChao e = e { objetosEstadoDLC = map congelar (objetosEstadoDLC e) }
   where
@@ -93,4 +168,3 @@ congelaDinamitesNoChao e = e { objetosEstadoDLC = map congelar (objetosEstadoDLC
            Just TerraDLC -> True
            Just PedraDLC -> True
            _ -> False
-

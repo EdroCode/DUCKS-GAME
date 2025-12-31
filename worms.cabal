@@ -34,6 +34,15 @@ library
         Tarefa2
         Tarefa3
         Tarefa4
+        DataDLC
+        Auxiliar
+        AvancaEstado
+        EfetuaJogada
+        Tempo
+        Worms
+        Desenhar
+        Eventos
+        Main
 
 
     -- Modules included in this library but not exported.
@@ -42,11 +51,14 @@ library
     -- LANGUAGE extensions used by modules in this package.
     -- other-extensions:
 
-    build-depends:
-        base
+  build-depends:
+    base,
+    gloss,
+    gloss-juicy,
+    directory
 
-    hs-source-dirs:   lib
-    default-language: GHC2021
+  hs-source-dirs: lib app
+  default-language: Haskell2010
 
 executable t1-feedback
     import:           warnings
