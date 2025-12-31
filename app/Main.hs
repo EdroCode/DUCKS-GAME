@@ -148,6 +148,12 @@ main = do
   Just patoOutlineNatalPulando <- loadJuicy (path ++ "PatoOutlineNatalPulando.png")
   Just patoOutlineNatalPulandoR <- loadJuicy (path ++ "PatoOutlineNatalPulandoRight.png")
 
+  Just patoCongelado <- loadJuicy (path ++ "PatoCongelado.png")
+  Just patoCongeladoR <- loadJuicy (path ++ "PatoCongeladoRight.png")
+  Just patoCongeladoOutline <- loadJuicy (path ++ "PatoCongeladoOutline.png")
+  Just patoCongeladoOutlineR <- loadJuicy (path ++ "PatoCongeladoOutlineRight.png")
+  Just snowBall <- loadJuicy (path ++ "SnowBall.png")
+
   Just backgroundNatal <- loadJuicy (path ++ "BackgroundNatal.png")
   Just backgroundNatalBorrado <- loadJuicy (path ++ "BackgroundNatalBorrado.png")
   Just backgroundMorningNatalBorrado <- loadJuicy (path ++ "BackgroundMorningNatalBorrado.png")
