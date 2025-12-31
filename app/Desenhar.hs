@@ -383,7 +383,10 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
       , Translate (-760) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 6
       , Translate (-690) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 9
       , Translate (-620) (y - weaponOffset) $ Scale 1.5 1.5 $ p !! 8
+      , Translate (-820) (y - 3*weaponOffset) $ Scale 1.5 1.5 $ p !! 130
+
       , Translate (-900) (y -  3*weaponOffset) $ Scale 1.5 1.5 $ p !! 69
+      
 
       , Pictures
           [
@@ -467,7 +470,7 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
           , Translate (-830) (y - weaponTextOffset - 140) $
               Scale 0.4 0.4 $
                 Color black $
-                  drawWord p ("Burning counter: " ++ show burn)
+                  drawWord p (show burn)
           ]
 
       , Pictures
