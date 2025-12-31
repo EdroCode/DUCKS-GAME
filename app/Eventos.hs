@@ -508,7 +508,7 @@ reageEventos (EventKey (SpecialKey KeyRight) Down _ _) (MapCreatorTool e b a l t
 reageEventos (EventKey (SpecialKey KeyDown) Down _ _) (MapCreatorTool e 3 1 l t edit c w d) =
     let
 
-        novot = if edit then (t + 1) `mod` 5 else t
+        novot = if edit then (t + 1) `mod` 3 else t
 
 
     in return $ MapCreatorTool e 3 1 l novot edit c w d
@@ -516,7 +516,7 @@ reageEventos (EventKey (SpecialKey KeyDown) Down _ _) (MapCreatorTool e 3 1 l t 
 reageEventos (EventKey (SpecialKey KeyUp) Down _ _) (MapCreatorTool e 3 1 l t edit c w d) =
     let
 
-        novot = if edit then (t - 1) `mod` 8 else 0
+        novot = if edit then (t - 1) `mod` 3 else 0
 
     in return $ MapCreatorTool e 3 1 l novot edit c w d
 

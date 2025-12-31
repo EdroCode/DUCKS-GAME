@@ -282,32 +282,32 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
 
     drawBloco y (idx, nome, pic) = Pictures
       [ if idx == blocoSelecionado
-          then Color (makeColor 0.3 0.6 1.0 0.3) $ Translate (-750) y $ rectangleSolid 280 70
+          then Translate (-750) y $ Scale 5 5 $ p !! 126
           else Blank
       , Translate (-880) y $ Scale 0.6 0.6 $ drawWord p (show (idx + 1))
       , Translate (-850) (y + 5) $ Scale 0.6 0.6 $ Color black $ drawWord p nome
-      , Translate (-700) y $ Scale 2 2 $ pic
+      , Translate (-700) y $ Scale 2 2 pic
       ]
 
     drawObjeto y (idx, nome, pic) = Pictures
       [ if idx == blocoSelecionado
-          then Color (makeColor 0.3 0.6 1.0 0.3) $ Translate (-750) y $ rectangleSolid 280 70
+          then Translate (-750) y $ Scale 5 5 $ p !! 126
           else Blank
       , Translate (-880) y $ Scale 0.6 0.6 $ Color black $ drawWord p (show (idx + 1))
       , Translate (-850) (y + 5) $ Scale 0.6 0.6 $ Color black $ drawWord p nome
-      , Translate (-700) y $ Scale 2 2 $ pic
+      , Translate (-700) y $ Scale 2 2 pic
       ]
 
     drawAmmoPackSelector y = Pictures
       [ if blocoSelecionado == 2
-          then Color (makeColor 0.3 0.6 1.0 0.3) $ Translate (-750) y $ rectangleSolid 280 70
+          then Translate (-750) y $ Scale 5 5 $ p !! 126
           else Blank
       , Translate (-880) y $ Scale 0.6 0.6 $ Color black $ drawWord p (show (selectedIdx + 1))
       , Translate (-850) (y + 5) $ Scale 0.6 0.6 $ Color black $ drawWord p "Ammo Pack"
-      , Translate (-600) y $ Scale 2 2 $ selectedPic
+      , Translate (-600) y $ Scale 2 2 selectedPic
       , Translate (-850) (y - 30) $ Scale 0.5 0.5 $ Color (greyN 0.5) $ drawWord p "<"
       , Translate (-650) (y - 30) $ Scale 0.5 0.5 $ Color (greyN 0.5) $ drawWord p ">"
-      , Translate (-825) (y - 30) $ Scale 0.5 0.5 $ Color (greyN 0.5) $ drawWord p (selectedName)
+      , Translate (-825) (y - 30) $ Scale 0.5 0.5 $ Color (greyN 0.5) $ drawWord p selectedName
 
       ]
       where
@@ -316,7 +316,7 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
 
     drawDisparoSelector y = Pictures
       [ if blocoSelecionado == 3
-          then  if editMode then Color red $ Translate (-750) y $ rectangleSolid 280 70 else Color (makeColor 0.3 0.6 1.0 0.3) $ Translate (-750) y $ rectangleSolid 280 70
+          then  if editMode then Translate (-750) y $ Scale 5 5 $ p !! 129 else Translate (-750) y $ Scale 5 5 $ p !! 126
           else Blank
       , Translate (-880) y $ Scale 0.6 0.6 $ Color black $ drawWord p (show (selectedIdx + 1))
       , Translate (-850) (y + 5) $ Scale 0.6 0.6 $ Color black $ drawWord p "Disparos"
@@ -324,12 +324,11 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
       , Translate (-850) (y - 30) $ Scale 0.5 0.5 $ Color (greyN 0.5) $ drawWord p "<"
       , Translate (-650) (y - 30) $ Scale 0.5 0.5 $ Color (greyN 0.5) $ drawWord p ">"
       , Translate (-825) (y - 30) $ Scale 0.5 0.5 $ Color (greyN 0.5) $ drawWord p selectedName
-      , (if blocoSelecionado == 3 then Pictures
+      , (if blocoSelecionado == 3  then Pictures
           [
-            if thirdSel == 0
+            if thirdSel == 0 && editMode 
               then Color editColor $
-                  Translate (-940) (y - 60) $
-                  rectangleSolid 50 30
+                  Translate (-940) (y - 60) $ Scale 2 2 $ p !! 126
               else Blank
           , Translate (-940) (y - 60) $
               Scale 0.6 0.6 $
@@ -338,10 +337,9 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
           ] else Blank)
       , if blocoSelecionado == 3 then Pictures
           [
-            if thirdSel == 1
+            if thirdSel == 1 && editMode 
               then Color editColor $
-                  Translate (-940) (y  - 120) $
-                  rectangleSolid 50 30
+                  Translate (-940) (y  - 120) $ Scale 2 2 $ p !! 126
               else Blank
           , Translate (-940) (y - 120) $
               Scale 0.6 0.6 $
@@ -350,10 +348,9 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
           ] else Blank
       , if blocoSelecionado == 3 then Pictures
           [
-            if thirdSel == 2
+            if thirdSel == 2 && editMode 
               then Color editColor $
-                  Translate (-940) (y - 180) $
-                  rectangleSolid 50 30
+                  Translate (-940) (y - 180) $ Scale 2 2 $ p !! 126
               else Blank
           , Translate (-940) (y - 180) $
               Scale 0.6 0.6 $
@@ -376,7 +373,7 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
 
     drawPersonagens y (idx, nome, pic) = Pictures
       [ if idx == blocoSelecionado
-          then Color (makeColor 0.3 0.6 1.0 0.3) $ Translate (-750) y $ rectangleSolid 280 70
+          then Translate (-750) y $ Scale 5 5 $ p !! 126
           else Blank
       , Translate (-880) y $ Scale 0.6 0.6 $ Color black $ drawWord p (show (idx + 1))
       , Translate (-850) (y + 5) $ Scale 0.6 0.6 $ Color black $ drawWord p nome
@@ -392,8 +389,7 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
           [
             if thirdSel == 0
               then Color editColor $
-                  Translate (-910) (y - weaponTextOffset) $
-                  rectangleSolid 50 30
+                  Translate (-910) (y - weaponTextOffset) $ Scale 0.5 2 $ p !! 126
               else Blank
           , Translate (-920) (y - weaponTextOffset) $
               Scale 0.4 0.4 $
@@ -405,8 +401,7 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
           [
             if thirdSel == 1
               then Color editColor $
-                  Translate (-840) (y - weaponTextOffset) $
-                  rectangleSolid 50 30
+                  Translate (-840) (y - weaponTextOffset) $ Scale 0.5 2 $ p !! 126
               else Blank
           , Translate (-830) (y - weaponTextOffset) $
               Scale 0.4 0.4 $
@@ -418,8 +413,7 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
           [
             if thirdSel == 2
               then Color editColor $
-                  Translate (-770) (y - weaponTextOffset) $
-                  rectangleSolid 50 30
+                  Translate (-750) (y - weaponTextOffset) $ Scale 0.5 2 $ p !! 126
               else Blank
           , Translate (-760) (y - weaponTextOffset) $
               Scale 0.4 0.4 $
@@ -431,8 +425,7 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
           [
             if thirdSel == 3
               then Color editColor $
-                  Translate (-700) (y - weaponTextOffset) $
-                  rectangleSolid 50 30
+                  Translate (-700) (y - weaponTextOffset) $ Scale 0.5 2 $ p !! 126
               else Blank
           , Translate (-690) (y - weaponTextOffset) $
               Scale 0.4 0.4 $
@@ -444,8 +437,7 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
           [
             if thirdSel == 4
               then Color editColor $
-                  Translate (-630) (y - weaponTextOffset) $
-                  rectangleSolid 50 30
+                  Translate (-630) (y - weaponTextOffset) $ Scale 0.5 2 $ p !! 126
               else Blank
           , Translate (-620) (y - weaponTextOffset) $
               Scale 0.4 0.4 $
@@ -458,8 +450,7 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
           [
             if thirdSel == 5
               then Color editColor $
-                  Translate (-910) (y - weaponTextOffset - 140) $
-                  rectangleSolid 50 30
+                  Translate (-910) (y - weaponTextOffset - 140) $ Scale 0.5 2 $ p !! 126
               else Blank
           , Translate (-920) (y - weaponTextOffset - 140) $
               Scale 0.4 0.4 $
@@ -471,8 +462,7 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
           [
             if thirdSel == 6
               then Color editColor $
-                  Translate (-600) (y - weaponTextOffset - 140) $
-                  rectangleSolid 50 30
+                  Translate (-600) (y - weaponTextOffset - 140) $ Scale 0.5 2 $ p !! 126
               else Blank
           , Translate (-830) (y - weaponTextOffset - 140) $
               Scale 0.4 0.4 $
@@ -483,17 +473,16 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
       , Pictures
         [ if thirdSel == 7
             then Color editColor $
-              Translate (-800) (y - weaponTextOffset - 240) $
-              rectangleSolid 50 30
+              Translate (-800) (y - weaponTextOffset - 240) $ Scale 0.5 2 $ p !! 126
             else Blank
         , Translate (-800) (y - weaponTextOffset - 240) $ Scale 0.6 0.6 $ drawWord p "Equipa:"
 
-        ,Translate (-830) (y - weaponTextOffset - 240) $
-            Scale 1 1 $
+        ,Translate (-760) (y - weaponTextOffset - 320) $
+            Scale 3 3 $
               case equipa of
-                Just Red -> Color red $ rectangleSolid 20 20
-                Just Blue -> Color blue $ rectangleSolid 20 20
-                Nothing -> Color (greyN 0.5) $ rectangleSolid 20 20
+                Just Red -> p !! 128
+                Just Blue -> p !! 127
+                Nothing -> Color (greyN 0.5) $ rectangleSolid 70 70
         ]
 
 
