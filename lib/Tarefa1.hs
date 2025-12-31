@@ -2,6 +2,7 @@
 {-# HLINT ignore "Use notElem" #-}
 {-# HLINT ignore "Replace case with fromMaybe" #-}
 {-# HLINT ignore "Eta reduce" #-}
+{-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 {-|
 Module      : Tarefa1
 Description : Validação de estados.
@@ -113,27 +114,20 @@ True
 
 eObjetosValido :: Estado -> [Objeto] -> Bool
 eObjetosValido _ [] = True
-eObjetosValido e (h:t) =
-    if ehDisparo h == True
-        then
-            if not (existeBarril (posicaoObjeto h) t) && objetoValido h && disparoValido mapa h && donoValido e h
-                then eObjetosValido e t
-                else False
-        else
-            if ePosicaoMapaLivre (posicaoObjeto h) mapa && ePosicaoEstadoLivre (posicaoObjeto h) e{objetosEstado = t}
-                then eObjetosValido e t
-                else False
-
-    where
-        mapa = mapaEstado e
-
-        objetoValido obj = case obj of
-            Disparo{tipoDisparo = Escavadora} -> False
-            Disparo{tipoDisparo = Jetpack}  -> False
-            Disparo{tipoDisparo = Bazuca} -> disparoValido mapa obj
-            Disparo{tipoDisparo = Mina} -> disparoValido mapa obj
-            Disparo{tipoDisparo = Dinamite} -> disparoValido mapa obj
-
+eObjetosValido e (h:t)
+  | ehDisparo h = (not (existeBarril (posicaoObjeto h) t) && objetoValido h && disparoValido mapa h && donoValido e h) && eObjetosValido e t
+  | ePosicaoMapaLivre (posicaoObjeto h) mapa && ePosicaoEstadoLivre (posicaoObjeto h) e{objetosEstado = t} = eObjetosValido e t
+  | otherwise = False
+  where
+      mapa = mapaEstado e
+      objetoValido obj
+        = case obj of
+            Disparo {tipoDisparo = Escavadora} -> False
+            Disparo {tipoDisparo = Jetpack} -> False
+            Disparo {tipoDisparo = Bazuca} -> disparoValido mapa obj
+            Disparo {tipoDisparo = Mina} -> disparoValido mapa obj
+            Disparo {tipoDisparo = Dinamite} -> disparoValido mapa obj
+            _ -> False
 
 {-| Verifica se o 'Disparo' é valido
 
@@ -163,6 +157,8 @@ disparoValido :: Mapa -> Objeto -> Bool
 disparoValido m d@Disparo{tipoDisparo = Bazuca} = tempoDisparo d == Nothing && disparoBazucaValido d m
 disparoValido m d@Disparo{tipoDisparo = Mina} = (tempoDisparo d <= Just 2 && tempoDisparo d >= Just 0 && ePosicaoMapaLivre (posicaoObjeto d) m) || (tempoDisparo d == Nothing && ePosicaoMapaLivre (posicaoObjeto d) m)
 disparoValido m d@Disparo{tipoDisparo = Dinamite} = tempoDisparo d <= Just 4 && tempoDisparo d >= Just 0 && ePosicaoMapaLivre (posicaoObjeto d) m
+
+
 
 {-| Verifica se o 'Disparo' de 'Bazuca' é valido
 
@@ -323,7 +319,7 @@ Funcionalidade:
 >>> validaMorte Minhoca{posicaoMinhoca=Just (5,8), vidaMinhoca=Morta, jetpackMinhoca=100, escavadoraMinhoca=200, bazucaMinhoca=150, minaMinhoca=3, dinamiteMinhoca=1} mapaValido
 True
 
--} 
+-}
 
 validaMorte :: Minhoca -> Mapa -> Bool
 validaMorte _ [] = False

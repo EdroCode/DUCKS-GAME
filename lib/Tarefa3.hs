@@ -1,6 +1,7 @@
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 {-# HLINT ignore "Redundant if" #-}
 {-# OPTIONS_GHC -Wno-incomplete-patterns #-}
+{-# OPTIONS_GHC -Wno-overlapping-patterns #-}
 {-|
 Module      : Tarefa3
 Description : Avançar tempo do jogo.
@@ -15,7 +16,7 @@ import Tarefa0_geral
 import Tarefa0_2025
 import Tarefa2
 import Labs2025
-import GHC.Generics ((:+:)(R1))
+
 
 -- * Tipos Auxiliares
 type Dano = Int
@@ -57,7 +58,7 @@ Funcionamento:
 
 -}
 avancaMinhoca :: Estado -> NumMinhoca -> Minhoca -> Minhoca
-avancaMinhoca e i minhoca =
+avancaMinhoca e _ minhoca =
   case posicaoMinhoca minhoca of
     Nothing -> minhoca
     Just pos ->
@@ -86,7 +87,7 @@ avancaMinhoca e i minhoca =
     mapa = mapaEstado e
 
     estaMinhocaBaixoViva :: Posicao -> Estado -> Bool
-    estaMinhocaBaixoViva pos e =
+    estaMinhocaBaixoViva pos _ =
       let
         posAbaixo = movePosicao Sul pos
 
@@ -152,7 +153,7 @@ Funcinamento Geral:
 -}
 
 avancaObjeto :: Estado -> NumObjeto -> Objeto -> Either Objeto Danos
-avancaObjeto e i o = case o of
+avancaObjeto e _ o = case o of
   Barril posBarril explode ->
     if not explode
       then
@@ -271,8 +272,8 @@ avancaObjeto e i o = case o of
 
 
     estaEmAgua :: Posicao -> Mapa -> Bool
-    estaEmAgua p [] = False
-    estaEmAgua pos mapa = case encontraPosicaoMatriz (movePosicao Sul pos) mapa of
+    estaEmAgua _ [] = False
+    estaEmAgua pos _ = case encontraPosicaoMatriz (movePosicao Sul pos) mapa of
         Nothing -> False
         Just Agua -> True
         Just _ -> False
@@ -385,7 +386,7 @@ aplicaDanos danos estado = estado {
 
     atualizaObjetos :: Danos -> [Objeto] -> [Objeto]
     atualizaObjetos _ [] = []
-    atualizaObjetos danos (obj:resto) =
+    atualizaObjetos _ (obj:resto) =
       let pos = posicaoObjeto obj
           objAtualizado = case obj of
             Barril _ False ->
