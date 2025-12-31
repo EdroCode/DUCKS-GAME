@@ -142,6 +142,24 @@ drawQuitConfirm p sel = Pictures
   , Translate 150 (-50) $ Scale 1 1 $ drawWord p "Cancelar"
   ]
 
+{-
+  Desenha o menu de temas do jogo.
+
+  Funcionamento:
+
+  * Apresenta o título "Temas"
+  * Mostra duas opções de tema: Base e Natal
+  * Destaca o tema selecionado
+
+  ==__Exemplo de Utilização:__
+
+  >>> drawTemas recursos TemaBase
+  Picture (tema base destacado)
+
+  >>> drawTemas recursos TemaNatal
+  Picture (tema natal destacado)
+-}
+
 drawTemas :: [Picture] -> TemaAtual -> Picture
 drawTemas p temaAtual = Pictures
   [ p !! 88
