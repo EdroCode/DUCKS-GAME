@@ -69,8 +69,12 @@ drawMenu p sel = Pictures
   [ Scale 1 1 $ p !! 85
 
   -- Título "WORMS"
+
   , Translate 0 350 $ Scale 1 1 $ p !! 20
-  , Translate (-140) 370 $ Scale 1.6 1.6 $ drawWord p "worms"
+  , Translate (-190) 370 $ Scale 1.6 1.6 $ p !! 3
+  , Translate (-140) 370 $ Scale 1.6 1.6 $ drawWord p "DUCKS"
+  , Translate 180 370 $ Scale (-1.6) 1.6 $ p !! 3
+
 
   -- Subtítulo
   , Translate (-210) 290 $ Scale 0.5 0.5 $ drawWord p "Escolha o modo de jogo"
@@ -532,8 +536,6 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
     sx = if largura > 0 then usableWidth / largura else 1
     sy = if altura > 0 then usableHeight / altura else 1
     scaleFactor = min (min sx sy) 2.0
-
-    editColor = if editMode then red else makeColor 0.3 0.6 1.0 0.3
 
     world =
       Translate (sidebarWidth / 2) 0 $
