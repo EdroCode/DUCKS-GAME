@@ -227,14 +227,20 @@ main = do
   Just bot <- loadJuicy (path ++ "Bot.png") 
   Just sword <- loadJuicy (path ++ "Sword.png") 
   Just book <- loadJuicy (path ++ "Book.png") 
-  Just pencil <- loadJuicy (path ++ "Pencil.png") 
+  Just pencil <- loadJuicy (path ++ "Pencil.png")
+
+  Just exit <- loadJuicy (path ++ "Exit.png") 
+
+
+
+  Just iconNatal <- loadJuicy (path ++ "PatoNatal.png") 
 
 
 
 
 
 
-  let tiles = [grass, water, stone, pato, morto, barril, bazuca, sky, dinamite, mina, dirt, lava, healthPack, patoPulando, blank_sprite, ammoJetpack, ammoEscavadora, ammoBazuca, ammoMina, ammoDinamite, botao, botaoOn, botaoOff, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, space, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, dash, pl, pr, slash, dott_points, comma, exclamation, interrogation, arrombado, fireball, leftArrow, rightArrow, patoBazucaVermelho, patoBazucaAzul, blank_sprite, blank_sprite, patoAzulPulando, patoVermelhoPulando, patoVermelhoParado, patoAzulParado, blank_sprite, blank_sprite, patoEscavadoraAzul, patoEscavadoraVermelho, patoFogo, background, patoVermelhoJetpack, patoAzulJetpack, backgroundBorrado, botaoOn2, botaoOff2, lvlAddSign, patoOutline, patoOutlinePulando, sidebar, sidebarAzul, sidebarVermelho, mapSheet, patoPulandoR, patoR, patoFogoR, patoOutlineR, patoOutlinePulandoR, patoVermelhoPulandoR, patoVermelhoParadoR, patoBazucaVermelhoR, patoEscavadoraVermelhoR, patoVermelhoJetpackR, patoBazucaAzulR, patoAzulPulandoR, patoAzulParadoR, patoEscavadoraAzulR, patoAzulJetpackR, jetpack, escavadora, redWins, blueWins, selectedOutline, patoFogoOutline, patoFogoOutlineR, gelo, waterMedium, waterDeep, waterDeeper, explosao, backgroundMorningBorrado, selected, flagB, flagR, selectedRed, burnCounter, bot, sword, book, pencil]
+  let temaBase = [grass, water, stone, pato, morto, barril, bazuca, sky, dinamite, mina, dirt, lava, healthPack, patoPulando, blank_sprite, ammoJetpack, ammoEscavadora, ammoBazuca, ammoMina, ammoDinamite, botao, botaoOn, botaoOff, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, space, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, dash, pl, pr, slash, dott_points, comma, exclamation, interrogation, arrombado, fireball, leftArrow, rightArrow, patoBazucaVermelho, patoBazucaAzul, blank_sprite, blank_sprite, patoAzulPulando, patoVermelhoPulando, patoVermelhoParado, patoAzulParado, blank_sprite, blank_sprite, patoEscavadoraAzul, patoEscavadoraVermelho, patoFogo, background, patoVermelhoJetpack, patoAzulJetpack, backgroundBorrado, botaoOn2, botaoOff2, lvlAddSign, patoOutline, patoOutlinePulando, sidebar, sidebarAzul, sidebarVermelho, mapSheet, patoPulandoR, patoR, patoFogoR, patoOutlineR, patoOutlinePulandoR, patoVermelhoPulandoR, patoVermelhoParadoR, patoBazucaVermelhoR, patoEscavadoraVermelhoR, patoVermelhoJetpackR, patoBazucaAzulR, patoAzulPulandoR, patoAzulParadoR, patoEscavadoraAzulR, patoAzulJetpackR, jetpack, escavadora, redWins, blueWins, selectedOutline, patoFogoOutline, patoFogoOutlineR, gelo, waterMedium, waterDeep, waterDeeper, explosao, backgroundMorningBorrado, selected, flagB, flagR, selectedRed, burnCounter, bot, sword, book, pencil, iconNatal,exit]
 
 {- Indices dos sprites (corrigidos para corresponder à lista `tiles`):
   0: grass
@@ -326,15 +332,15 @@ main = do
   131: bot
   132: book
   133: pencil
+  134: iconeNatal
+  134: exit
 
 
 
 -}
 
-  let temanatal = [neve, water, stone, patoParadoNatal, morto, barril, bazuca, skyNatal, dinamite, mina, dirt, lava, healthPack, patoPulandoNatal, blank_sprite, ammoJetpack, ammoEscavadora, ammoBazuca, ammoMina, ammoDinamite, botao, botaoOn, botaoOff, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, space, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, dash, pl, pr, slash, dott_points, comma, exclamation, interrogation, arrombado, fireball, leftArrow, rightArrow, patoBazucaVermelho, patoBazucaAzul, blank_sprite, blank_sprite, patoAzulPulandoNatal, patoVermelhoPulandoNatal, patoVermelhoParadoNatal, patoAzulParadoNatal, blank_sprite, blank_sprite, patoEscavadoraAzul, patoEscavadoraVermelho, patoFogo, backgroundNatal, patoVermelhoJetpack, patoAzulJetpack, backgroundNatalBorrado, botaoOn2, botaoOff2, lvlAddSign, patoOutlineNatal, patoOutlineNatalPulando, sidebar, sidebarAzul, sidebarVermelho, mapSheet, patoPulandoNatalR, patoParadoNatalR, patoFogoR, patoOutlineNatalR, patoOutlineNatalPulandoR, patoVermelhoPulandoNatalR, patoVermelhoParadoNatalR, patoBazucaVermelhoR, patoEscavadoraVermelhoR, patoVermelhoJetpackR, patoBazucaAzulR, patoAzulPulandoNatalR, patoAzulParadoNatalR, patoEscavadoraAzulR, patoAzulJetpackR, jetpack, escavadora, redWins, blueWins, selectedOutline, patoFogoOutline, patoFogoOutlineR, gelo, waterMedium, waterDeep, waterDeeper, explosao, backgroundMorningNatalBorrado, selected, flagB, flagR, selectedRed, burnCounter, bot, sword, book, pencil]
+  let temanatal = [neve, water, stone, patoParadoNatal, morto, barril, bazuca, skyNatal, dinamite, mina, dirt, lava, healthPack, patoPulandoNatal, blank_sprite, ammoJetpack, ammoEscavadora, ammoBazuca, ammoMina, ammoDinamite, botao, botaoOn, botaoOff, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, space, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, dash, pl, pr, slash, dott_points, comma, exclamation, interrogation, arrombado, fireball, leftArrow, rightArrow, patoBazucaVermelho, patoBazucaAzul, blank_sprite, blank_sprite, patoAzulPulandoNatal, patoVermelhoPulandoNatal, patoVermelhoParadoNatal, patoAzulParadoNatal, blank_sprite, blank_sprite, patoEscavadoraAzul, patoEscavadoraVermelho, patoFogo, backgroundNatal, patoVermelhoJetpack, patoAzulJetpack, backgroundNatalBorrado, botaoOn2, botaoOff2, lvlAddSign, patoOutlineNatal, patoOutlineNatalPulando, sidebar, sidebarAzul, sidebarVermelho, mapSheet, patoPulandoNatalR, patoParadoNatalR, patoFogoR, patoOutlineNatalR, patoOutlineNatalPulandoR, patoVermelhoPulandoNatalR, patoVermelhoParadoNatalR, patoBazucaVermelhoR, patoEscavadoraVermelhoR, patoVermelhoJetpackR, patoBazucaAzulR, patoAzulPulandoNatalR, patoAzulParadoNatalR, patoEscavadoraAzulR, patoAzulJetpackR, jetpack, escavadora, redWins, blueWins, selectedOutline, patoFogoOutline, patoFogoOutlineR, gelo, waterMedium, waterDeep, waterDeeper, explosao, backgroundMorningNatalBorrado, selected, flagB, flagR, selectedRed, burnCounter, bot, sword, book, pencil, iconNatal, exit]
 
-  let temaNatal = temanatal
-  let temaBase = tiles
 
-  playIO janela fundo fr (Menu 0 TemaBase) (desenha [temaBase, temaNatal]) reageEventos reageTempo
+  playIO janela fundo fr (Menu 0 TemaBase) (desenha [temaBase, temanatal]) reageEventos reageTempo
 

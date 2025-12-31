@@ -149,10 +149,12 @@ drawTemas p temaAtual = Pictures
   , Translate (-140) 370 $ Scale 1.6 1.6 $ drawWord p "Temas"
   
   , Translate (-300) 100 $ Scale 1 1 (if temaAtual == TemaBase then p !! 21 else p !! 22)
+  , Translate (-500) 100 $ Scale 1.6 1.6 $ p !! 3
   , Translate (-450) 100 $ Scale 0.6 0.6 $ drawWord p "Tema Base"
   
   , Translate (300) 100 $ Scale 1 1 (if temaAtual == TemaNatal then p !! 21 else p !! 22)
-  , Translate (150) 100 $ Scale 0.6 0.6 $ drawWord p "Tema Natal"
+  , Translate 110 100 $ Scale 1.6 1.6 $ p !! 135
+  , Translate 150 100 $ Scale 0.6 0.6 $ drawWord p "Tema Natal"
   ]
 
 {-| Desenha o menu principal do jogo.
@@ -198,7 +200,8 @@ drawMenu p sel = Pictures
   , Translate (-300- 150) 100 $ Scale 0.6 0.6 $ Color (if sel==0 then red else black) $ drawWord p "Bot Simulation"
 
   -- Player vs Player 
-  , Translate 300 100 $ Scale 1 1 (if sel==1 then p !! 21 else p !! 22)
+  , Translate 300 100 $ Scale 1 1 (if sel==1 then p !! 21 else p !! 22)  , Translate 210 (-50) $ Scale 1.2 1.2 $ p !! 133
+
   , Translate 100 100 $ Scale 1.2 1.2 $ p !! 132
   , Translate (300- 160) 100 $ Scale 0.6 0.6 $ Color (if sel==1 then red else black) $ drawWord p "Player vs Player"
 
@@ -214,10 +217,12 @@ drawMenu p sel = Pictures
 
   -- Temas
   , Translate (-300) (-200) $ Scale 1 1 (if sel==4 then p !! 21 else p !! 22)
-  , Translate (-500) (-200) $ Scale 0.6 0.6 $ Color (if sel==4 then red else black) $ drawWord p "Temas"
+  , Translate (-480) (-200) $ Scale 1.6 1.6 $ p !! 135
+  , Translate (-430) (-200) $ Scale 0.6 0.6 $ Color (if sel==4 then red else black) $ drawWord p "Temas"
 
   -- Quit 
   , Translate 300 (-200) $ Scale 1 1 (if sel==5 then p !! 21 else p !! 22)
+  , Translate 172 (-200) $ Scale 1.6 1.6 $ p !! 136
   , Translate 210 (-200) $ Scale 0.6 0.6 $ Color (if sel==5 then red else black) $ drawWord p "Quit"
   ]
 
