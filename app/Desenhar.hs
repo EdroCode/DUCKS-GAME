@@ -1,7 +1,7 @@
 {-# OPTIONS_GHC -Wno-incomplete-patterns #-}
 {-|
 Module      : Desenhar
-Description : Funções para desenhar elementos do jogo.
+Description : Renderização visual do jogo Worms.
 
 Módulo que contém funções para desenhar os elementos do jogo Worms usando a biblioteca Gloss.
 -}
@@ -21,14 +21,32 @@ import Data.Char (toLower)
 
 
 
+-- * Constantes de Janela
+
+-- | Largura da janela do jogo em pixels.
+
 janelaLargura :: Float
 janelaLargura = 1920
+
+-- | Altura da janela do jogo em pixels.
+
 janelaAltura :: Float
 janelaAltura = 1080
 
 
--- * Assets
+-- * Tipos e Estruturas de Dados
 
+{-| Estrutura que contém todos os recursos gráficos (sprites) do jogo.
+
+Componentes:
+
+* 'imgWorm': sprite da minhoca
+* 'imgBarrel': sprite do barril
+* 'imgBackground': imagem de fundo
+* 'grassImg': textura de relva
+* 'waterImg': textura de água
+* 'stoneImg': textura de pedra
+-}
 data Assets = Assets
   { imgWorm :: Picture
   , imgBarrel :: Picture
@@ -38,9 +56,44 @@ data Assets = Assets
   , stoneImg :: Picture
   }
 
+{-| Tuplo que representa o estado do jogo com os seus recursos gráficos.
+
+Componentes:
+
+* 'Estado': estado atual do jogo
+* 'Assets': recursos gráficos carregados
+-}
 type EstadoGloss = (Estado, Assets)
 
--- | Menu do jogo com múltiplas opções
+-- * Função Principal de Renderização
+
+{-| Função principal que coordena a renderização de todos os estados do jogo.
+
+Funcionamento:
+
+* Recebe uma lista de 'Picture' (recursos gráficos) e o estado atual 'Worms'
+* Delega para a função de desenho apropriada conforme o estado
+* Retorna uma 'Picture' pronta para renderização no Gloss
+
+Estados suportados:
+
+* 'Menu': menu principal do jogo
+* 'BotSimulation': modo de simulação com bots
+* 'PVP': modo jogador contra jogador
+* 'MapCreatorTool': editor de mapas
+* 'LevelSelector': seletor de níveis
+* 'Quit': confirmação de saída
+* 'Help': ecrã de ajuda
+* 'GameOver': ecrã de fim de jogo
+
+==__Exemplos de Utilização:__
+
+>>> desenha recursos (Menu 0)
+Picture (menu com primeira opção selecionada)
+
+>>> desenha recursos (PVP estado 0.0 0 jogada)
+Picture (jogo PvP renderizado)
+-}
 desenha :: [Picture] -> Worms -> IO Picture
 desenha p (Menu sel) = return $ drawMenu p sel
 desenha p (BotSimulation est _ _ (numMinhoca, jogada)) = return $ drawGame p est (Just numMinhoca) (Just jogada)
@@ -51,7 +104,29 @@ desenha p (Quit sel) = return $ drawQuitConfirm p sel
 desenha p (Help pagina) = return $ drawHelp p pagina
 desenha p (GameOver team) = return $ drawGameOver p team
 
--- | UI for quit confirmation with two buttons (Confirmar / Cancelar)
+-- * Funções de Desenho de Menus
+
+{-| Desenha a interface de confirmação de saída do jogo.
+
+Funcionamento:
+
+* Apresenta uma mensagem de confirmação
+* Mostra dois botões: "Confirmar" e "Cancelar"
+* Destaca o botão selecionado com base no parâmetro 'sel'
+
+Parâmetros:
+
+* @p@: lista de recursos gráficos ('Picture')
+* @sel@: índice do botão selecionado (0 = Confirmar, 1 = Cancelar)
+
+==__Exemplo de Utilização:__
+
+>>> drawQuitConfirm recursos 0
+Picture (botão Confirmar destacado)
+
+>>> drawQuitConfirm recursos 1
+Picture (botão Cancelar destacado)
+-}
 drawQuitConfirm :: [Picture] -> Int -> Picture
 drawQuitConfirm p sel = Pictures
   [ p !! 88
@@ -63,7 +138,28 @@ drawQuitConfirm p sel = Pictures
   , Translate 150 (-50) $ Scale 1 1 $ drawWord p "Cancelar"
   ]
 
--- | Menu principal com seletor expandido (centralizado para 1920x1080)
+{-| Desenha o menu principal do jogo.
+
+Funcionamento:
+
+* Apresenta o título "WORMS"
+* Mostra 5 opções de menu dispostas em grid
+* Destaca a opção selecionada
+* Opções disponíveis: Bot Simulation, Player vs Player, MAP Creator Tool, Help, Quit
+
+Parâmetros:
+
+* @p@: lista de recursos gráficos ('Picture')
+* @sel@: índice da opção selecionada (0-4)
+
+==__Exemplo de Utilização:__
+
+>>> drawMenu recursos 0
+Picture (Bot Simulation selecionado)
+
+>>> drawMenu recursos 4
+Picture (Quit selecionado)
+-}
 drawMenu :: [Picture] -> Int -> Picture
 drawMenu p sel = Pictures
   [ Scale 1 1 $ p !! 85
@@ -96,6 +192,37 @@ drawMenu p sel = Pictures
   , Translate (- 50) (-200) $ Scale 0.6 0.6 $ Color (if sel==4 then red else black) $ drawWord p "Quit"
   ]
 
+
+{-| Desenha o ecrã de ajuda do jogo com navegação entre páginas.
+
+Funcionamento:
+
+* Apresenta informações de ajuda divididas em 6 páginas
+* Permite navegação entre páginas com indicadores visuais
+* Mostra título, conteúdo e navegação para cada página
+
+Páginas disponíveis:
+
+1. Menu Principal - navegação no menu
+2. Level Selector - seleção de níveis
+3. Movimentação PVP - controlos de movimento
+4. Controles PVP - ações e comandos
+5. Map Creator 1 - uso básico do editor
+6. Map Creator 2 - funcionalidades avançadas
+
+Parâmetros:
+
+* @p@: lista de recursos gráficos ('Picture')
+* @pagina@: índice da página atual (0-5)
+
+==__Exemplo de Utilização:__
+
+>>> drawHelp recursos 0
+Picture (página do Menu Principal)
+
+>>> drawHelp recursos 3
+Picture (página de Controles PVP)
+-}
 
 drawHelp :: [Picture] -> Int -> Picture
 drawHelp p pagina = Pictures
@@ -206,7 +333,29 @@ drawHelp p pagina = Pictures
 
     conteudoPagina _ = Blank
 
--- | Desenha o selector de níveis como uma lista vertical
+-- * Funções de Seleção e Game Over
+
+{-| Desenha o seletor de níveis com lista de mapas disponíveis.
+
+Funcionamento:
+
+* Apresenta uma lista vertical de níveis disponíveis
+* Mostra informações sobre cada nível (dimensões do mapa)
+* Destaca o nível selecionado
+* Cada nível é apresentado numa caixa individual com preview
+
+Parâmetros:
+
+* @p@: lista de recursos gráficos ('Picture')
+* @selected@: índice do nível selecionado
+* @estadosImportados@: lista de estados DLC com mapas importados
+
+==__Exemplo de Utilização:__
+
+>>> drawLvlSelector recursos 0 [estado1, estado2, estado3]
+Picture (lista de níveis com primeiro selecionado)
+-}
+
 drawLvlSelector :: [Picture] -> Int -> [EstadoDLC] -> Picture
 drawLvlSelector p selected estadosImportados = Pictures
  ([p !! 88] ++ (zipWith drawNivel [0..] estadosImportados))
@@ -230,6 +379,28 @@ drawLvlSelector p selected estadosImportados = Pictures
         y = 300 - fromIntegral idx * (altura + espaco)
 
 
+{-| Desenha o ecrã de fim de jogo com a equipa vencedora.
+
+Funcionamento:
+
+* Apresenta mensagem de vitória para a equipa vencedora
+* Mostra fundo personalizado conforme a equipa (vermelha ou azul)
+* Inclui instruções para retornar ao menu principal
+* Usa cores e sprites temáticos para cada equipa
+
+Parâmetros:
+
+* @p@: lista de recursos gráficos ('Picture')
+* @equipa@: equipa vencedora ('Red' ou 'Blue')
+
+==__Exemplo de Utilização:__
+
+>>> drawGameOver recursos Red
+Picture (ecrã de vitória da equipa vermelha)
+
+>>> drawGameOver recursos Blue
+Picture (ecrã de vitória da equipa azul)
+-}
 drawGameOver :: [Picture] -> Team -> Picture
 drawGameOver p equipa =
     Pictures
@@ -256,6 +427,42 @@ drawGameOver p equipa =
         ]
 
 
+-- * Funções de Desenho do Editor de Mapas
+
+{-| Desenha a interface do Map Creator Tool (MCT) completa.
+
+Funcionamento:
+
+* Apresenta o mapa sendo editado no centro
+* Mostra barra lateral com opções de edição
+* Permite seleção de blocos, objetos e minhocas
+* Exibe informações sobre o elemento selecionado
+* Suporta três modos: Blocos, Objetos e Minhocas
+
+Modos de edição:
+
+* Modo 0 (Blocos): Terra, Água, Pedra, Ar, Lava, Gelo
+* Modo 1 (Objetos): Barril, Health Pack, Ammo Packs, Disparos
+* Modo 2 (Minhocas): Posicionamento e configuração de minhocas
+
+Parâmetros:
+
+* @p@: lista de recursos gráficos
+* @e@: estado DLC atual do mapa
+* @blocoSelecionado@: índice do elemento selecionado
+* @mode@: modo de edição atual (0-2)
+* @secSel@: seleção secundária (usado para subopções)
+* @thirdSel@: seleção terciária
+* @editMode@: se está em modo de edição ativo
+* @_@: parâmetro não utilizado
+* @MinhocaDLC{...}@: configuração da minhoca sendo editada
+* @DisparoDLC{...}@: configuração do disparo sendo editado
+
+==__Exemplo de Utilização:__
+
+>>> drawMCT recursos estado 0 0 0 0 False Nothing minhocaDefault disparoDefault
+Picture (editor com Terra selecionada no modo Blocos)
+-}
 drawMCT :: [Picture] -> EstadoDLC -> Int -> Int -> Int -> Int -> Bool -> Maybe Int -> MinhocaDLC -> ObjetoDLC -> Picture
 drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet esc baz mina dina flame burn equipa _) (DisparoDLC _ dir _ tempoR dono) = Pictures
   [ p !! 88
@@ -301,7 +508,7 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
           else Blank
       , Translate (-880) y $ Scale 0.6 0.6 $ Color black $ drawWord p (show (idx + 1))
       , Translate (-850) (y + 5) $ Scale 0.6 0.6 $ Color black $ drawWord p nome
-      , Translate (-680) y $ Scale 2 2 pic
+      , Translate (-700) y $ Scale 2 2 pic
       ]
 
     drawAmmoPackSelector y = Pictures
@@ -333,32 +540,35 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
       , (if blocoSelecionado == 3  then Pictures
           [
             if thirdSel == 0 && editMode 
-              then if editMode then Translate (-850) (y - 60) $ Scale 1 2 $ p !! 129 else Translate (-940) (y - 60) $ Scale 1 2 $ p !! 126
+              then Color editColor $
+                  Translate (-940) (y - 60) $ Scale 2 2 $ p !! 126
               else Blank
           , Translate (-940) (y - 60) $
               Scale 0.6 0.6 $
                 Color black $
-                  drawWord p ("<> Dir:" ++ show dir)
+                  drawWord p ("Dir:" ++ show dir)
           ] else Blank)
       , if blocoSelecionado == 3 then Pictures
           [
             if thirdSel == 1 && editMode 
-              then if editMode then Translate (-830) (y - 120) $ Scale 1.3 2 $ p !! 129 else Translate (-940) (y - 120) $ Scale 1.3 2 $ p !! 126
+              then Color editColor $
+                  Translate (-940) (y  - 120) $ Scale 2 2 $ p !! 126
               else Blank
           , Translate (-940) (y - 120) $
               Scale 0.6 0.6 $
                 Color black $
-                  drawWord p ("<> Tempo:" ++ show tempoR)
+                  drawWord p ("Tempo:" ++ show tempoR)
           ] else Blank
       , if blocoSelecionado == 3 then Pictures
           [
             if thirdSel == 2 && editMode 
-              then if editMode then Translate (-850) (y - 180) $ Scale 0.9 2 $ p !! 129 else Translate (-940) (y - 180) $ Scale 0.9 2 $ p !! 126
+              then Color editColor $
+                  Translate (-940) (y - 180) $ Scale 2 2 $ p !! 126
               else Blank
           , Translate (-940) (y - 180) $
               Scale 0.6 0.6 $
                 Color black $
-                  drawWord p ("<> Dono:" ++ show dono)
+                  drawWord p ("Dono:" ++ show dono)
           ] else Blank
 
       ]
@@ -394,7 +604,8 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
       , Pictures
           [
             if thirdSel == 0
-              then if editMode then Translate (-910) (y - weaponTextOffset ) $ Scale 0.7 2 $ p !! 129 else Translate (-910) (y - weaponTextOffset) $ Scale 0.7 2 $ p !! 126
+              then Color editColor $
+                  Translate (-910) (y - weaponTextOffset) $ Scale 0.5 2 $ p !! 126
               else Blank
           , Translate (-920) (y - weaponTextOffset) $
               Scale 0.4 0.4 $
@@ -405,7 +616,8 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
       , Pictures
           [
             if thirdSel == 1
-              then if editMode then Translate (-820) (y - weaponTextOffset) $ Scale 0.7 2 $ p !! 129 else Translate (-820) (y - weaponTextOffset) $ Scale 0.7 2 $ p !! 126
+              then Color editColor $
+                  Translate (-840) (y - weaponTextOffset) $ Scale 0.5 2 $ p !! 126
               else Blank
           , Translate (-830) (y - weaponTextOffset) $
               Scale 0.4 0.4 $
@@ -416,7 +628,8 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
       , Pictures
           [
             if thirdSel == 2
-              then if editMode then Translate (-750) (y - weaponTextOffset) $ Scale 0.7 2 $ p !! 129 else Translate (-750) (y - weaponTextOffset) $ Scale 0.7 2 $ p !! 126
+              then Color editColor $
+                  Translate (-750) (y - weaponTextOffset) $ Scale 0.5 2 $ p !! 126
               else Blank
           , Translate (-760) (y - weaponTextOffset) $
               Scale 0.4 0.4 $
@@ -427,7 +640,8 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
       , Pictures
           [
             if thirdSel == 3
-              then if editMode then Translate (-680) (y - weaponTextOffset ) $ Scale 0.7 2 $ p !! 129 else Translate (-680) (y - weaponTextOffset) $ Scale 0.7 2 $ p !! 126
+              then Color editColor $
+                  Translate (-700) (y - weaponTextOffset) $ Scale 0.5 2 $ p !! 126
               else Blank
           , Translate (-690) (y - weaponTextOffset) $
               Scale 0.4 0.4 $
@@ -438,7 +652,8 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
       , Pictures
           [
             if thirdSel == 4
-              then if editMode then Translate (-610) (y - weaponTextOffset) $ Scale 0.7 2 $ p !! 129 else Translate (-610) (y - weaponTextOffset) $ Scale 0.7 2 $ p !! 126
+              then Color editColor $
+                  Translate (-630) (y - weaponTextOffset) $ Scale 0.5 2 $ p !! 126
               else Blank
           , Translate (-620) (y - weaponTextOffset) $
               Scale 0.4 0.4 $
@@ -450,8 +665,8 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
       , Pictures
           [
             if thirdSel == 5
-              then if editMode then Translate (-910) (y - weaponTextOffset - 140) $ Scale 0.7 2 $ p !! 129 else Translate (-910) (y - weaponTextOffset - 140) $ Scale 0.7 2 $ p !! 126
-
+              then Color editColor $
+                  Translate (-910) (y - weaponTextOffset - 140) $ Scale 0.5 2 $ p !! 126
               else Blank
           , Translate (-920) (y - weaponTextOffset - 140) $
               Scale 0.4 0.4 $
@@ -462,30 +677,29 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
       , Pictures
           [
             if thirdSel == 6
-              then if editMode then Translate (-830) (y - weaponTextOffset - 140) $ Scale 0.7 2 $ p !! 129 else Translate (-830) (y - weaponTextOffset - 140) $ Scale 0.7 2 $ p !! 126
+              then Color editColor $
+                  Translate (-600) (y - weaponTextOffset - 140) $ Scale 0.5 2 $ p !! 126
               else Blank
           , Translate (-830) (y - weaponTextOffset - 140) $
               Scale 0.4 0.4 $
                 Color black $
                   drawWord p (show burn)
           ]
-      
+
       , Pictures
-          [
-            if thirdSel == 7
-              then  if editMode then Translate (-670) (y - weaponTextOffset - 140) $ Scale 1.3 2 $ p !! 129 else Translate (-670) (y - weaponTextOffset - 140) $ Scale 1.3 2 $ p !! 126
-              else Blank
-          ,Translate (-690) (y - weaponTextOffset - 90) $
-              Scale 1.7 1.7 $
-                case equipa of
-                  Just Red -> p !! 128
-                  Just Blue -> p !! 127
-                  Nothing -> Color (greyN 0.5) $ rectangleSolid 70 70
-          , Translate (-740) (y - weaponTextOffset - 140) $ Scale 0.4 0.4$ drawWord p "< Equipa >"
+        [ if thirdSel == 7
+            then Color editColor $
+              Translate (-800) (y - weaponTextOffset - 240) $ Scale 0.5 2 $ p !! 126
+            else Blank
+        , Translate (-800) (y - weaponTextOffset - 240) $ Scale 0.6 0.6 $ drawWord p "Equipa:"
 
-          ]
-
-
+        ,Translate (-760) (y - weaponTextOffset - 320) $
+            Scale 3 3 $
+              case equipa of
+                Just Red -> p !! 128
+                Just Blue -> p !! 127
+                Nothing -> Color (greyN 0.5) $ rectangleSolid 70 70
+        ]
 
 
 
@@ -564,6 +778,39 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
 cellSize :: Float
 cellSize = 32
 
+-- * Funções de Desenho de Jogo
+
+{-| Desenha o estado de jogo no modo Bot Simulation.
+
+Funcionamento:
+
+* Renderiza o mapa completo do jogo
+* Mostra todas as minhocas e objetos
+* Apresenta barra lateral com informações do estado
+* Destaca a minhoca ativa e sua última jogada
+* Exibe estatísticas: minhocas vivas/mortas, objetos
+
+Componentes visuais:
+
+* Mundo do jogo: mapa, minhocas, objetos
+* Sidebar: sprite da minhoca selecionada, estatísticas
+* Informações do mapa: dimensões, número de elementos
+
+Parâmetros:
+
+* @p@: lista de recursos gráficos
+* @est@: estado atual do jogo
+* @numMinhoca@: índice da minhoca ativa (opcional)
+* @jogada@: última jogada executada (opcional)
+
+==__Exemplo de Utilização:__
+
+>>> drawGame recursos estado (Just 0) (Just (Move Norte))
+Picture (jogo com minhoca 0 após mover para Norte)
+
+>>> drawGame recursos estado Nothing Nothing
+Picture (jogo sem jogada destacada)
+-}
 drawGame :: [Picture] -> Estado -> Maybe NumMinhoca -> Maybe Jogada -> Picture
 drawGame p est numMinhoca jogada = Pictures [p !! 88, sidebar, world]
   where
@@ -642,6 +889,37 @@ drawGame p est numMinhoca jogada = Pictures [p !! 88, sidebar, world]
             , drawMinhocas p ms mapa numMinhoca jogada
             ]
 
+{-| Desenha o estado de jogo no modo Player vs Player (PVP).
+
+Funcionamento:
+
+* Renderiza o mapa com todas as minhocas e objetos (versão DLC)
+* Mostra barra lateral com informações das equipas
+* Destaca a minhoca selecionada pelo jogador
+* Exibe estatísticas de ambas as equipas
+* Apresenta inventário de armas da minhoca ativa
+
+Diferenças do Bot Simulation:
+
+* Usa tipos DLC ('EstadoDLC', 'MinhocaDLC', etc.)
+* Suporta equipas Red e Blue
+* Mostra sprite personalizado por equipa
+* Inclui sistema de seleção de minhoca pelo jogador
+
+Parâmetros:
+
+* @p@: lista de recursos gráficos
+* @est@: estado DLC atual do jogo
+* @jogada@: última jogada executada pelo jogador
+
+==__Exemplo de Utilização:__
+
+>>> drawPvPGame recursos estadoDLC (Move Norte)
+Picture (jogo PvP após movimento para Norte)
+
+>>> drawPvPGame recursos estadoDLC (Dispara BazucaDLC Este)
+Picture (jogo PvP após disparo de bazuca)
+-}
 drawPvPGame :: [Picture] -> EstadoDLC -> JogadaDLC -> Picture
 drawPvPGame p est jogada =
   Pictures [p !! 88, p!!97, sidebar, world]
@@ -823,6 +1101,34 @@ drawPvPGame p est jogada =
             ]
 
 
+-- * Funções de Conversão de Coordenadas
+
+{-| Converte coordenadas de matriz do mapa para coordenadas de ecrã.
+
+Funcionamento:
+
+* Calcula dimensões totais do mapa
+* Centra o mapa no ecrã
+* Converte índices (linha, coluna) para coordenadas (x, y) em pixels
+* Sistema de coordenadas: origem no centro, Y positivo para cima
+
+Cálculos:
+
+* Origem no centro do ecrã
+* Cada célula tem tamanho 'cellSize' (32 pixels)
+* Linha 0 no topo, cresce para baixo
+* Coluna 0 à esquerda, cresce para a direita
+
+Parâmetros:
+
+* @mapa@: mapa para obter dimensões
+* @(r,c)@: posição na matriz (linha, coluna)
+
+==__Exemplo de Utilização:__
+
+>>> converteMapa [[Ar,Ar],[Terra,Terra]] (0,0)
+(-16.0, 16.0)
+-}
 converteMapa :: Mapa -> Posicao -> (Float, Float)
 converteMapa mapa (r,c) = (x,y)
   where
@@ -836,6 +1142,28 @@ converteMapa mapa (r,c) = (x,y)
     y = top - fromIntegral r * cellSize
 
 
+{-| Conta quantos blocos de água existem diretamente acima de uma posição.
+
+Funcionamento:
+
+* Percorre a coluna verticalmente para cima
+* Conta blocos consecutivos de 'Agua'
+* Para quando encontra outro tipo de bloco
+* Retorna 0 se já está no topo do mapa
+
+Usado para determinar o sprite visual de água (níveis de profundidade).
+
+Parâmetros:
+
+* @mapa@: mapa do jogo
+* @r@: linha (índice)
+* @c@: coluna (índice)
+
+==__Exemplo de Utilização:__
+
+>>> contaAguasAcima [[Ar,Ar],[Agua,Agua],[Agua,Terra]] 2 0
+1
+-}
 contaAguasAcima :: Mapa -> Int -> Int -> Int
 contaAguasAcima mapa r c
   | r <= 0 = 0
@@ -843,6 +1171,35 @@ contaAguasAcima mapa r c
       Agua -> 1 + contaAguasAcima mapa (r-1) c
       _ -> 0
 
+-- * Funções Auxiliares de Desenho
+
+{-| Desenha o mapa do jogo completo.
+
+Funcionamento:
+
+* Percorre todas as linhas e colunas do mapa
+* Desenha cada bloco com o sprite apropriado
+* Aplica textura diferente para Terra com Ar acima
+* Mostra diferentes níveis de profundidade para Água
+* Adiciona contorno a cada célula do mapa
+
+Texturas aplicadas:
+
+* Ar: sprite transparente
+* Terra: textura diferente se tiver Ar acima
+* Água: 4 níveis visuais baseados na profundidade
+* Pedra: textura sólida
+
+Parâmetros:
+
+* @p@: lista de recursos gráficos
+* @mapa@: matriz representando o mapa do jogo
+
+==__Exemplo de Utilização:__
+
+>>> drawMapa recursos [[Ar,Ar],[Terra,Terra]]
+Picture (mapa 2x2 renderizado)
+-}
 drawMapa :: [Picture] -> Mapa -> Picture
 drawMapa p mapa = Pictures $ concatMap drawRow (zip [0..] mapa)
   where
@@ -862,6 +1219,26 @@ drawMapa p mapa = Pictures $ concatMap drawRow (zip [0..] mapa)
                                  | otherwise = Scale 0.66 0.66 $ p !! 10
         colorTile _ _ Pedra = p !! 2
 
+{-| Desenha todos os objetos presentes no estado do jogo.
+
+Funcionamento:
+
+* Itera sobre a lista de objetos
+* Desenha cada tipo de objeto com o sprite apropriado
+* Posiciona objetos nas coordenadas corretas do mapa
+* Aplica rotação para disparos direcionais
+
+Parâmetros:
+
+* @p@: lista de recursos gráficos
+* @objs@: lista de objetos a desenhar
+* @mapa@: mapa para conversão de coordenadas
+
+==__Exemplo de Utilização:__
+
+>>> drawObjetos recursos [Barril (2,3) 3, Disparo (1,1) Norte Bazuca Nothing 0] mapa
+Picture (barril e bazuca renderizados)
+-}
 drawObjetos :: [Picture] -> [Objeto] -> Mapa -> Picture
 drawObjetos p objs mapa = Pictures $ map drawO objs
   where
@@ -876,6 +1253,33 @@ drawObjetos p objs mapa = Pictures $ map drawO objs
       where (x,y) = converteMapa mapa (Tarefa0_2025.posicaoObjeto b)
 
 
+{-| Desenha texto usando sprites de caracteres.
+
+Funcionamento:
+
+* Converte cada caractere para um sprite
+* Posiciona sprites com espaçamento horizontal
+* Suporta letras, números e alguns símbolos especiais
+* Usa sistema de sprites bitmap para renderização
+
+Espaçamento:
+
+* Cada caractere é espaçado por 40 unidades
+* Alinhamento da esquerda para a direita
+
+Parâmetros:
+
+* @p@: lista de recursos gráficos (incluindo sprites de caracteres)
+* @str@: string a ser renderizada
+
+==__Exemplo de Utilização:__
+
+>>> drawWord recursos "WORMS"
+Picture (palavra WORMS renderizada)
+
+>>> drawWord recursos "Level 1"
+Picture (texto com espaço renderizado)
+-}
 drawWord :: [Picture] -> String -> Picture
 drawWord p str =
   Pictures $
@@ -886,11 +1290,56 @@ drawWord p str =
 
 
 
+{-| Converte uma string para uma lista de sprites de caracteres.
+
+Funcionalidade:
+
+* Mapeia cada caractere da string para um sprite
+* Usa 'drawLetters' para conversão individual
+* Suporta letras (a-z), números (0-9) e símbolos
+
+Usado por:
+
+* 'drawWord' para renderizar texto no jogo
+
+Parâmetros:
+
+* @p@: lista de recursos gráficos (sprites de caracteres)
+* @str@: string a converter
+
+==__Exemplo de Utilização:__
+
+>>> stringToPictures recursos "abc"
+[sprite_a, sprite_b, sprite_c]
+-}
 stringToPictures :: [Picture] -> String -> [Picture]
 stringToPictures p str =
   map (drawLetters p) str
 
 
+{-| Converte um caractere individual para o sprite correspondente.
+
+Funcionalidade:
+
+* Mapeia caractere para índice na lista de sprites
+* Suporta letras minúsculas e maiúsculas (convertidas para minúsculas)
+* Suporta números 0-9
+* Suporta símbolos: espaço, '-', '(', ')', '/', ':', ',', '!', '?', '@', '<', '>'
+* Retorna 'Blank' para caracteres não suportados
+
+Parâmetros:
+
+* @p@: lista de recursos gráficos
+* @c@: caractere a converter
+
+==__Exemplo de Utilização:__
+
+>>> drawLetters recursos 'a'
+sprite_a
+
+>>> drawLetters recursos '5'
+sprite_5
+-}
 drawLetters :: [Picture] -> Char -> Picture
 drawLetters p c =
   let lc = toLower c in
@@ -948,6 +1397,25 @@ drawLetters p c =
 
 
 
+{-| Aplica rotação apropriada ao sprite de bazuca conforme a direção.
+
+Funcionamento:
+
+* Recebe a direção do disparo
+* Rotaciona o sprite base da bazuca
+* Suporta 8 direções (cardeais e diagonais)
+* Retorna sprite rotacionado pronto para renderização
+
+Parâmetros:
+
+* @p@: lista de recursos gráficos
+* @dir@: direção do disparo
+
+==__Exemplo de Utilização:__
+
+>>> bazucaDir recursos Norte
+Picture (bazuca apontando para cima)
+-}
 bazucaDir :: [Picture] -> Direcao -> Picture
 bazucaDir p dir = case dir of
     Este -> p !! 6
@@ -959,6 +1427,25 @@ bazucaDir p dir = case dir of
     Nordeste -> Rotate 315 (p !! 6)
     Noroeste -> Rotate 225 (p !! 6)
 
+{-| Aplica rotação apropriada ao sprite de fireball (lança-chamas) conforme a direção.
+
+Funcionamento:
+
+* Similar a 'bazucaDir' mas para sprite de fireball
+* Rotaciona sprite conforme direção do disparo
+* Suporta direções cardeais e diagonais
+* Usado para arma FlameTrower no modo DLC
+
+Parâmetros:
+
+* @p@: lista de recursos gráficos
+* @dir@: direção do disparo
+
+==__Exemplo de Utilização:__
+
+>>> fireballDir recursos Sul
+Picture (fireball apontando para baixo)
+-}
 fireballDir :: [Picture] -> Direcao -> Picture
 fireballDir p dir = case dir of
     Este -> p !! 69
@@ -970,7 +1457,36 @@ fireballDir p dir = case dir of
     Nordeste -> Rotate 315 (p !! 69)
     Noroeste -> Rotate 225 (p !! 69)
 
--- | Desenha as minhocas com sprites diferentes baseado na última jogada
+{-| Desenha todas as minhocas do jogo com sprites apropriados.
+
+Funcionamento:
+
+* Itera sobre a lista de minhocas
+* Seleciona sprite baseado no estado da minhoca
+* Aplica animação diferente para minhoca ativa
+* Mostra sprite de morte para minhocas mortas
+* Considera a última jogada executada
+
+Sprites baseados em:
+
+* Estado: viva ou morta
+* Jogada: movimento ou disparo
+* Direção: horizontal (Este/Oeste)
+* Terreno: no chão ou no ar
+
+Parâmetros:
+
+* @p@: lista de recursos gráficos
+* @ms@: lista de minhocas a desenhar
+* @mapa@: mapa para verificação de terreno
+* @numMinhoca@: índice da minhoca ativa (opcional)
+* @jogada@: última jogada executada (opcional)
+
+==__Exemplo de Utilização:__
+
+>>> drawMinhocas recursos [minhoca1, minhoca2] mapa (Just 0) (Just (Move Este))
+Picture (minhocas com primeira animada movendo para Este)
+-}
 drawMinhocas :: [Picture] -> [Minhoca] -> Mapa -> Maybe NumMinhoca -> Maybe Jogada -> Picture
 drawMinhocas p ms mapa numMinhoca jogada = Pictures $ map drawM (zip [0..] ms)
   where
@@ -985,6 +1501,38 @@ drawMinhocas p ms mapa numMinhoca jogada = Pictures $ map drawM (zip [0..] ms)
 
 
 
+{-| Determina o sprite apropriado para uma minhoca baseado na sua jogada.
+
+Funcionamento:
+
+* Avalia o tipo de jogada (movimento ou disparo)
+* Considera se a minhoca está ativa
+* Verifica se está no chão ou no ar
+* Determina direção horizontal (Este/Oeste)
+* Retorna sprite apropriado para a situação
+
+Sprites diferenciados por:
+
+* Jogada: None (idle), Move, Dispara
+* Estado: no chão vs no ar
+* Direção: Este vs Oeste
+* Ativa: minhoca selecionada vs outras
+* Arma: cada arma tem sprite específico
+
+Parâmetros:
+
+* @minhoca@: minhoca a renderizar
+* @jogada@: última jogada executada (opcional)
+* @p@: lista de recursos gráficos
+* @isActiveMinhoca@: se é a minhoca ativa
+* @mapa@: mapa para verificação de terreno
+* @_@: posição (não utilizada)
+
+==__Exemplo de Utilização:__
+
+>>> getSpriteParaAcao minhoca (Just (Move Este)) recursos True mapa pos
+sprite_minhoca_movimento_este
+-}
 getSpriteParaAcao :: Minhoca -> Maybe Jogada -> [Picture] -> Bool -> Mapa -> Posicao -> Picture
 getSpriteParaAcao _ Nothing p _ _ _ = p !! 3  -- Idle
 
@@ -1035,6 +1583,27 @@ getSpriteParaAcao minhoca (Just (Labs2025.Dispara arma direcaoDisparo)) p isActi
 
 
 
+{-| Desenha minhocas estáticas (sem animação) no editor de mapas.
+
+Funcionamento:
+
+* Renderiza minhocas em modo estático
+* Usa sprites padrão sem animação
+* Diferencia por equipa (Red/Blue)
+* Mostra sprite de morte para minhocas mortas
+* Usado principalmente no Map Creator Tool
+
+Parâmetros:
+
+* @p@: lista de recursos gráficos
+* @minhocas@: lista de minhocas DLC a desenhar
+* @mapa@: mapa DLC para conversão de coordenadas
+
+==__Exemplo de Utilização:__
+
+>>> drawMinhocasStatic recursos [minhocaDLC1, minhocaDLC2] mapaDLC
+Picture (minhocas em pose estática)
+-}
 drawMinhocasStatic :: [Picture] -> [MinhocaDLC] -> MapaDLC -> Picture
 drawMinhocasStatic p minhocas mapa = Pictures $ map drawM minhocas
   where
@@ -1054,8 +1623,30 @@ drawMinhocasStatic p minhocas mapa = Pictures $ map drawM minhocas
 
 
 
--- * DLC
+-- * Funções de Desenho DLC
 
+{-| Conta quantos blocos de água existem diretamente acima de uma posição no mapa DLC.
+
+Funcionamento:
+
+* Percorre a coluna verticalmente para cima
+* Conta blocos consecutivos de 'AguaDLC'
+* Para quando encontra outro tipo de bloco
+* Retorna 0 se já está no topo
+
+Usado para determinar níveis visuais de profundidade da água.
+
+Parâmetros:
+
+* @mapa@: mapa DLC
+* @r@: linha (índice)
+* @c@: coluna (índice)
+
+==__Exemplo de Utilização:__
+
+>>> contaAguasAcimaDLC [[ArDLC,ArDLC],[AguaDLC,AguaDLC],[AguaDLC,TerraDLC]] 2 0
+1
+-}
 contaAguasAcimaDLC :: MapaDLC -> Int -> Int -> Int
 contaAguasAcimaDLC mapa r c
   | r <= 0 = 0
@@ -1063,6 +1654,31 @@ contaAguasAcimaDLC mapa r c
       AguaDLC -> 1 + contaAguasAcimaDLC mapa (r-1) c
       _ -> 0
 
+{-| Desenha o mapa DLC completo com todos os tipos de terreno.
+
+Funcionamento:
+
+* Similar a 'drawMapa' mas para tipos DLC
+* Suporta tipos adicionais: Lava, Gelo
+* Aplica texturas apropriadas por terreno
+* Usa sistema de profundidade para água
+* Adiciona contorno em cada célula
+
+Tipos de terreno DLC:
+
+* ArDLC, TerraDLC, AguaDLC (com níveis)
+* PedraDLC, Lava, Gelo
+
+Parâmetros:
+
+* @p@: lista de recursos gráficos
+* @mapa@: mapa DLC a desenhar
+
+==__Exemplo de Utilização:__
+
+>>> drawMapaDLC recursos [[ArDLC,TerraDLC],[TerraDLC,PedraDLC]]
+Picture (mapa DLC renderizado)
+-}
 drawMapaDLC :: [Picture] -> MapaDLC -> Picture
 drawMapaDLC p mapa = Pictures $ concatMap drawRow (zip [0..] mapa)
   where
@@ -1084,6 +1700,33 @@ drawMapaDLC p mapa = Pictures $ concatMap drawRow (zip [0..] mapa)
         colorTile _ _ Lava = p !! 11
         colorTile _ _ Gelo = p !! 120
 
+{-| Desenha todos os objetos DLC presentes no estado.
+
+Funcionamento:
+
+* Similar a 'drawObjetos' mas para tipos DLC
+* Suporta objetos adicionais: HealthPack, AmmoPack, FlameTrower
+* Posiciona cada objeto nas coordenadas do mapa DLC
+* Aplica rotação para disparos direcionais
+
+Tipos de objetos DLC:
+
+* DisparoDLC: BazucaDLC, MinaDLC, DinamiteDLC, FlameTrower, EscavadoraDLC, JetpackDLC
+* BarrilDLC: barril explosivo
+* HealthPack: recuperação de vida
+* AmmoPack: munição de diferentes tipos
+
+Parâmetros:
+
+* @p@: lista de recursos gráficos
+* @objs@: lista de objetos DLC
+* @mapa@: mapa DLC para conversão de coordenadas
+
+==__Exemplo de Utilização:__
+
+>>> drawObjetosDLC recursos [BarrilDLC (1,1) 3, HealthPack (2,2)] mapaDLC
+Picture (barril e health pack renderizados)
+-}
 drawObjetosDLC :: [Picture] -> [ObjetoDLC] -> MapaDLC -> Picture
 drawObjetosDLC p objs mapa = Pictures $ map drawO objs
   where
@@ -1111,6 +1754,28 @@ drawObjetosDLC p objs mapa = Pictures $ map drawO objs
 
       where (x,y) = converteMapaDLC mapa (DataDLC.posicaoObjeto hp)
 
+{-| Determina o sprite apropriado para uma minhoca DLC baseado na jogada e estado.
+
+Funcionamento:
+
+* Similar a 'getSpriteParaAcao' mas para versão DLC
+* Considera equipa da minhoca (Red/Blue)
+* Aplica sprites de queimadura se 'burningCounter' > 0
+* Usa sprites específicos por arma e equipa
+* Verifica se está no chão para animação apropriada
+
+Parâmetros:
+
+* @minhoca@: minhoca DLC a renderizar
+* @jogada@: jogada DLC executada
+* @p@: lista de recursos gráficos
+* @e@: estado DLC completo (para verificações de terreno)
+
+==__Exemplo de Utilização:__
+
+>>> getSpriteParaAcaoDLC minhoca (Move Norte) recursos estado
+sprite_minhoca_equipa_movimento
+-}
 getSpriteParaAcaoDLC :: MinhocaDLC -> JogadaDLC -> [Picture] -> EstadoDLC -> Picture
 getSpriteParaAcaoDLC minhoca (DataDLC.Move _) p e
   | burningCounter minhoca > 0 =
@@ -1196,6 +1861,32 @@ getSpriteParaAcaoDLC minhoca (DataDLC.Dispara arma _) p e
             Este -> p !! 98
             _ -> p !! 3
 
+{-| Converte coordenadas de matriz do mapa DLC para coordenadas de ecrã.
+
+Funcionamento:
+
+* Idêntica a 'converteMapa' mas para mapas DLC
+* Calcula dimensões totais do mapa
+* Centra o mapa no ecrã
+* Converte índices para coordenadas em pixels
+
+Sistema de coordenadas:
+
+* Origem no centro do ecrã
+* Cada célula: 32 pixels ('cellSize')
+* Y positivo para cima
+* X positivo para a direita
+
+Parâmetros:
+
+* @mapa@: mapa DLC para obter dimensões
+* @(r,c)@: posição na matriz (linha, coluna)
+
+==__Exemplo de Utilização:__
+
+>>> converteMapaDLC [[ArDLC,TerraDLC],[TerraDLC,PedraDLC]] (1,1)
+(16.0, -16.0)
+-}
 converteMapaDLC :: MapaDLC -> Posicao -> (Float, Float)
 converteMapaDLC mapa (r,c) = (x,y)
   where
@@ -1209,7 +1900,30 @@ converteMapaDLC mapa (r,c) = (x,y)
     y = top - fromIntegral r * cellSize
 
 
--- | Desenha as minhocas com sprites diferentes baseado na última jogada
+{-| Desenha as minhocas DLC com sprites animados baseados na jogada.
+
+Funcionamento:
+
+* Similar a 'drawMinhocas' mas para versão DLC
+* Suporta sprites por equipa (Red/Blue)
+* Mostra indicador visual para minhoca selecionada
+* Aplica efeitos visuais (ex: queimadura)
+* Usa sprites específicos por arma e ação
+
+Parâmetros:
+
+* @p@: lista de recursos gráficos
+* @ms@: lista de minhocas DLC
+* @mapa@: mapa DLC
+* @_@: parâmetro não utilizado
+* @jogada@: última jogada executada
+* @e@: estado DLC completo (para minhoca selecionada)
+
+==__Exemplo de Utilização:__
+
+>>> drawMinhocasDLC recursos minhocas mapaDLC Nothing jogada estado
+Picture (minhocas DLC renderizadas com animações)
+-}
 drawMinhocasDLC :: [Picture] -> [MinhocaDLC] -> MapaDLC -> Maybe NumMinhoca -> JogadaDLC -> EstadoDLC -> Picture
 drawMinhocasDLC p ms mapa _ jogada e = Pictures $ map drawM (zip [0..] ms)
   where
@@ -1232,7 +1946,27 @@ drawMinhocasDLC p ms mapa _ jogada e = Pictures $ map drawM (zip [0..] ms)
             else getSpriteParaAcaoDLC m jogada p e
 
 
--- | Desenha sprites de explosão nos locais onde houve dano
+-- * Funções de Efeitos Visuais e Utilidades
+
+{-| Desenha sprites de explosão nos locais onde houve dano.
+
+Funcionamento:
+
+* Percorre a lista de danos no estado
+* Filtra apenas danos dentro dos limites do mapa
+* Desenha sprite de explosão em cada posição
+* Usado para feedback visual de ataques
+
+Parâmetros:
+
+* @p@: lista de recursos gráficos
+* @e@: estado DLC contendo histórico de danos
+
+==__Exemplo de Utilização:__
+
+>>> drawDanosDLC recursos estadoComDanos
+Picture (explosões nas posições danificadas)
+-}
 drawDanosDLC :: [Picture] -> EstadoDLC -> Picture
 drawDanosDLC p e = Pictures $ map drawDano $ filter dentroDoMapa (concat $ danosEstado e)
   where
@@ -1245,17 +1979,55 @@ drawDanosDLC p e = Pictures $ map drawDano $ filter dentroDoMapa (concat $ danos
       in Translate x y $ p !! 124
 
 
--- | Função para extrair apenas o valor da vida
+{-| Extrai apenas o valor numérico da vida de uma string.
+
+Funcionalidade:
+
+* Processa string representando 'VidaMinhocaDLC'
+* Retorna apenas o valor numérico da vida
+* Funciona tanto para "VivaDLC n" como "MortaDLC"
+* Retorna "N/A" se formato inválido
+
+Parâmetros:
+
+* @str@: string representando a vida
+
+==__Exemplo de Utilização:__
+
+>>> extrairVida "VivaDLC 100"
+"100"
+
+>>> extrairVida "MortaDLC"
+"N/A"
+-}
 extrairVida :: String -> String
 extrairVida str = case words str of
     ["VivaDLC", hp] -> hp
     ["MortaDLC", hp] -> hp
     _ -> "N/A"
 
--- | Função para extrair a posição
+{-| Extrai a posição de uma string formatada.
+
+Funcionalidade:
+
+* Processa string representando 'Maybe Posicao'
+* Retorna apenas as coordenadas
+* Retorna "N/A" para 'Nothing' ou formato inválido
+
+Parâmetros:
+
+* @str@: string representando a posição
+
+==__Exemplo de Utilização:__
+
+>>> extrairPosicao "Just (1,2)"
+"(1,2)"
+
+>>> extrairPosicao "Nothing"
+"N/A"
+-}
 extrairPosicao :: String -> String
 extrairPosicao str = case words str of
     ["Just", pos] -> pos
     ["Nothing"] -> "N/A"
     _ -> "N/A"
-
