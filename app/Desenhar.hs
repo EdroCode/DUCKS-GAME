@@ -243,8 +243,8 @@ drawGameOver p equipa =
     Pictures
         [ bg
         , Pictures
-            [ Translate (70) (-100) $ Scale 0.6 0.6 $ p !! 90
-            , Translate (-200) (-100) $ Scale 0.4 0.4 $ Color (greyN 0.7) $
+            [ Translate (70- 50) (-100) $ Scale 0.6 0.6 $ p !! 90
+            , Translate (-200 - 50) (-100) $ Scale 0.4 0.4 $ Color (greyN 0.7) $
                 drawWord p "Pressiona ESC para retornar ao menu"
             ]
         ]
@@ -252,15 +252,15 @@ drawGameOver p equipa =
     bg = case equipa of
       Red -> Pictures
         [ Translate 0 0 $ Scale 1 1 $ p !! 115
-        , Translate (80) 200 $ p !! 20
-        , Translate (-110) 250 $ Scale 0.7 0.7 $ drawWord p "Equipa Vermelha"
-        , Translate (-50) 200 $ Scale 1.5 1.5 $ Color black $ drawWord p "Ganha!"
+        , Translate (80 - 50) 200 $ p !! 20
+        , Translate (-110 - 50) 250 $ Scale 0.7 0.7 $ drawWord p "Equipa Vermelha"
+        , Translate (-50 - 50) 200 $ Scale 1.5 1.5 $ Color black $ drawWord p "Ganha!"
         ]
       Blue -> Pictures
         [ Translate 0 0 $ Scale 1 1 $ p !! 116
-        , Translate (80) 200 $ p !! 20
-        , Translate (-70) 250 $ Scale 0.7 0.7 $ drawWord p "Equipa Azul"
-        , Translate (-50) 200 $ Scale 1.5 1.5 $ Color black $ drawWord p "Ganha!"
+        , Translate (80 - 50) 200 $ p !! 20
+        , Translate (-70 - 50) 250 $ Scale 0.7 0.7 $ drawWord p "Equipa Azul"
+        , Translate (-50 - 50) 200 $ Scale 1.5 1.5 $ Color black $ drawWord p "Ganha!"
         ]
 
 
@@ -713,18 +713,13 @@ drawPvPGame p est jogada =
             Color (if armaSelecionada est == Nothing then dark red else black) $
                   drawWord p ("Player " ++ show i)
           -- Ícone vida
-          , Translate (-900) (y - 20) $ Scale 2.5 2.5 $ (case equipaMinhoca m of
+          , Translate (-900) (y - 20) $ Scale 2.5 2.5 (case equipaMinhoca m of
             Just Blue -> p !! 79
             Just Red -> p !! 78
             _ -> p !! 3)
           , Translate (-800) (y - 30) $
             Scale 0.6 0.6 $
             drawWord p ("HP: " ++ extrairVida (show (vidaMinhocaDLC m)))
-          -- Equipa
-          , case equipaMinhoca m of
-              Just Red -> Translate (-600) (y - 30) $ Color red $ rectangleSolid 20 20
-              Just Blue -> Translate (-600) (y - 30) $ Color blue $ rectangleSolid 20 20
-              Nothing -> Blank
           -- Posição
           , Translate (-800) (y - 60) $
             Scale 0.6 0.6 $

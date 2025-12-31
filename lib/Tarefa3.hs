@@ -204,19 +204,6 @@ avancaObjeto e _ o = case o of
                       else Right []
                     
 
-                    
-                    {- if ePosicaoMatrizValida pos mapa
-                      then if existeDonoMinhoca pos dono minhocas
-                        then if not (estaNoSolo pos mapa) || estaEmAgua pos mapa
-                          then Left (Disparo { posicaoDisparo = movePosicao Sul pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = Nothing, donoDisparo = dono })
-                          else Left (Disparo { posicaoDisparo = pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = Just 2, donoDisparo = dono })
-
-                        else if not (estaNoSolo pos mapa) || estaEmAgua pos mapa
-                          then Left (Disparo { posicaoDisparo = movePosicao Sul pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = Nothing, donoDisparo = dono })
-                          else Left (Disparo { posicaoDisparo = pos, direcaoDisparo = Norte, tipoDisparo = tipo, tempoDisparo = Nothing, donoDisparo = dono })
-                      else Right [] -}
-
-
       Dinamite ->
         case tempo of
           Just 0 -> Right (calculaExplosao pos 7)
