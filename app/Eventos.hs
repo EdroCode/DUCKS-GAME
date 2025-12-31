@@ -895,8 +895,8 @@ adicionaObjetoDLC e idx pos secSel obj =
             0 -> BarrilDLC pos False
             1 -> HealthPack pos 50
             2 ->let ammoPacks = [JetpackDLC, EscavadoraDLC, BazucaDLC, MinaDLC, DinamiteDLC]
-                    ammoType = ammoPacks !! (secSel `mod` 5)
-                in AmmoPack pos 50 ammoType
+                    am = ammoPacks !! (secSel `mod` 5)
+                in AmmoPack pos 50 am
             3 ->
                 let disparos = [BazucaDLC, MinaDLC, DinamiteDLC, FlameTrower]
                     tipo = disparos !! (secSel `mod` 4)

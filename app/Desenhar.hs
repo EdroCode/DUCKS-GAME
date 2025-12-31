@@ -516,7 +516,7 @@ drawMCT p e blocoSelecionado mode secSel thirdSel editMode _ (MinhocaDLC _ _ jet
           else Blank
       , Translate (-880) y $ Scale 0.6 0.6 $ Color black $ drawWord p (show (idx + 1))
       , Translate (-850) (y + 5) $ Scale 0.6 0.6 $ Color black $ drawWord p nome
-      , Translate (-700) y $ Scale 2 2 pic
+      , Translate (-630) y $ Scale 2 2 pic
       ]
 
     drawAmmoPackSelector y = Pictures
@@ -1540,11 +1540,11 @@ getSpriteParaAcao minhoca (Just (Labs2025.Move dir)) p isActiveMinhoca mapa _
         else if estaNoChao then p !! 3 else p !! 13
 
 
-getSpriteParaAcao minhoca (Just (Labs2025.Dispara arma direcaoDisparo)) p isActiveMinhoca mapa _
+getSpriteParaAcao minhoca (Just (Labs2025.Dispara arma d)) p isActiveMinhoca mapa _
   = let
         pos = case posicaoMinhoca minhoca of Just a -> a
         estaNoChao = Tarefa2.estaNoSolo pos mapa
-        direcaoHorizontal = getXWay direcaoDisparo
+        direcaoHorizontal = getXWay d
     in
       if isActiveMinhoca
         then
