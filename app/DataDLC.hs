@@ -1,3 +1,9 @@
+{-|
+Module      : DataDLC
+Description : Definição de tipos e estruturas de dados para o DLC do jogo Worms.
+
+Módulo que contém definições de tipos e estruturas de dados para o DLC do jogo Worms.
+-}
 module DataDLC where
 
 import Labs2025(Ticks, NumMinhoca, Direcao, Posicao)
