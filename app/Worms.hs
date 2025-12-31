@@ -1,9 +1,7 @@
 {-# OPTIONS_GHC -Wno-unused-imports #-}
 {-|
 Module      : Worms
-Description : Definição do estado do jogo Worms.
-
-Módulo que define o estado do jogo Worms, incluindo tipos de dados para representar o estado do jogo, minhocas, terrenos e objetos.
+Description : Definição do estado do jogo Worms com suporte a temas.
 -}
 module Worms where
 
@@ -11,19 +9,23 @@ import Labs2025(VidaMinhoca(Viva, Morta), TipoArma(Dinamite, Mina, Jetpack, Esca
 import DataDLC( TipoArmaDLC(JetpackDLC, EscavadoraDLC, BazucaDLC, MinaDLC, DinamiteDLC, FlameTrower),JogadaDLC,TerrenoDLC(ArDLC, TerraDLC, PedraDLC, AguaDLC, Gelo), Team(Blue,Red), EstadoDLC,danosEstado, jetpackMinhocaDLC, escavadoraMinhocaDLC, bazucaMinhocaDLC, minaMinhocaDLC, dinamiteMinhocaDLC,mapaEstadoDLC, objetosEstadoDLC, minhocasEstadoDLC,posicaoHP,armaSelecionada,minhocaSelecionada,curaHP, equipaMinhoca, burningCounter, Matriz, fireDamage, VidaMinhocaDLC(MortaDLC, VivaDLC), MapaDLC,EstadoDLC(EstadoDLC), MinhocaDLC (MinhocaDLC, flameMinhocaDLC, ultimaDirecaoHorizontal),  TerrenoDLC(Lava, AguaDLC, ArDLC, TerraDLC, PedraDLC), posicaoMinhocaDLC, vidaMinhocaDLC, burningCounter, posicaoDisparoDLC, direcaoDisparoDLC, tempoDisparoDLC, tipoDisparoDLC, donoDisparoDLC, posicaoBarrilDLC, explodeBarrilDLC, ObjetoDLC(DisparoDLC, BarrilDLC, HealthPack,AmmoPack, posicaoAP, ammoGiven, ammoType), TipoArmaDLC(MinaDLC, BazucaDLC, DinamiteDLC, FlameTrower), Dimensao)
 
 
+-- | Tipo para identificar os temas disponíveis
+data TemaAtual = TemaBase | TemaNatal
+    deriving (Eq, Show, Read, Enum)
 
 
 -- | Estado usado pela interface Gloss: pode estar no menu, a jogar ou em estado de saída.
 data Worms
-    = Menu Int
-    | BotSimulation Estado Float Int (NumMinhoca, Jogada)    
-    | PVP EstadoDLC Float Int JogadaDLC
-    | MapCreatorTool EstadoDLC Int Int Int Int Bool (Maybe Int) MinhocaDLC ObjetoDLC
-    | MapSelector
-    | LevelSelector Int [EstadoDLC]
-    | Help Int          
-    | Quit Int          
-    | GameOver Team         
+    = Menu Int TemaAtual
+    | BotSimulation Estado Float Int (NumMinhoca, Jogada) TemaAtual   
+    | PVP EstadoDLC Float Int JogadaDLC TemaAtual            
+    | MapCreatorTool EstadoDLC Int Int Int Int Bool (Maybe Int) MinhocaDLC ObjetoDLC TemaAtual 
+    | MapSelector TemaAtual                                  
+    | LevelSelector Int [EstadoDLC] TemaAtual                
+    | Help Int TemaAtual                                     
+    | Quit Int TemaAtual                                     
+    | GameOver Team TemaAtual                                
+    | ThemesMenu TemaAtual
     deriving (Eq, Show)
 
 

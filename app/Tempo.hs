@@ -81,35 +81,17 @@ PVP estadoAvancado 0.0 10 jogada
 -}
 reageTempo :: Segundos -> Worms -> IO Worms
 reageTempo _ m@Menu{} = return m
-reageTempo _ (Help p) = return (Help p)
-reageTempo _ (Quit sel) = return (Quit sel)
-reageTempo _ (LevelSelector i ei) = return (LevelSelector i ei) 
-reageTempo dt (BotSimulation est acc tick ultimaJogada) = return $ BotSimulation estFinal acc' tick' novaJogada
-        where
-                acc2 = acc + dt
-                steps = floor (acc2 / intervalo)
-                acc' = acc2 - fromIntegral steps * intervalo
-                tick' = tick + steps
-
-                (estFinal, novaJogada) = aplicaPassos est tick steps ultimaJogada
-
-                aplicaPassos :: Estado -> Int -> Int -> (NumMinhoca, Jogada) -> (Estado, (NumMinhoca, Jogada))
-                aplicaPassos st _ 0 lastJogada = (st, lastJogada)
-                aplicaPassos st t n _ = aplicaPassos estNovo (t + 1) (n - 1) jogadaAtual
-                        where
-                                (estNovo, jogadaAtual) = aplicaUm t st
-
-                aplicaUm :: Int -> Estado -> (Estado, (NumMinhoca, Jogada))
-                aplicaUm t st = (Tarefa3.avancaEstado $ Tarefa2.efetuaJogada jogador jogada st, (jogador, jogada))
-                        where
-                                (jogador, jogada) = jogadaTatica t st
+reageTempo _ (Help p tema) = return (Help p tema)
+reageTempo _ (Quit sel tema) = return (Quit sel tema)
+reageTempo _ (LevelSelector i ei tema) = return (LevelSelector i ei tema)
+reageTempo _ (ThemesMenu tema) = return (ThemesMenu tema)
                                 
 
-reageTempo _ (PVP est acc tick jogadaUser) = case (null minhocasRed, null minhocasBlue) of
-        (True, False) -> return $ GameOver Blue  -- Blue venceu
-        (False, True) -> return $ GameOver Red   -- Red venceu
-        (True, True)  -> return $ GameOver Red   -- Empate (ou escolhe uma equipa)
-        _             -> return $ PVP estFinal acc tick jogadaUser
+reageTempo _ (PVP est acc tick jogadaUser tema) = case (null minhocasRed, null minhocasBlue) of
+        (True, False) -> return $ GameOver Blue tema  -- Blue venceu
+        (False, True) -> return $ GameOver Red tema   -- Red venceu
+        (True, True)  -> return $ GameOver Red tema   -- Empate (ou escolhe uma equipa)
+        _             -> return $ PVP estFinal acc tick jogadaUser tema
   where
     minhocasVivas = getMinhocasValidasDLC (minhocasEstadoDLC est)
     minhocasRed = filter (\m -> equipaMinhoca m == Just Red) minhocasVivas
@@ -119,11 +101,30 @@ reageTempo _ (PVP est acc tick jogadaUser) = case (null minhocasRed, null minhoc
 
     estFinal = AvancaEstado.avancaEstado estComDinamitesCongeladas
 
+reageTempo dt (BotSimulation est acc tick ultimaJogada tema) = 
+    return $ BotSimulation estFinal acc' tick' novaJogada tema
+    where
+        acc2 = acc + dt
+        steps = floor (acc2 / intervalo)
+        acc' = acc2 - fromIntegral steps * intervalo
+        tick' = tick + steps
 
+        (estFinal, novaJogada) = aplicaPassos est tick steps ultimaJogada
 
-reageTempo _ (MapCreatorTool mp i a secSel thirdSel edit char minh disp) = return (MapCreatorTool mp i a secSel thirdSel edit char minh disp)
-reageTempo _ MapSelector = return MapSelector
-reageTempo _ (GameOver team) = return (GameOver team)
+        aplicaPassos :: Estado -> Int -> Int -> (NumMinhoca, Jogada) -> (Estado, (NumMinhoca, Jogada))
+        aplicaPassos st _ 0 lastJogada = (st, lastJogada)
+        aplicaPassos st t n _ = aplicaPassos estNovo (t + 1) (n - 1) jogadaAtual
+            where
+                (estNovo, jogadaAtual) = aplicaUm t st
+
+        aplicaUm :: Int -> Estado -> (Estado, (NumMinhoca, Jogada))
+        aplicaUm t st = (Tarefa3.avancaEstado $ Tarefa2.efetuaJogada jogador jogada st, (jogador, jogada))
+            where
+                (jogador, jogada) = jogadaTatica t st
+
+reageTempo _ (MapCreatorTool mp i a secSel thirdSel edit char minh disp tema) = return (MapCreatorTool mp i a secSel thirdSel edit char minh disp tema)
+reageTempo _ (MapSelector tema) = return (MapSelector tema)
+reageTempo _ (GameOver team tema) = return (GameOver team tema)
 
 
 -- * Funções Auxiliares
@@ -157,8 +158,8 @@ congelaDinamitesNoChao e = e { objetosEstadoDLC = map congelar (objetosEstadoDLC
     
     congelar :: ObjetoDLC -> ObjetoDLC
     congelar obj@(DisparoDLC pos _ DinamiteDLC _ _)
-      | estaNoChao pos mapa = obj  -- já está no chão, avancaEstado não deve mover
-      | otherwise = obj  -- deixa avancaEstado aplicar gravidade
+      | estaNoChao pos mapa = obj
+      | otherwise = obj
     congelar obj = obj
     
     estaNoChao :: Posicao -> MapaDLC -> Bool

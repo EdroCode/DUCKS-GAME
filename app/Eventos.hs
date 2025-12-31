@@ -137,102 +137,110 @@ Menu 0
 -}
 reageEventos :: Event -> Worms -> IO Worms
 
-reageEventos (EventKey (SpecialKey KeyUp) Down _ _) (Menu sel)
-    | sel == 2 = return $ Menu 0  -- MAP Creator -> Bot Simulation
-    | sel == 3 = return $ Menu 1  -- Help -> PvP
-    | sel == 4 = return $ Menu 2  -- Quit -> MAP Creator (ou Help)
-    | otherwise = return $ Menu sel
+reageEventos (EventKey (SpecialKey KeyUp) Down _ _) (Menu sel tema)
+    | sel == 2 = return $ Menu 0 tema
+    | sel == 3 = return $ Menu 1 tema
+    | sel == 4 = return $ Menu 2 tema
+    | sel == 5 = return $ Menu 3 tema
+    | otherwise = return $ Menu sel tema
 
-reageEventos (EventKey (SpecialKey KeyDown) Down _ _) (Menu sel)
-    | sel == 0 = return $ Menu 2  -- Bot Simulation -> MAP Creator
-    | sel == 1 = return $ Menu 3  -- PvP -> Help
-    | sel == 2 || sel == 3 = return $ Menu 4  -- MAP Creator/Help -> Quit
-    | otherwise = return $ Menu sel
+reageEventos (EventKey (SpecialKey KeyDown) Down _ _) (Menu sel tema)
+    | sel == 0 = return $ Menu 2 tema
+    | sel == 1 = return $ Menu 3 tema
+    | sel == 2 = return $ Menu 4 tema
+    | sel == 3 = return $ Menu 5 tema
+    | otherwise = return $ Menu sel tema
 
-reageEventos (EventKey (SpecialKey KeyLeft) Down _ _) (Menu sel)
-    | sel == 1 = return $ Menu 0  -- PvP -> Bot Simulation
-    | sel == 3 = return $ Menu 2  -- Help -> MAP Creator
-    | otherwise = return $ Menu sel
+reageEventos (EventKey (SpecialKey KeyLeft) Down _ _) (Menu sel tema)
+    | sel == 1 = return $ Menu 0 tema
+    | sel == 3 = return $ Menu 2 tema
+    | sel == 5 = return $ Menu 4 tema
+    | otherwise = return $ Menu sel tema
 
-reageEventos (EventKey (SpecialKey KeyRight) Down _ _) (Menu sel)
-    | sel == 0 = return $ Menu 1  -- Bot Simulation -> PvP
-    | sel == 2 = return $ Menu 3  -- MAP Creator -> Help
-    | otherwise = return $ Menu sel
+reageEventos (EventKey (SpecialKey KeyRight) Down _ _) (Menu sel tema)
+    | sel == 0 = return $ Menu 1 tema
+    | sel == 2 = return $ Menu 3 tema
+    | sel == 4 = return $ Menu 5 tema
+    | otherwise = return $ Menu sel tema
 
 -- Seleção de opção no menu
-reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (Menu sel)
-        | sel == 0  = return $ BotSimulation novoEstado 0 0 (0, Labs2025.Move Sul)
-        | sel == 1  = return $ LevelSelector 0 [level1, level2, level3]
-        | sel == 2  = return $ MapCreatorTool baseEstado 0 0 0 0 False Nothing minhocaDefault disparoDefault
-        | sel == 3  = return $ Help 0
-        | sel == 4  = return $ Quit 1
-        | otherwise = return $ Menu sel
+reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (Menu sel tema)
+        | sel == 0  = return $ BotSimulation novoEstado 0 0 (0, Labs2025.Move Sul) tema
+        | sel == 1  = return $ LevelSelector 0 [level1, level2, level3] tema
+        | sel == 2  = return $ MapCreatorTool baseEstado 0 0 0 0 False Nothing minhocaDefault disparoDefault tema
+        | sel == 3  = return $ Help 0 tema
+        | sel == 4  = return $ ThemesMenu tema
+        | sel == 5  = return $ Quit 1 tema
+        | otherwise = return $ Menu sel tema
+
+reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (Help _ tema) = return $ Menu 0 tema
+reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (Help _ tema) = return $ Menu 0 tema
+reageEventos (EventKey (SpecialKey KeyLeft) Down _ _) (Help p tema) = return $ Help (max 0 (p - 1)) tema
+reageEventos (EventKey (SpecialKey KeyRight) Down _ _) (Help p tema) = return $ Help (min 5 (p + 1)) tema
+
+reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (ThemesMenu tema) = return $ Menu 0 tema
+
+reageEventos (EventKey (SpecialKey KeyLeft) Down _ _) (ThemesMenu TemaBase) = return $ ThemesMenu TemaNatal
+
+reageEventos (EventKey (SpecialKey KeyLeft) Down _ _) (ThemesMenu TemaNatal) = return $ ThemesMenu TemaBase
+
+reageEventos (EventKey (SpecialKey KeyRight) Down _ _) (ThemesMenu TemaBase) = return $ ThemesMenu TemaNatal
+
+reageEventos (EventKey (SpecialKey KeyRight) Down _ _) (ThemesMenu TemaNatal) = return $ ThemesMenu TemaBase
+
+reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (ThemesMenu tema) = return $ Menu 0 tema
+
+reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (MapCreatorTool _ _ _ _ _ _ _ _ _ tema) = return $ Menu 0 tema
+reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (BotSimulation _ _ _ _ tema) = return $ Menu 0 tema
+reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (Menu 0 tema) = return $ Quit 1 tema
 
 
--- * Tecla ESC - Lógica de Saída
 
-
-reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (Help _) = return $ Menu 0
-reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (Help _) = return $ Menu 0
-
-reageEventos (EventKey (SpecialKey KeyLeft) Down _ _) (Help p) =
-    return $ Help (max 0 (p - 1))
-
-reageEventos (EventKey (SpecialKey KeyRight) Down _ _) (Help p) =
-    return $ Help (min 5 (p + 1))
-
-reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (MapCreatorTool {}) = return $ Menu 0
-reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (BotSimulation {}) = return $ Menu 0
-reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (Menu 0) = return $ Quit 1
-
-
-
-reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (Quit _) = exitSuccess
-reageEventos (EventKey (SpecialKey KeyLeft) Down _ _) (Quit sel) = return $ Quit (max 0 (sel - 1))
-reageEventos (EventKey (SpecialKey KeyRight) Down _ _) (Quit sel) = return $ Quit (min 1 (sel + 1))
-reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (Quit sel)
+reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (Quit _ tema) = exitSuccess
+reageEventos (EventKey (SpecialKey KeyLeft) Down _ _) (Quit sel tema) = return $ Quit (max 0 (sel - 1)) tema
+reageEventos (EventKey (SpecialKey KeyRight) Down _ _) (Quit sel tema) = return $ Quit (min 1 (sel + 1)) tema
+reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (Quit sel tema)
     | sel == 0 = exitSuccess
-    | otherwise = return $ Menu 0
+    | otherwise = return $ Menu 0 tema
 
 
 -- * Seletor de Níveis
 
-reageEventos (EventKey (Char 'i') Down _ _) (LevelSelector i ei) = do
+reageEventos (EventKey (Char 'i') Down _ _) (LevelSelector i ei tema) = do
     existe <- doesFileExist "estado.txt"
     if not existe
-        then return (LevelSelector i ei)
+        then return (LevelSelector i ei tema)
         else do
             conteudo <- readFile "estado.txt"
             case readMaybe conteudo :: Maybe EstadoDLC of
-                Nothing -> return (LevelSelector i ei)
-                Just estado -> return (LevelSelector i (ei ++ [estado]))
+                Nothing -> return (LevelSelector i ei tema)
+                Just estado -> return (LevelSelector i (ei ++ [estado]) tema)
 
-reageEventos (EventKey (SpecialKey KeyDown) Down _ _) (LevelSelector i ei) = -- * Down
-    return $ LevelSelector (min (i + 1) (length ei - 1)) ei
+reageEventos (EventKey (SpecialKey KeyDown) Down _ _) (LevelSelector i ei tema) =
+    return $ LevelSelector (min (i + 1) (length ei - 1)) ei tema
 
-reageEventos (EventKey (SpecialKey KeyUp) Down _ _) (LevelSelector i ei) = -- * Up
-    return $ LevelSelector (max (i - 1) 0) ei
+reageEventos (EventKey (SpecialKey KeyUp) Down _ _) (LevelSelector i ei tema) =
+    return $ LevelSelector (max (i - 1) 0) ei tema
 
-reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (LevelSelector i ei)
-    | i >= 0 && i < length ei = return $ PVP (ei !! i) 0 0 (DataDLC.Move Sul)
-    | otherwise = return $ LevelSelector i ei
+reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (LevelSelector i ei tema)
+    | i >= 0 && i < length ei = return $ PVP (ei !! i) 0 0 (DataDLC.Move Sul) tema
+    | otherwise = return $ LevelSelector i ei tema
 
-reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (LevelSelector _ _) = return $ Menu 0
+reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (LevelSelector _ _ tema) = return $ Menu 0 tema
+
 
 -- * Modo PVP - Entradas
 
-reageEventos (EventKey (SpecialKey KeyF1) Down _ _) (PVP _ _ _ _) = exitSuccess
+reageEventos (EventKey (SpecialKey KeyF1) Down _ _) (PVP _ _ _ _ _) = exitSuccess
 
+reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (PVP _ _ _ _ tema) = return $ Menu 0 tema
 
-reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (PVP _ _ _ _) = return $ Menu 0
 
 
 -- * Mudar de minhoca
-reageEventos (EventKey (Char '1') Down _ _) (PVP est acc tick _) =
-
+reageEventos (EventKey (Char '1') Down _ _) (PVP est acc tick _ tema) =
     let minhocaAtualIndex = minhocaSelecionada est
         proximoIndiceValido = encontraProximoIndiceValido minhocaAtualIndex (minhocasEstadoDLC est)
-
         nEstado = EstadoDLC {
             mapaEstadoDLC = mapaEstadoDLC est
             , minhocasEstadoDLC = minhocasEstadoDLC est
@@ -241,16 +249,13 @@ reageEventos (EventKey (Char '1') Down _ _) (PVP est acc tick _) =
             , minhocaSelecionada = proximoIndiceValido
             , danosEstado = danosEstado est
         }
-
-    in
-        return $ PVP nEstado acc tick (DataDLC.Move Sul)
+    in return $ PVP nEstado acc tick (DataDLC.Move Sul) tema
 
 
 
 
 -- * Mudar arma da minhoca
-reageEventos (EventKey (Char '2') Down _ _) (PVP est acc tick _) =
-
+reageEventos (EventKey (Char '2') Down _ _) (PVP est acc tick _ tema) =
     let novaArma = case armaSelecionada est of
             Just JetpackDLC -> Just EscavadoraDLC
             Just EscavadoraDLC -> Just BazucaDLC
@@ -259,7 +264,6 @@ reageEventos (EventKey (Char '2') Down _ _) (PVP est acc tick _) =
             Just DinamiteDLC -> Just FlameTrower
             Just FlameTrower -> Just JetpackDLC
             Nothing -> Just JetpackDLC
-
         nEstado = EstadoDLC {
             mapaEstadoDLC = mapaEstadoDLC est
             , minhocasEstadoDLC = minhocasEstadoDLC est
@@ -268,21 +272,19 @@ reageEventos (EventKey (Char '2') Down _ _) (PVP est acc tick _) =
             , minhocaSelecionada = minhocaSelecionada est
             , danosEstado = danosEstado est
         }
-
-    in
-
-        return $ PVP nEstado acc tick (DataDLC.Move Sul)
+    in return $ PVP nEstado acc tick (DataDLC.Move Sul) tema
 
 -- * Resto das teclas no modo PvP
-reageEventos (EventKey key Down _ _) (PVP est _ _ _) =
+reageEventos (EventKey key Down _ _) (PVP est _ _ _ tema) =
     let (novoEst, _) = handleAction key est
-        estadoFinal = verificaVitoria novoEst
+        estadoFinal = verificaVitoria novoEst tema
     in return estadoFinal
 
 -- * Ecrã de Game Over
 
-reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (GameOver _) =
-    return $ Menu 0
+reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (GameOver _ tema) =
+    return $ Menu 0 tema
+
 
 
 
@@ -297,17 +299,17 @@ reageEventos (EventKey (SpecialKey KeyEsc) Down _ _) (GameOver _) =
 -- t -> Terceiro slider
 
 
-reageEventos (EventKey (SpecialKey KeyRight) Down _ _) (MapCreatorTool e 1 3 l t True c w d) =
+reageEventos (EventKey (SpecialKey KeyRight) Down _ _) (MapCreatorTool e 1 3 l t True c w d tema) =
     return $ case t of
         0 -> let newt = if (t + 1) < length axis8 then (t+1) else length axis8
-             in MapCreatorTool e 1 3 l t True c w (d{direcaoDisparoDLC = axis8 !! newt})
-        _ -> MapCreatorTool e 1 3 l t True c w d
+             in MapCreatorTool e 1 3 l t True c w (d{direcaoDisparoDLC = axis8 !! newt}) tema
+        _ -> MapCreatorTool e 1 3 l t True c w d tema
 
-reageEventos (EventKey (SpecialKey KeyLeft) Down _ _) (MapCreatorTool e 1 3 l t True c w d) =
+reageEventos (EventKey (SpecialKey KeyLeft) Down _ _) (MapCreatorTool e 1 3 l t True c w d tema) =
     return $ case t of
         0 -> let newt = if (t - 1) > 0 then (t-1) else 0
-             in MapCreatorTool e 1 3 l t True c w (d{direcaoDisparoDLC = axis8 !! newt})
-        _ -> MapCreatorTool e 1 3 l t True c w d
+             in MapCreatorTool e 1 3 l t True c w (d{direcaoDisparoDLC = axis8 !! newt}) tema
+        _ -> MapCreatorTool e 1 3 l t True c w d tema
 
 
 
@@ -315,7 +317,7 @@ reageEventos (EventKey (SpecialKey KeyLeft) Down _ _) (MapCreatorTool e 1 3 l t 
 
 
 
-reageEventos (EventKey (SpecialKey KeyRight) Down _ _) (MapCreatorTool e 3 1 l t True i w d) =
+reageEventos (EventKey (SpecialKey KeyRight) Down _ _) (MapCreatorTool e 3 1 l t True i w d tema) =
     let
         direcaoAtual = direcaoDisparoDLC d
         indiceAtual = case elemIndex direcaoAtual axis8 of
@@ -331,13 +333,13 @@ reageEventos (EventKey (SpecialKey KeyRight) Down _ _) (MapCreatorTool e 3 1 l t
 
 
     in case t of
-        0 -> return $ MapCreatorTool e 3 1 l t True i w (d{direcaoDisparoDLC = novaDirecao})
-        1 -> return $ MapCreatorTool e 3 1 l t True i w (d{tempoDisparoDLC = novoTempo})
-        2 -> return $ MapCreatorTool e 3 1 l t True i w (d{donoDisparoDLC = if (donoDisparoDLC d + 1) >= length (minhocasEstadoDLC e) then donoDisparoDLC d else donoDisparoDLC d + 1})
-        _ -> return $ MapCreatorTool e 3 1 l t True i w d
+        0 -> return $ MapCreatorTool e 3 1 l t True i w (d{direcaoDisparoDLC = novaDirecao}) tema
+        1 -> return $ MapCreatorTool e 3 1 l t True i w (d{tempoDisparoDLC = novoTempo}) tema
+        2 -> return $ MapCreatorTool e 3 1 l t True i w (d{donoDisparoDLC = if (donoDisparoDLC d + 1) >= length (minhocasEstadoDLC e) then donoDisparoDLC d else donoDisparoDLC d + 1}) tema
+        _ -> return $ MapCreatorTool e 3 1 l t True i w d tema
 
 
-reageEventos (EventKey (SpecialKey KeyLeft) Down _ _) (MapCreatorTool e 3 1 l t True i w d) =
+reageEventos (EventKey (SpecialKey KeyLeft) Down _ _) (MapCreatorTool e 3 1 l t True i w d tema) =
     let
         direcaoAtual = direcaoDisparoDLC d
         indiceAtual = case elemIndex direcaoAtual axis8 of
@@ -352,103 +354,103 @@ reageEventos (EventKey (SpecialKey KeyLeft) Down _ _) (MapCreatorTool e 3 1 l t 
             Nothing -> Nothing
             Just n -> if n > 0 then Just (n - 1) else Nothing
     in case t of
-        0 -> return $ MapCreatorTool e 3 1 l t True i w (d{direcaoDisparoDLC = novaDirecao})
-        1 -> return $ MapCreatorTool e 3 1 l t True i w (d{tempoDisparoDLC = novoTempo})
-        2 -> return $ MapCreatorTool e 3 1 l t True i w (d{donoDisparoDLC = max (donoDisparoDLC d - 1) 0})
-        _ -> return $ MapCreatorTool e 3 1 l t True i w d
+        0 -> return $ MapCreatorTool e 3 1 l t True i w (d{direcaoDisparoDLC = novaDirecao}) tema
+        1 -> return $ MapCreatorTool e 3 1 l t True i w (d{tempoDisparoDLC = novoTempo}) tema
+        2 -> return $ MapCreatorTool e 3 1 l t True i w (d{donoDisparoDLC = max (donoDisparoDLC d - 1) 0}) tema
+        _ -> return $ MapCreatorTool e 3 1 l t True i w d tema
 
 
 
-reageEventos (EventKey (Char char) Down _ _) (MapCreatorTool e b 2 l t True _ w d) =
+reageEventos (EventKey (Char char) Down _ _) (MapCreatorTool e b 2 l t True _ w d tema) =
     return $
         if char `elem` ['0'..'9']
         then
             let num = charParaInt char
             in case t of
-                    0 -> MapCreatorTool e b 2 l t True (Just num) (w{jetpackMinhocaDLC = read (show (jetpackMinhocaDLC w) ++ [char]) :: Int}) d
-                    1 -> MapCreatorTool e b 2 l t True (Just num) (w{escavadoraMinhocaDLC = read (show (escavadoraMinhocaDLC w) ++ [char]) :: Int}) d
-                    2 -> MapCreatorTool e b 2 l t True (Just num) (w{bazucaMinhocaDLC = read (show (bazucaMinhocaDLC w) ++ [char]) :: Int}) d
-                    3 -> MapCreatorTool e b 2 l t True (Just num) (w{minaMinhocaDLC = read (show (minaMinhocaDLC w) ++ [char]) :: Int}) d
-                    4 -> MapCreatorTool e b 2 l t True (Just num) (w{dinamiteMinhocaDLC = read (show (dinamiteMinhocaDLC w) ++ [char]) :: Int}) d
-                    5 -> MapCreatorTool e b 2 l t True (Just num) (w{flameMinhocaDLC = read (show (flameMinhocaDLC w) ++ [char]) :: Int}) d
-                    6 -> MapCreatorTool e b 2 l t True (Just num) (w{burningCounter = read (show (burningCounter w) ++ [char]) :: Int}) d
-                    _ -> MapCreatorTool e b 2 l t True (Just num) w d
-        else MapCreatorTool e b 2 l t True Nothing w d
+                    0 -> MapCreatorTool e b 2 l t True (Just num) (w{jetpackMinhocaDLC = read (show (jetpackMinhocaDLC w) ++ [char]) :: Int}) d tema
+                    1 -> MapCreatorTool e b 2 l t True (Just num) (w{escavadoraMinhocaDLC = read (show (escavadoraMinhocaDLC w) ++ [char]) :: Int}) d tema
+                    2 -> MapCreatorTool e b 2 l t True (Just num) (w{bazucaMinhocaDLC = read (show (bazucaMinhocaDLC w) ++ [char]) :: Int}) d tema
+                    3 -> MapCreatorTool e b 2 l t True (Just num) (w{minaMinhocaDLC = read (show (minaMinhocaDLC w) ++ [char]) :: Int}) d tema
+                    4 -> MapCreatorTool e b 2 l t True (Just num) (w{dinamiteMinhocaDLC = read (show (dinamiteMinhocaDLC w) ++ [char]) :: Int}) d tema
+                    5 -> MapCreatorTool e b 2 l t True (Just num) (w{flameMinhocaDLC = read (show (flameMinhocaDLC w) ++ [char]) :: Int}) d tema
+                    6 -> MapCreatorTool e b 2 l t True (Just num) (w{burningCounter = read (show (burningCounter w) ++ [char]) :: Int}) d tema
+                    _ -> MapCreatorTool e b 2 l t True (Just num) w d tema
+        else MapCreatorTool e b 2 l t True Nothing w d tema
 
 -- * Tanto delete ou backspace servem 
 
-reageEventos (EventKey (SpecialKey KeyBackspace) Down _ _) (MapCreatorTool e b 2 l t True c w d) =
+reageEventos (EventKey (SpecialKey KeyBackspace) Down _ _) (MapCreatorTool e b 2 l t True c w d tema) =
     return $ case t of
-        0 -> MapCreatorTool e b 2 l t True c (w{jetpackMinhocaDLC = max 0 (jetpackMinhocaDLC w `div` 10)}) d
-        1 -> MapCreatorTool e b 2 l t True c (w{escavadoraMinhocaDLC = max 0 (escavadoraMinhocaDLC w `div` 10)}) d
-        2 -> MapCreatorTool e b 2 l t True c (w{bazucaMinhocaDLC = max 0 (bazucaMinhocaDLC w `div` 10)}) d
-        3 -> MapCreatorTool e b 2 l t True c (w{minaMinhocaDLC = max 0 (minaMinhocaDLC w `div` 10)}) d
-        4 -> MapCreatorTool e b 2 l t True c (w{dinamiteMinhocaDLC = max 0 (dinamiteMinhocaDLC w `div` 10)}) d
-        5 -> MapCreatorTool e b 2 l t True c (w{flameMinhocaDLC = max 0 (flameMinhocaDLC w `div` 10)}) d
-        6 -> MapCreatorTool e b 2 l t True c (w{burningCounter = max 0 (burningCounter w `div` 10)}) d
-        _ -> MapCreatorTool e b 2 l t True c w d
+        0 -> MapCreatorTool e b 2 l t True c (w{jetpackMinhocaDLC = max 0 (jetpackMinhocaDLC w `div` 10)}) d tema
+        1 -> MapCreatorTool e b 2 l t True c (w{escavadoraMinhocaDLC = max 0 (escavadoraMinhocaDLC w `div` 10)}) d tema
+        2 -> MapCreatorTool e b 2 l t True c (w{bazucaMinhocaDLC = max 0 (bazucaMinhocaDLC w `div` 10)}) d tema
+        3 -> MapCreatorTool e b 2 l t True c (w{minaMinhocaDLC = max 0 (minaMinhocaDLC w `div` 10)}) d tema
+        4 -> MapCreatorTool e b 2 l t True c (w{dinamiteMinhocaDLC = max 0 (dinamiteMinhocaDLC w `div` 10)}) d tema
+        5 -> MapCreatorTool e b 2 l t True c (w{flameMinhocaDLC = max 0 (flameMinhocaDLC w `div` 10)}) d tema
+        6 -> MapCreatorTool e b 2 l t True c (w{burningCounter = max 0 (burningCounter w `div` 10)}) d tema
+        _ -> MapCreatorTool e b 2 l t True c w d tema
 
-reageEventos (EventKey (SpecialKey KeyDelete) Down _ _) (MapCreatorTool e b 2 l t True c w d) =
+reageEventos (EventKey (SpecialKey KeyDelete) Down _ _) (MapCreatorTool e b 2 l t True c w d tema) =
     return $ case t of
-        0 -> MapCreatorTool e b 2 l t True c (w{jetpackMinhocaDLC = max 0 (jetpackMinhocaDLC w `div` 10)}) d
-        1 -> MapCreatorTool e b 2 l t True c (w{escavadoraMinhocaDLC = max 0 (escavadoraMinhocaDLC w `div` 10)}) d
-        2 -> MapCreatorTool e b 2 l t True c (w{bazucaMinhocaDLC = max 0 (bazucaMinhocaDLC w `div` 10)}) d
-        3 -> MapCreatorTool e b 2 l t True c (w{minaMinhocaDLC = max 0 (minaMinhocaDLC w `div` 10)}) d
-        4 -> MapCreatorTool e b 2 l t True c (w{dinamiteMinhocaDLC = max 0 (dinamiteMinhocaDLC w `div` 10)}) d
-        5 -> MapCreatorTool e b 2 l t True c (w{flameMinhocaDLC = max 0 (flameMinhocaDLC w `div` 10)}) d
-        6 -> MapCreatorTool e b 2 l t True c (w{burningCounter = max 0 (burningCounter w `div` 10)}) d
-        _ -> MapCreatorTool e b 2 l t True c w d
+        0 -> MapCreatorTool e b 2 l t True c (w{jetpackMinhocaDLC = max 0 (jetpackMinhocaDLC w `div` 10)}) d tema
+        1 -> MapCreatorTool e b 2 l t True c (w{escavadoraMinhocaDLC = max 0 (escavadoraMinhocaDLC w `div` 10)}) d tema
+        2 -> MapCreatorTool e b 2 l t True c (w{bazucaMinhocaDLC = max 0 (bazucaMinhocaDLC w `div` 10)}) d tema
+        3 -> MapCreatorTool e b 2 l t True c (w{minaMinhocaDLC = max 0 (minaMinhocaDLC w `div` 10)}) d tema
+        4 -> MapCreatorTool e b 2 l t True c (w{dinamiteMinhocaDLC = max 0 (dinamiteMinhocaDLC w `div` 10)}) d tema
+        5 -> MapCreatorTool e b 2 l t True c (w{flameMinhocaDLC = max 0 (flameMinhocaDLC w `div` 10)}) d tema
+        6 -> MapCreatorTool e b 2 l t True c (w{burningCounter = max 0 (burningCounter w `div` 10)}) d tema
+        _ -> MapCreatorTool e b 2 l t True c w d tema
 
-reageEventos (EventKey (SpecialKey KeyRight) Down _ _) (MapCreatorTool e b 2 l t True c w d) =
+reageEventos (EventKey (SpecialKey KeyRight) Down _ _) (MapCreatorTool e b 2 l t True c w d tema) =
     return $ case t of
-        7 -> MapCreatorTool e b 2 l t True c (w{equipaMinhoca = Just Red}) d
-        _ -> MapCreatorTool e b 2 l t True c w d
+        7 -> MapCreatorTool e b 2 l t True c (w{equipaMinhoca = Just Red}) d tema
+        _ -> MapCreatorTool e b 2 l t True c w d tema
 
-reageEventos (EventKey (SpecialKey KeyLeft) Down _ _) (MapCreatorTool e b 2 l t True c w d) =
+reageEventos (EventKey (SpecialKey KeyLeft) Down _ _) (MapCreatorTool e b 2 l t True c w d tema) =
     return $ case t of
-        7 -> MapCreatorTool e b 2 l t True c (w{equipaMinhoca = Just Blue}) d
-        _ -> MapCreatorTool e b 2 l t True c w d
+        7 -> MapCreatorTool e b 2 l t True c (w{equipaMinhoca = Just Blue}) d tema
+        _ -> MapCreatorTool e b 2 l t True c w d tema
 
 -- *
 
 -- AUmentar Linhas -> 
-reageEventos (EventKey (Char 'k') Down _ _) (MapCreatorTool e b a l t ed c w d) =
+reageEventos (EventKey (Char 'k') Down _ _) (MapCreatorTool e b a l t ed c w d tema) =
     let
         mapa = mapaEstadoDLC e
         colunas = if null mapa then 0 else length (head mapa)
         novaLinha = replicate colunas ArDLC
         novoMapa = mapa ++ [novaLinha]
-    in return $ MapCreatorTool e{mapaEstadoDLC = novoMapa} b a l t ed c w d
+    in return $ MapCreatorTool e{mapaEstadoDLC = novoMapa} b a l t ed c w d tema
 
-reageEventos (EventKey (Char 'l') Down _ _) (MapCreatorTool e b a l t ed c w d) =
+reageEventos (EventKey (Char 'l') Down _ _) (MapCreatorTool e b a l t ed c w d tema) =
     let
         mapa = mapaEstadoDLC e
         novoMapa = map (++ [ArDLC]) mapa
-    in return $ MapCreatorTool e{mapaEstadoDLC = novoMapa} b a  l t ed c w d
+    in return $ MapCreatorTool e{mapaEstadoDLC = novoMapa} b a l t ed c w d tema
 
 
-reageEventos (EventKey (Char 'n') Down _ _) (MapCreatorTool e b a l t ed c w d) =
+reageEventos (EventKey (Char 'n') Down _ _) (MapCreatorTool e b a l t ed c w d tema) =
     let
         mapa = mapaEstadoDLC e
         novoMapa = init mapa
-    in return $ MapCreatorTool e{mapaEstadoDLC = novoMapa} b a l t ed c w d
+    in return $ MapCreatorTool e{mapaEstadoDLC = novoMapa} b a l t ed c w d tema
 
-reageEventos (EventKey (Char 'm') Down _ _) (MapCreatorTool e b a l t ed c w d) =
+reageEventos (EventKey (Char 'm') Down _ _) (MapCreatorTool e b a l t ed c w d tema) =
     let
         mapa = mapaEstadoDLC e
         novoMapa = map init  mapa
-    in return $ MapCreatorTool e{mapaEstadoDLC = novoMapa} b a l t ed c w d
+    in return $ MapCreatorTool e{mapaEstadoDLC = novoMapa} b a l t ed c w d tema
 
 
 
-reageEventos (EventKey (Char '1') Down _ _) (MapCreatorTool e _ a l t ed c w d) =
+reageEventos (EventKey (Char '1') Down _ _) (MapCreatorTool e _ a l t ed c w d tema) =
     let novoa = if a > 1 then 0 else a + 1
-    in return $ MapCreatorTool e 0 novoa l t ed c w d
+    in return $ MapCreatorTool e 0 novoa l t ed c w d tema
 
 
 
 
-reageEventos (EventKey (MouseButton LeftButton) Down _ mousePos) (MapCreatorTool e blocoSelecionado modo l t ed c w d) =
+reageEventos (EventKey (MouseButton LeftButton) Down _ mousePos) (MapCreatorTool e blocoSelecionado modo l t ed c w d tema) =
     let
         mapa = mapaEstadoDLC e
         (mx, my) = mousePos
@@ -479,10 +481,10 @@ reageEventos (EventKey (MouseButton LeftButton) Down _ mousePos) (MapCreatorTool
                 2 -> adicionaMinhocaDLC e posicao w
                 _ -> e
             else e
-    in return $ MapCreatorTool nEstado blocoSelecionado modo l t ed c w d
+    in return $ MapCreatorTool nEstado blocoSelecionado modo l t ed c w d tema
 
 
-reageEventos (EventKey (MouseButton RightButton) Down _ mousePos) (MapCreatorTool e blocoSelecionado modo l t ed c w d) =
+reageEventos (EventKey (MouseButton RightButton) Down _ mousePos) (MapCreatorTool e blocoSelecionado modo l t ed c w d tema) =
     let
         mapa = mapaEstadoDLC e
         (mx, my) = mousePos
@@ -513,11 +515,11 @@ reageEventos (EventKey (MouseButton RightButton) Down _ mousePos) (MapCreatorToo
                 2 -> removeMinhocaDLC e posicao
                 _ -> e
             else e
-    in return $ MapCreatorTool nEstado blocoSelecionado modo l t ed c w d
+    in return $ MapCreatorTool nEstado blocoSelecionado modo l t ed c w d tema
 
 
 
-reageEventos (EventKey (SpecialKey KeyUp) Down _ _) (MapCreatorTool e b a _ _ False c w d) = -- * UP
+reageEventos (EventKey (SpecialKey KeyUp) Down _ _) (MapCreatorTool e b a _ _ False c w d tema) = -- * UP
     let
         x = case a of
             0 -> 5
@@ -526,9 +528,9 @@ reageEventos (EventKey (SpecialKey KeyUp) Down _ _) (MapCreatorTool e b a _ _ Fa
             _ -> 0 -- !
         novob = if b >= x || b <= 0 then 0 else b - 1
 
-    in return $ MapCreatorTool e novob a 0 0 False c w d
+    in return $ MapCreatorTool e novob a 0 0 False c w d tema
 
-reageEventos (EventKey (SpecialKey KeyDown) Down _ _) (MapCreatorTool e b a _ _ False c w d) = -- * DOWN
+reageEventos (EventKey (SpecialKey KeyDown) Down _ _) (MapCreatorTool e b a _ _ False c w d tema) = -- * DOWN
     let
         x = case a of
             0 -> 5
@@ -537,10 +539,10 @@ reageEventos (EventKey (SpecialKey KeyDown) Down _ _) (MapCreatorTool e b a _ _ 
             _ -> 0 -- !
         novob = if b >= x then 0 else b + 1
 
-    in return $ MapCreatorTool e novob a 0 0 False c w d
+    in return $ MapCreatorTool e novob a 0 0 False c w d tema
 
 
-reageEventos (EventKey (Char '2') Down _ _) (MapCreatorTool e b a _ _ False c w d) = -- * DOWN V2
+reageEventos (EventKey (Char '2') Down _ _) (MapCreatorTool e b a _ _ False c w d tema) = -- * DOWN V2
     let
         x = case a of
             0 -> 5
@@ -549,9 +551,9 @@ reageEventos (EventKey (Char '2') Down _ _) (MapCreatorTool e b a _ _ False c w 
             _ -> 0 -- !
         novob = if b >= x then 0 else b + 1
 
-    in return $ MapCreatorTool e novob a 0 0 False c w d
+    in return $ MapCreatorTool e novob a 0 0 False c w d tema
 
-reageEventos (EventKey (SpecialKey KeyLeft) Down _ _) (MapCreatorTool e b a l t edit c w d) =  -- * <
+reageEventos (EventKey (SpecialKey KeyLeft) Down _ _) (MapCreatorTool e b a l t edit c w d tema) =  -- * <
     let
 
         novol
@@ -564,9 +566,9 @@ reageEventos (EventKey (SpecialKey KeyLeft) Down _ _) (MapCreatorTool e b a l t 
             | a == 2 && l == 0 = (t - 1) `mod` 8
             | otherwise = 0
 
-    in if novol <= 0 then return $ MapCreatorTool e b a 0 novot edit c w d else return $ MapCreatorTool e b a novol novot edit c w d
+    in if novol <= 0 then return $ MapCreatorTool e b a 0 novot edit c w d tema else return $ MapCreatorTool e b a novol novot edit c w d tema
 
-reageEventos (EventKey (SpecialKey KeyRight) Down _ _) (MapCreatorTool e b a l t edit c w d) =  -- * >
+reageEventos (EventKey (SpecialKey KeyRight) Down _ _) (MapCreatorTool e b a l t edit c w d tema) =  -- * >
     let
         disparos = [BazucaDLC, MinaDLC, DinamiteDLC, FlameTrower]
         novol
@@ -579,25 +581,25 @@ reageEventos (EventKey (SpecialKey KeyRight) Down _ _) (MapCreatorTool e b a l t
             | a == 2 && l == 0 = (t + 1) `mod` 8
             | otherwise = 0
 
-    in if novol <= 0 then return $ MapCreatorTool e b a 0 novot edit c w d else return $ MapCreatorTool e b a novol novot edit c w (d{tipoDisparoDLC = disparos !! l})
+    in if novol <= 0 then return $ MapCreatorTool e b a 0 novot edit c w d tema else return $ MapCreatorTool e b a novol novot edit c w (d{tipoDisparoDLC = disparos !! l}) tema
 
 
 
 
-reageEventos (EventKey (SpecialKey KeyDown) Down _ _) (MapCreatorTool e 3 1 l t edit c w d) =
+reageEventos (EventKey (SpecialKey KeyDown) Down _ _) (MapCreatorTool e 3 1 l t edit c w d tema) =
     let
 
         novot = if edit then (t + 1) `mod` 3 else t
 
 
-    in return $ MapCreatorTool e 3 1 l novot edit c w d
+    in return $ MapCreatorTool e 3 1 l novot edit c w d tema
 
-reageEventos (EventKey (SpecialKey KeyUp) Down _ _) (MapCreatorTool e 3 1 l t edit c w d) =
+reageEventos (EventKey (SpecialKey KeyUp) Down _ _) (MapCreatorTool e 3 1 l t edit c w d tema) =
     let
 
         novot = if edit then (t - 1) `mod` 3 else 0
 
-    in return $ MapCreatorTool e 3 1 l novot edit c w d
+    in return $ MapCreatorTool e 3 1 l novot edit c w d tema
 
 
 
@@ -606,14 +608,14 @@ reageEventos (EventKey (SpecialKey KeyUp) Down _ _) (MapCreatorTool e 3 1 l t ed
 
 
 
-reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (MapCreatorTool e b 2 l t ed c w d) =
-    return $ MapCreatorTool e b 2 l t (not ed) c w d
+reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (MapCreatorTool e b 2 l t ed c w d tema) =
+    return $ MapCreatorTool e b 2 l t (not ed) c w d tema
 
 
-reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (MapCreatorTool e b 1 l t ed c w d) =
-    return $ MapCreatorTool e b 1 l t (not ed) c w d
+reageEventos (EventKey (SpecialKey KeyEnter) Down _ _) (MapCreatorTool e b 1 l t ed c w d tema) =
+    return $ MapCreatorTool e b 1 l t (not ed) c w d tema
 
-reageEventos (EventKey (Char 'e') Down _ _) m@(MapCreatorTool e _ _ _ _ _ _ _ _) = do
+reageEventos (EventKey (Char 'e') Down _ _) m@(MapCreatorTool e _ _ _ _ _ _ _ _ _) = do
     writeFile "estado.txt" (show e)
     return m
 
@@ -1038,16 +1040,16 @@ GameOver Blue
 PVP estadoAtual 0 0 (Move Sul)
 
 -}
-verificaVitoria :: EstadoDLC -> Worms
-verificaVitoria est =
+verificaVitoria :: EstadoDLC -> TemaAtual -> Worms
+verificaVitoria est tema =
     let minhocasVivas = getMinhocasValidasDLC (minhocasEstadoDLC est)
         minhocasRed = filter (\m -> equipaMinhoca m == Just Red) minhocasVivas
         minhocasBlue = filter (\m -> equipaMinhoca m == Just Blue) minhocasVivas
     in case (null minhocasRed, null minhocasBlue) of
-        (True, False) -> GameOver Blue  -- Blue venceu
-        (False, True) -> GameOver Red   -- Red venceu
-        (True, True)  -> GameOver Red   -- Empate (ou escolhe uma equipa)
-        _             -> PVP est 0 0 (DataDLC.Move Sul)  -- Jogo continua
+        (True, False) -> GameOver Blue tema
+        (False, True) -> GameOver Red tema
+        (True, True)  -> GameOver Red tema
+        _             -> PVP est 0 0 (DataDLC.Move Sul) tema
 
 
 

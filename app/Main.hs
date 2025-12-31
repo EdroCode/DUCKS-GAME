@@ -124,6 +124,34 @@ main = do
   Just patoEscavadoraAzulR <- loadJuicy (path ++ "PatoEscavadoraAzulRight.png")
   Just patoAzulJetpackR <- loadJuicy (path ++ "PatoAzulJetpackRight.png")
 
+  -- Natal
+  Just neve <- loadJuicy (path ++ "Neve.png")
+  Just skyNatal <- loadJuicy (path ++ "skyNatal.png")
+
+  Just patoAzulParadoNatal <- loadJuicy (path ++ "PatoAzulParadoNatal.png")
+  Just patoAzulParadoNatalR <- loadJuicy (path ++ "PatoAzulParadoNatalRight.png")
+  Just patoAzulPulandoNatal <- loadJuicy (path ++ "PatoAzulPulandoNatal.png")
+  Just patoAzulPulandoNatalR <- loadJuicy (path ++ "PatoAzulPulandoNatalRight.png")
+
+  Just patoVermelhoParadoNatal <- loadJuicy (path ++ "PatoVermelhoParadoNatal.png")
+  Just patoVermelhoParadoNatalR <- loadJuicy (path ++ "PatoVermelhoParadoNatalRight.png")
+  Just patoVermelhoPulandoNatal <- loadJuicy (path ++ "PatoVermelhoPulandoNatal.png")
+  Just patoVermelhoPulandoNatalR <- loadJuicy (path ++ "PatoVermelhoPulandoNatalRight.png")
+
+  Just patoParadoNatal <- loadJuicy (path ++ "PatoParadoNatal.png")
+  Just patoParadoNatalR <- loadJuicy (path ++ "PatoParadoNatalRight.png")
+  Just patoPulandoNatal <- loadJuicy (path ++ "PatoPulandoNatal.png")
+  Just patoPulandoNatalR <- loadJuicy (path ++ "PatoPulandoNatalRight.png")
+
+  Just patoOutlineNatal <- loadJuicy (path ++ "PatoOutlineNatal.png")
+  Just patoOutlineNatalR <- loadJuicy (path ++ "PatoOutlineNatalRight.png")
+  Just patoOutlineNatalPulando <- loadJuicy (path ++ "PatoOutlineNatalPulando.png")
+  Just patoOutlineNatalPulandoR <- loadJuicy (path ++ "PatoOutlineNatalPulandoRight.png")
+
+  Just backgroundNatal <- loadJuicy (path ++ "BackgroundNatal.png")
+  Just backgroundNatalBorrado <- loadJuicy (path ++ "BackgroundNatalBorrado.png")
+  Just backgroundMorningNatalBorrado <- loadJuicy (path ++ "BackgroundMorningNatalBorrado.png")
+  
   Just mapSheet <- loadJuicy (path ++ "MapSheet.png")
   -- * Fontes
 
@@ -303,8 +331,10 @@ main = do
 
 -}
 
-  -- let temanatal = [grass, water, stone, pato, morto, barril, bazuca, sky, dinamite, mina, dirt, lava, healthPack, patoPulando, patoCaindo, ammoJetpack, ammoEscavadora, ammoBazuca, ammoMina, ammoDinamite, botao, botaoOn, botaoOff, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, space, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, dash, pl, pr, slash, dott_points, comma, exclamation, interrogation]
+  let temanatal = [neve, water, stone, patoParadoNatal, morto, barril, bazuca, skyNatal, dinamite, mina, dirt, lava, healthPack, patoPulandoNatal, blank_sprite, ammoJetpack, ammoEscavadora, ammoBazuca, ammoMina, ammoDinamite, botao, botaoOn, botaoOff, a, b, c, d, e, f, g, h, i, j, k, l, m, n, o, p, q, r, s, t, u, v, w, x, y, z, space, _0, _1, _2, _3, _4, _5, _6, _7, _8, _9, dash, pl, pr, slash, dott_points, comma, exclamation, interrogation, arrombado, fireball, leftArrow, rightArrow, patoBazucaVermelho, patoBazucaAzul, blank_sprite, blank_sprite, patoAzulPulandoNatal, patoVermelhoPulandoNatal, patoVermelhoParadoNatal, patoAzulParadoNatal, blank_sprite, blank_sprite, patoEscavadoraAzul, patoEscavadoraVermelho, patoFogo, backgroundNatal, patoVermelhoJetpack, patoAzulJetpack, backgroundNatalBorrado, botaoOn2, botaoOff2, lvlAddSign, patoOutlineNatal, patoOutlineNatalPulando, sidebar, sidebarAzul, sidebarVermelho, mapSheet, patoPulandoNatalR, patoParadoNatalR, patoFogoR, patoOutlineNatalR, patoOutlineNatalPulandoR, patoVermelhoPulandoNatalR, patoVermelhoParadoNatalR, patoBazucaVermelhoR, patoEscavadoraVermelhoR, patoVermelhoJetpackR, patoBazucaAzulR, patoAzulPulandoNatalR, patoAzulParadoNatalR, patoEscavadoraAzulR, patoAzulJetpackR, jetpack, escavadora, redWins, blueWins, selectedOutline, patoFogoOutline, patoFogoOutlineR, gelo, waterMedium, waterDeep, waterDeeper, explosao, backgroundMorningNatalBorrado, selected, flagB, flagR, selectedRed, burnCounter, bot, sword, book, pencil]
 
+  let temaNatal = temanatal
+  let temaBase = tiles
 
-  playIO janela fundo fr (Menu 0) (desenha tiles) reageEventos reageTempo
+  playIO janela fundo fr (Menu 0 TemaBase) (desenha [temaBase, temaNatal]) reageEventos reageTempo
 

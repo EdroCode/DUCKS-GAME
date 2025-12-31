@@ -67,6 +67,10 @@ type EstadoGloss = (Estado, Assets)
 
 -- * Função Principal de Renderização
 
+getTemaIndex :: TemaAtual -> Int
+getTemaIndex TemaBase = 0
+getTemaIndex TemaNatal = 1
+
 {-| Função principal que coordena a renderização de todos os estados do jogo.
 
 Funcionamento:
@@ -94,16 +98,16 @@ Picture (menu com primeira opção selecionada)
 >>> desenha recursos (PVP estado 0.0 0 jogada)
 Picture (jogo PvP renderizado)
 -}
-desenha :: [Picture] -> Worms -> IO Picture
-desenha p (Menu sel) = return $ drawMenu p sel
-desenha p (BotSimulation est _ _ (numMinhoca, jogada)) = return $ drawGame p est (Just numMinhoca) (Just jogada)
-desenha p (PVP est _ _ jogada) = return $ drawPvPGame p est jogada
-desenha p (MapCreatorTool e b a secSel thirdSel edit char worm disp) = return $ (drawMCT p e b a secSel thirdSel edit char worm disp)
-desenha p (LevelSelector i estImp) = return $ (drawLvlSelector p i estImp)
-desenha p (Quit sel) = return $ drawQuitConfirm p sel
-desenha p (Help pagina) = return $ drawHelp p pagina
-desenha p (GameOver team) = return $ drawGameOver p team
-
+desenha :: [[Picture]] -> Worms -> IO Picture
+desenha p (Menu sel tema) = return $ drawMenu (p !! getTemaIndex tema) sel
+desenha p (BotSimulation est _ _ (numMinhoca, jogada) tema) = return $ drawGame (p !! getTemaIndex tema) est (Just numMinhoca) (Just jogada)
+desenha p (PVP est _ _ jogada tema) = return $ drawPvPGame (p !! getTemaIndex tema) est jogada
+desenha p (MapCreatorTool e b a secSel thirdSel edit char worm disp tema) = return $ (drawMCT (p !! getTemaIndex tema) e b a secSel thirdSel edit char worm disp)
+desenha p (LevelSelector i estImp tema) = return $ (drawLvlSelector (p !! getTemaIndex tema) i estImp)
+desenha p (Quit sel tema) = return $ drawQuitConfirm (p !! getTemaIndex tema) sel
+desenha p (Help pagina tema) = return $ drawHelp (p !! getTemaIndex tema) pagina
+desenha p (GameOver team tema) = return $ drawGameOver (p !! getTemaIndex tema) team
+desenha p (ThemesMenu tema) = return $ drawTemas (p !! getTemaIndex tema) tema
 -- * Funções de Desenho de Menus
 
 {-| Desenha a interface de confirmação de saída do jogo.
@@ -138,12 +142,25 @@ drawQuitConfirm p sel = Pictures
   , Translate 150 (-50) $ Scale 1 1 $ drawWord p "Cancelar"
   ]
 
+drawTemas :: [Picture] -> TemaAtual -> Picture
+drawTemas p temaAtual = Pictures
+  [ p !! 88
+  , Translate 0 350 $ Scale 1 1 $ p !! 20
+  , Translate (-140) 370 $ Scale 1.6 1.6 $ drawWord p "Temas"
+  
+  , Translate (-300) 100 $ Scale 1 1 (if temaAtual == TemaBase then p !! 21 else p !! 22)
+  , Translate (-450) 100 $ Scale 0.6 0.6 $ drawWord p "Tema Base"
+  
+  , Translate (300) 100 $ Scale 1 1 (if temaAtual == TemaNatal then p !! 21 else p !! 22)
+  , Translate (150) 100 $ Scale 0.6 0.6 $ drawWord p "Tema Natal"
+  ]
+
 {-| Desenha o menu principal do jogo.
 
 Funcionamento:
 
 * Apresenta o título "WORMS"
-* Mostra 5 opções de menu dispostas em grid
+* Mostra 6 opções de menu dispostas em grid
 * Destaca a opção selecionada
 * Opções disponíveis: Bot Simulation, Player vs Player, MAP Creator Tool, Help, Quit
 
@@ -195,9 +212,13 @@ drawMenu p sel = Pictures
   , Translate 210 (-50) $ Scale 1.2 1.2 $ p !! 133
   , Translate (300 - 50) (-50) $ Scale 0.6 0.6 $ Color (if sel==3 then red else black) $ drawWord p "Help"
 
+  -- Temas
+  , Translate (-300) (-200) $ Scale 1 1 (if sel==4 then p !! 21 else p !! 22)
+  , Translate (-500) (-200) $ Scale 0.6 0.6 $ Color (if sel==4 then red else black) $ drawWord p "Temas"
+
   -- Quit 
-  , Translate 0 (-200) $ Scale 1 1 (if sel==4 then p !! 21 else p !! 22)
-  , Translate (- 50) (-200) $ Scale 0.6 0.6 $ Color (if sel==4 then red else black) $ drawWord p "Quit"
+  , Translate 300 (-200) $ Scale 1 1 (if sel==5 then p !! 21 else p !! 22)
+  , Translate 210 (-200) $ Scale 0.6 0.6 $ Color (if sel==5 then red else black) $ drawWord p "Quit"
   ]
 
 
