@@ -2,7 +2,7 @@
 
 ## Overview
 
-This project was developed for the ** Laboratórios de Informática I** course.
+This project was developed for the **Laboratórios de Informática I** course.
 
 The project submission deadline was **December 31, 2025**.
 
