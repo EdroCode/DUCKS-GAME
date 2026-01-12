@@ -1,4 +1,4 @@
-# Laboratórios de Informática / Programação I
+# 🐤 Laboratórios de Informática I 🐤
 
 ## Overview
 
